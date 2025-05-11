@@ -119,7 +119,17 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
       const section = pathSegments[0]; // e.g. "lifestyle"
       const subsection = pathSegments.length > 1 ? pathSegments[1] : null; // e.g. "preferences"
       
-      // Special handling for Q4 and Q5 subsections
+      // Special handling for Q1, Q4 and Q5 subsections
+      if (subsection === 'preferences') {
+        // Look specifically for Q1 question in the subheadings
+        for (const subHeading of subHeadings) {
+          const q1Question = subHeading.questions.find(q => q.text.includes('Q1'));
+          if (q1Question) {
+            return q1Question.text;
+          }
+        }
+      }
+      
       if (subsection === 'satisfaction-now') {
         // Look specifically for Q4 question in the subheadings
         for (const subHeading of subHeadings) {
@@ -197,7 +207,13 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
     const newSelectedQuestion = event.target.value;
     setSelectedQuestion(newSelectedQuestion);
     
-    // Special handling for Q4 and Q5 questions which appear to be causing issues
+    // Special handling for Q1, Q4 and Q5 questions
+    if (newSelectedQuestion.includes('Q1')) {
+      // Directly navigate to the correct section/subsection for Q1
+      navigate('/lifestyle/preferences');
+      return;
+    }
+    
     if (newSelectedQuestion.includes('Q4')) {
       // Directly navigate to the correct section/subsection for Q4
       navigate('/lifestyle/satisfaction-now');
@@ -309,19 +325,12 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
 
   // Determine which visualization to render based on selected question
   const renderVisualization = () => {
-    if (!selectedQuestion) {
-      return (
-        <div className="visualization-placeholder">
-          <p>Please select a question from the dropdown above to view its visualization.</p>
-        </div>
-      );
-    }
-
-    // Using includes() instead of exact matching
-    if (selectedQuestion.includes('Q1')) {
+    // If no question is selected or if Q1 is selected, show Q1 visualization
+    if (!selectedQuestion || selectedQuestion.includes('Q1')) {
       return <Q1Visualization />;
     }
     
+    // For other specific questions
     if (selectedQuestion.includes('Q4')) {
       return <Q4Visualization />;
     }
