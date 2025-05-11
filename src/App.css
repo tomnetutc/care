@@ -61,6 +61,16 @@
   margin-top: 85px;
 }
 
+.simple-page-content {
+  padding-top: 60px; /* Adjust based on your navbar height */
+  min-height: calc(100vh - 60px);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
 @media (max-width: 768px) {
   .main-area {
     margin-left: 0;
