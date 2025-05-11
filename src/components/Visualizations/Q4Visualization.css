@@ -1,0 +1,238 @@
+/* Chart container and general structure */
+.q4-visualization-container {
+  width: 100%;
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.q4-visualization-container:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.q4-visualization-container h2 {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-weight: normal;
+  color: #333;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  max-width: 1000px;
+}
+
+.gauge-container {
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;  /* This centers the gauge */
+  padding: 10px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.gauge-container svg {
+  overflow: visible;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  max-width: 100%;
+  height: auto;
+}
+
+/* Gauge specific styles */
+.gauge-arc {
+  stroke: #e6e6e6;
+  stroke-width: 2px;
+}
+
+.gauge-value {
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  font-size: 42px;
+  letter-spacing: -0.5px;
+}
+
+.gauge-label {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  fill: #666;
+  font-weight: 400;
+}
+
+.tick-label {
+  font-size: 14px;
+  fill: #555;
+  font-weight: 500;
+  font-family: Arial, sans-serif;
+}
+
+.needle {
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+}
+
+.needle-cap {
+  fill: #4a4a4a;
+  stroke: #ffffff;
+  stroke-width: 1.5px;
+}
+
+/* Summary table styling - matched with Q1 */
+.summary-table-container {
+  margin-top: 40px;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.summary-table-container h3 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.summary-table th,
+.summary-table td {
+  padding: 8px 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.summary-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+.summary-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.summary-table td:first-child,
+.summary-table th:first-child {
+  text-align: left;
+  max-width: 300px;
+}
+
+.summary-table tr:hover {
+  background-color: #f0f0f0;
+}
+
+/* Loading and error states */
+.loading-container, 
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 50px;
+  color: #555;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error container */
+.error-container {
+  min-height: 400px;
+  padding: 20px;
+  border-left: 4px solid #e41a1c;
+  background-color: #fff8f8;
+  border-radius: 4px;
+}
+
+.error-container h3 {
+  color: #e41a1c;
+  margin-top: 0;
+}
+
+.error-container button {
+  background-color: #4daf4a;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+}
+
+.error-container button:hover {
+  background-color: #3d9c3a;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .q4-visualization-container {
+    padding: 10px 5px;
+  }
+  
+  .summary-table-container {
+    margin-top: 20px;
+  }
+  
+  .summary-table {
+    font-size: 0.8rem;
+  }
+  
+  .summary-table th,
+  .summary-table td {
+    padding: 6px 8px;
+  }
+}
+
+/* Active filters section (from Q1) */
+.active-filters {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border-left: 4px solid #007bff;
+}
+
+.active-filters h4 {
+  margin-top: 0;
+  font-size: 16px;
+  color: #495057;
+}
+
+.active-filters ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin-bottom: 8px;
+}
+
+.active-filters li {
+  margin-bottom: 4px;
+}
+
+.filtered-count {
+  font-style: italic;
+  margin-bottom: 0;
+  color: #6c757d;
+}

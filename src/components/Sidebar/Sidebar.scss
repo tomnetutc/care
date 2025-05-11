@@ -1,0 +1,153 @@
+.sidebar {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  width: 300px;
+  min-width: 300px;
+  height: calc(100vh - 100px);
+  background-color: white;
+  border-top: 2px solid #ccc;
+  border-right: 2px solid #ccc !important;
+  overflow-y: auto;
+  z-index: 100;
+  box-sizing: border-box;
+  padding: 20px;
+  padding-top: 13px;
+
+  .sidebar-nav {
+    .sections-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px; // Space between sections
+    }
+
+    .sidebar-section {
+      background-color: white; // White background for the entire section
+      border-radius: 8px; // Rounded corners
+      padding: 0; // Remove padding for the entire section
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Subtle shadow for depth
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 15px; // Increased padding for better spacing
+        background-color: #f8f9fa; // Light gray background for header
+        color: #333;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border-radius: 8px 8px 0 0; // Rounded corners for the top of the section
+        justify-content: space-between;
+
+        .section-icon {
+          color: #666;
+          width: 20px;
+          text-align: center;
+        }
+
+        .section-title {
+          font-size: 16px; // Slightly larger font size
+          font-weight: bold;
+          color: #333;
+          text-decoration: none;
+          flex: 1;
+        }
+
+        .section-toggle {
+          color: #666;
+          width: 20px;
+          text-align: center;
+          transition: transform 0.3s;
+        }
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.05); // Subtle hover effect
+        }
+
+        &.active {
+          background-color: rgba(0, 0, 0, 0.08); // Changed from blue to dark gray
+          border-radius: 8px 8px 0 0; // Match the rounded corners
+        }
+      }
+
+      .subheadings-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        padding-left: 28px; // Indentation for subheadings
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, margin 0.3s ease;
+        opacity: 0;
+        visibility: hidden;
+        background-color: #fafafa; // Lighter background for subsection area
+
+        &.expanded {
+          max-height: 500px; // Enough height to accommodate all items
+          margin-top: 8px;
+          margin-bottom: 8px;
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .subheading-item {
+          margin: 4px 0;
+
+          .subheading-link {
+            display: block;
+            padding: 6px 12px;
+            color: #888; // Lighter text color (was #666)
+            text-decoration: none;
+            font-size: 14px; // Smaller font size for subheadings
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-weight: 400; // Normal font weight for non-active items
+
+            &:hover {
+              background-color: rgba(0, 0, 0, 0.03); // Lighter hover effect (was 0.05)
+              color: #555; // Slightly darker on hover but still lighter than headers
+            }
+
+            &.active {
+              background-color: rgba(0, 0, 0, 0.05); // Lightened from 0.08 to 0.05
+              color: #444; // Darker than normal but still lighter than header
+              font-weight: 600; // Semi-bold instead of bold
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Ensure padding or margins from parent elements don't affect the width
+.content-wrapper {
+  display: flex;
+  min-height: 100vh;
+  padding-left: 300px;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-300px);
+    transition: transform 0.3s ease;
+
+    &.open {
+      transform: translateX(0);
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    position: fixed;
+    z-index: 1000;
+    height: 100vh;
+  }
+}

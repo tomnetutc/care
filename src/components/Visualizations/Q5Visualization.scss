@@ -1,0 +1,199 @@
+.q5-visualization {
+  width: 100%;
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  h2, h3 {
+    font-weight: normal;
+    color: #333;
+    margin-bottom: 30px;
+  }
+  
+  h2 {
+    font-size: 16px;
+    margin-top: 0;
+  }
+
+  h3 {
+    font-size: 14px;
+    color: #666;
+    margin: 25px 0 15px;
+    text-align: center;  /* Center align like Q1 and Q4 */
+  }
+
+  .chart-container {
+    position: relative;
+    margin: 25px 0 45px;
+    padding-left: 180px;
+    height: 220px;
+    width: 100%;  /* Ensure full width */
+    box-sizing: border-box;
+
+    .grid-lines {
+      position: absolute;
+      inset: 0 0 0 180px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 0;
+
+      .grid-line {
+        position: absolute;
+        width: 1px;
+        height: 100%;
+        background-color: #eee;
+      }
+    }
+  }
+
+  .bar-chart {
+    position: relative;
+    z-index: 1;
+    width: 100%;  /* Ensure full width */
+
+    .bar-row {
+      display: flex;
+      margin-bottom: 22px;
+      position: relative;
+      height: 30px;
+
+      .label {
+        width: 180px;
+        font-size: 14px;
+        position: absolute;
+        left: -180px;
+      }
+
+      .bar-container {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        height: 30px;
+
+        .bar {
+          height: 100%;
+          background-color: #e6b400;
+          transition: width 0.3s ease;
+        }
+
+        .value {
+          font-size: 14px;
+          min-width: 50px;
+          margin-left: 12px;
+        }
+      }
+    }
+  }
+
+  .summary-table {
+    margin-top: 50px;
+    width: 100%;
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Add shadow like Q1/Q4 */
+      border-radius: 5px;
+      overflow: hidden;
+      
+      th, td {
+        text-align: center;  /* Center align like Q1/Q4 */
+        padding: 10px;
+        font-size: 14px;
+        font-weight: normal;
+        border: 1px solid #ddd;  /* Match Q1/Q4 border style */
+      }
+
+      th {
+        color: #666;
+        background-color: #f5f5f5;
+        font-weight: 600;  /* Match Q1/Q4 header weight */
+      }
+
+      td {
+        border-bottom: 1px solid #eee;
+        background-color: #ffffff;
+      }
+
+      td:first-child {
+        text-align: left;  /* Left align first column like Q1/Q4 */
+        max-width: 300px;  /* Match Q1/Q4 first column width */
+      }
+
+      tr:nth-child(even) {
+        background-color: #f9f9f9;  /* Match Q1/Q4 zebra striping */
+      }
+
+      tr:hover {
+        background-color: #f0f0f0;  /* Match Q1/Q4 hover effect */
+      }
+
+      .total td {
+        border-top: 1px solid #ddd;
+        border-bottom: none;
+        background-color: #f5f5f5;
+        font-weight: 500;  /* Make total row slightly bolder */
+      }
+    }
+  }
+  
+  .loading-container, .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 350px;
+    padding: 30px;
+  }
+  
+  .loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #e6b400;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    animation: spin 2s linear infinite;
+    margin-bottom: 15px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .error-container {
+    border-left: 4px solid #e41a1c;
+    background-color: #fff8f8;
+    border-radius: 4px;
+    
+    h3 {
+      color: #e41a1c;
+      margin-top: 0;
+    }
+
+    button {
+      background-color: #e6b400;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 15px;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: #d1a300;
+      }
+    }
+  }
+}
