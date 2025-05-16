@@ -130,6 +130,33 @@
   padding-left: 300px;
 }
 
+.topics-list {
+  margin: 0 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.topic-label {
+  font-size: 0.95em;
+  color: #666;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin: 2px 0;
+  transition: background 0.2s, color 0.2s;
+  cursor: default;
+}
+
+.topic-label:hover {
+  background: #f0f0f0;
+  color: #222;
+}
+
+.topic-label.active {
+  background: #f0f0f0;
+  color: #222;
+  font-weight: 600;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-300px);

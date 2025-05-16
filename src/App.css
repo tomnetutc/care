@@ -31,8 +31,7 @@
 
 .main-area {
   flex: 1;
-  padding: 20px 20px;
-  background-color: white;
+  background-color: black;
   overflow-y: auto;
   position: relative;
 }

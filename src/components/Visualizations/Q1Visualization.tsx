@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import * as d3 from 'd3';
 import './Q1Visualization.css';
-import { useFilters, FilterOption } from '../../context/FilterContext';
+import { useFilters } from '../../context/FilterContext';
 
 interface DataItem {
   [key: string]: string | number;
@@ -35,7 +35,7 @@ const sanitizeForCssSelector = (text: string): string => {
     .toLowerCase();                  // Convert to lowercase for consistency
 };
 
-// Order of questions to match the reference image
+// Order of questions and labels remain the same as before
 const questionOrder = [
   "att_travel_satisfaction",
   "att_weather_concern",
@@ -71,7 +71,7 @@ const questionLabels: { [key: string]: string } = {
   att_public_social: "I enjoy the chance to meet people unexpectedly, interact with strangers, or make new acquaintances when I go out"
 };
 
-// Response categories and their colors (matching the reference image)
+// Response categories and their colors
 const responseCategories = [
   "Strongly disagree", 
   "Somewhat disagree", 
@@ -90,6 +90,7 @@ const categoryColors = [
 
 const Q1Visualization: React.FC = () => {
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const [data, setData] = useState<ProcessedDataItem[]>([]);
   const [summaryStats, setSummaryStats] = useState<SummaryStatistic[]>([]);
@@ -97,18 +98,18 @@ const Q1Visualization: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [totalResponses, setTotalResponses] = useState<number>(0);
   const [highlightedCategory, setHighlightedCategory] = useState<string | null>(null);
-  const [rawData, setRawData] = useState<any[]>([]);  // Store the original data
+  const [rawData, setRawData] = useState<any[]>([]);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   
   // Get filters from context
   const { filters } = useFilters();
 
+  // Load data on component mount
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const isGitHubPages = window.location.hostname.includes('github.io');
-        const basePath = isGitHubPages ? '/hard' : '';
-        const response = await fetch(`${basePath}/leaphi_final_data.csv`);
+        const response = await fetch('./hard/leaphi_final_data.csv');
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
@@ -132,14 +133,39 @@ const Q1Visualization: React.FC = () => {
     loadData();
   }, []);
 
-  // Add a new effect to reprocess data when filters change
+  // Reprocess data when filters change
   useEffect(() => {
     if (rawData.length > 0) {
       processData(rawData);
     }
   }, [filters, rawData]);
 
-  // New function to process data with filters applied
+  // Update dimensions on resize
+  useLayoutEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.clientWidth;
+        const containerHeight = Math.max(600, data.length * 40);
+        setDimensions({
+          width: containerWidth,
+          height: containerHeight
+        });
+      }
+    };
+
+    // Set initial dimensions
+    updateDimensions();
+    
+    // Add resize listener
+    window.addEventListener('resize', updateDimensions);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+    };
+  }, [data.length]);
+
+  // Process data with filters applied
   const processData = (parsedData: any[]) => {
     // Apply filters
     let filteredData = parsedData;
@@ -186,7 +212,7 @@ const Q1Visualization: React.FC = () => {
       };
     });
 
-    // Calculate summary statistics for each question
+    // Calculate summary statistics
     const calculatedStats: SummaryStatistic[] = questionOrder.map(column => {
       const values: number[] = [];
       let validResponses = 0;
@@ -199,7 +225,7 @@ const Q1Visualization: React.FC = () => {
         }
       });
       
-      // Calculate statistics (with safety checks for empty arrays)
+      // Calculate statistics with safety checks for empty arrays
       const min = values.length > 0 ? Math.min(...values) : 0;
       const max = values.length > 0 ? Math.max(...values) : 0;
       const mean = validResponses > 0 ? values.reduce((sum, val) => sum + val, 0) / validResponses : 0;
@@ -222,8 +248,9 @@ const Q1Visualization: React.FC = () => {
     setIsLoading(false);
   };
   
+  // Create and update visualization
   useEffect(() => {
-    if (data.length === 0 || !svgRef.current) return;
+    if (data.length === 0 || !svgRef.current || dimensions.width === 0) return;
 
     // Create tooltip div if it doesn't exist
     if (!tooltipRef.current) {
@@ -236,17 +263,29 @@ const Q1Visualization: React.FC = () => {
     // Clear any existing visualization
     d3.select(svgRef.current).selectAll('*').remove();
 
-    // Set up dimensions
-    const margin = { top: 100, right: 10, bottom: 50, left: 280 }; // Increased right margin from 40 to 80
-    const width = 1000 - margin.left - margin.right;
-    const height = Math.max(600, data.length * 40) - margin.top - margin.bottom;
+    // Calculate responsive dimensions with proper text/chart ratio
+    const textWidth = dimensions.width * 0.30; // Always use 33% for text
+    const chartWidth = dimensions.width * 0.70; // Always use 67% for chart
+    
+    // Set up margins with the proper ratio
+    const margin = { 
+      top: Math.min(80, dimensions.width * 0.06),
+      right: 10, // Fixed small right margin
+      bottom: Math.min(50, dimensions.width * 0.05),
+      left: textWidth
+    };
 
-    // Create responsive SVG
+    // Calculate width to maintain the ratio
+    const width = chartWidth - margin.right; // Subtract right margin
+    const barHeightMultiplier = dimensions.width > 768 ? 40 : 30;
+    const height = Math.max(500, data.length * barHeightMultiplier) - margin.top - margin.bottom;
+
+    // Create responsive SVG with better viewBox settings
     const svg = d3.select(svgRef.current)
-      .attr('width', '100%')
+      .attr('width', '100%') 
       .attr('height', height + margin.top + margin.bottom)
-      .attr('viewBox', `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-      .attr('preserveAspectRatio', 'xMidYMid meet')
+      .attr('viewBox', `0 0 ${dimensions.width} ${height + margin.top + margin.bottom}`)
+      .attr('preserveAspectRatio', 'xMinYMid meet') // Changed from xMidYMid to xMinYMid
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
@@ -257,15 +296,15 @@ const Q1Visualization: React.FC = () => {
     svg.append('rect')
       .attr('x', -margin.left)
       .attr('y', -margin.top)
-      .attr('width', width + margin.left + margin.right)
+      .attr('width', dimensions.width)
       .attr('height', margin.top)
       .attr('fill', 'url(#titleBackground)');
 
-    // Create scales
+    // Create scales - increase padding between bars for better separation
     const y = d3.scaleBand()
       .domain(data.map(d => d.question))
       .range([0, height])
-      .padding(0.3);
+      .padding(0.1); // Increase padding between bars (was 0.3)
       
     const x = d3.scaleLinear()
       .domain([0, 100])
@@ -276,7 +315,7 @@ const Q1Visualization: React.FC = () => {
       .domain(responseCategories)
       .range(categoryColors);
 
-    // Add styled legend
+    // Add styled legend with responsive positioning
     addLegend(svg, width, color, setHighlightedCategory);
 
     // Stack the data
@@ -295,7 +334,7 @@ const Q1Visualization: React.FC = () => {
         tooltipRef.current = null;
       }
     };
-  }, [data, highlightedCategory, totalResponses]);
+  }, [data, highlightedCategory, totalResponses, dimensions]);
 
   // Helper functions for D3 visualization components
   function createBackgroundGradient(svg: d3.Selection<SVGGElement, unknown, null, undefined>) {
@@ -319,13 +358,13 @@ const Q1Visualization: React.FC = () => {
       .attr('class', 'legend-group')
       .attr('transform', 'translate(0, -15)');
     
-    // Define custom positions for each legend item
+    // Define responsive positions for each legend item
     const positions = [
-      0,                // Strongly disagree
-      width * 0.2 + 8,      // Somewhat disagree
-      width * 0.4 + 30, // Neutral - add extra 10px space
-      width * 0.6 + 2, // Somewhat agree - shifted right to accommodate Neutral
-      width * 0.8 + 10  // Strongly agree - shifted right to accommodate Neutral
+      0,                  // Strongly disagree
+      width * 0.2,        // Somewhat disagree
+      width * 0.4 + (width * 0.02), // Neutral - add small spacing
+      width * 0.6 + (width * 0.01), // Somewhat agree - shifted right to accommodate Neutral
+      width * 0.8        // Strongly agree - shifted right to accommodate Neutral
     ];
     
     responseCategories.forEach((category, i) => {
@@ -384,7 +423,7 @@ const Q1Visualization: React.FC = () => {
       .attr('class', 'y-axis axis')
       .call(d3.axisLeft(y).tickSize(0).tickPadding(10))
       .call(g => g.selectAll(".domain").remove())
-      .call(wrap, margin.left - 20);
+      .call(wrap, margin.left * 0.9); // Use 90% of the text area width
 
     // X axis
     svg.append('g')
@@ -424,18 +463,20 @@ const Q1Visualization: React.FC = () => {
       color: d3.ScaleOrdinal<string, unknown>,
       tooltipRef: React.MutableRefObject<HTMLDivElement | null>
     ) {
+    // Calculate fixed bar height to ensure consistency
+    const barHeight = y.bandwidth();
+    
     stackedData.forEach(questionData => {
       const group = svg.append('g')
         .attr('class', `question-group-${questionData.questionId}`);
         
       questionData.segments.forEach(segment => {
-        // Calculate bar dimensions
-        const barHeight = y.bandwidth();
+        // Use the precalculated fixed bar height
         const barY = y(segment.question) || 0;
         const barX = x(segment.start);
         const barWidth = x(segment.end) - x(segment.start);
         
-        // Add bar
+        // Add bar with consistent height
         group.append('rect')
           .attr('class', `bar bar-${sanitizeForCssSelector(segment.category)}`)
           .attr('y', barY)
@@ -446,12 +487,9 @@ const Q1Visualization: React.FC = () => {
           .on('mouseenter', function(event) {
             if (tooltipRef.current) {
               const tooltipContent = `
-                <div class="tooltip-title">${segment.question}</div>
-                <hr style="margin:5px 0">
-                <div class="tooltip-content" style="color:${color(segment.category)}">
-                  <strong>${segment.category}:</strong> ${segment.value.toFixed(1)}%
-                </div>
-                <div class="tooltip-count">(${segment.count} respondents)</div>
+                <div class="tooltip-title">${segment.category}</div>
+                ${segment.value.toFixed(1)}%
+                <div class="tooltip-count">Responses: ${segment.count.toLocaleString()}</div>
               `;
               
               d3.select(tooltipRef.current)
@@ -498,7 +536,7 @@ const Q1Visualization: React.FC = () => {
     });
   }
 
-  // Helper function to wrap text with consistent first-label width
+  // Helper function to wrap text with responsive width
   function wrap(selection: d3.Selection<SVGGElement, unknown, null, undefined>, width: number) {
     // Create tooltip container once for performance
     let tooltip: d3.Selection<HTMLDivElement, unknown, HTMLElement, any> = d3.select('body').select('.y-axis-tooltip') as d3.Selection<HTMLDivElement, unknown, HTMLElement, any>;
@@ -510,17 +548,8 @@ const Q1Visualization: React.FC = () => {
     }
 
     // First pass: measure the width of the first text element
-    let firstLabelWidth = 0;
-    selection.select('text').each(function() {
-      const node = this as SVGTextElement;
-      // Store original text
-      const originalText = d3.select(node).text();
-      firstLabelWidth = node.getComputedTextLength();
-    });
-
-    // Add some padding to the width
-    firstLabelWidth = Math.max(firstLabelWidth, 120); // Reduced from 150 to 120
-
+    let textAreaWidth = width * 0.9; // Use 90% of the available width for text
+    
     // Second pass: truncate text if needed and add hover behavior
     selection.selectAll('text').each(function() {
       const text = d3.select(this);
@@ -531,13 +560,13 @@ const Q1Visualization: React.FC = () => {
       text.attr('data-full-text', originalText);
 
       // Check if text needs truncation
-      if (node.getComputedTextLength() > firstLabelWidth) {
+      if (node.getComputedTextLength() > textAreaWidth) {
         // Truncate text
         let displayText = originalText;
         while (displayText.length > 3) {
           displayText = displayText.slice(0, -1);
           text.text(displayText + '...');
-          if ((this as SVGTextElement).getComputedTextLength() <= firstLabelWidth) {
+          if ((this as SVGTextElement).getComputedTextLength() <= textAreaWidth) {
             break;
           }
         }
@@ -565,7 +594,7 @@ const Q1Visualization: React.FC = () => {
     });
   }
 
-  // Add this function for rendering the summary table
+  // Render summary table
   const renderSummaryTable = () => {
     return (
       <div className="summary-table-container">
@@ -620,8 +649,22 @@ const Q1Visualization: React.FC = () => {
   }
 
   return (
-    <div className="q1-visualization-container">
-      <h2>Question 1 - First, we want to learn about your lifestyle preferences. Please rate your agreement with the following statements.</h2>
+    <div className="q1-visualization-container" ref={containerRef}>
+      <h2><strong>First, we want to learn about your lifestyle preferences. Please rate your agreement with the following statements.</strong></h2>
+      
+      {/* Active filters display */}
+      {filters.length > 0 && (
+        <div className="active-filters">
+          <h4>Active Filters:</h4>
+          <ul>
+            {filters.map((filter, index) => (
+              <li key={index}><strong>{filter.field}:</strong> {filter.value}</li>
+            ))}
+          </ul>
+          <p className="filtered-count">Showing data from {totalResponses} responses</p>
+        </div>
+      )}
+      
       <svg ref={svgRef}></svg>
       {renderSummaryTable()}
     </div>

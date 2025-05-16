@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
-import './Q5Visualization.scss';
+import './Q6Visualization.scss';
 import { useFilters } from '../../context/FilterContext';
 
 interface DataItem {
-  life_satisfaction_duringcovid: string;
+  social_connect_strength: string;
   count: number;
   percentage: number;
 }
@@ -16,9 +16,9 @@ interface TooltipState {
   data: DataItem | null;
 }
 
-const Q5Visualization: React.FC = () => {
+const Q6Visualization: React.FC = () => {
   const [data, setData] = useState<DataItem[]>([]);
-  const [rawData, setRawData] = useState<any[]>([]);
+  const [rawData, setRawData] = useState<any[]>([]);  // Store raw data for filtering
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalResponses, setTotalResponses] = useState(0);
@@ -85,78 +85,40 @@ const Q5Visualization: React.FC = () => {
           });
         });
       }
-      
-      // Define the category order we want to display
-      const categoryOrder = [
-        "Much better now",
-        "Somewhat better now",
-        "About the same",
-        "Somewhat worse now",
-        "Much worse now"
-      ];
 
-      // Map numeric values to text descriptions
-      const valueMap: {[key: string]: string} = {
-        "1": "Much better now",
-        "2": "Somewhat better now",
-        "3": "About the same", 
-        "4": "Somewhat worse now",
-        "5": "Much worse now"
+      // Define the category order and corresponding labels
+      const categoryOrder = ["1", "2", "3", "4", "5"];
+      const categoryLabels: {[key: string]: string} = {
+        "1": "Very strong",
+        "2": "Somewhat strong",
+        "3": "Neither strong nor weak", 
+        "4": "Somewhat weak",
+        "5": "Very weak"
       };
 
-      // Initialize satisfaction groups with zeros
-      const satisfactionGroups: Record<string, number> = {};
+      // Initialize connection strength groups with zeros
+      const strengthGroups: Record<string, number> = {};
       for (const category of categoryOrder) {
-        satisfactionGroups[category] = 0;
+        strengthGroups[category] = 0;
       }
 
       // Process the filtered CSV data
       let validResponses = 0;
       
       filteredData.forEach((d: any) => {
-        const rawValue = d.life_satisfaction_duringcovid;
+        const rawValue = d.social_connect_strength;
         
-        // Try multiple ways to get the correct satisfaction group
-        let group: string | undefined;
-        
-        // First check if it's already a text value that matches our categories
-        if (categoryOrder.includes(rawValue)) {
-          group = rawValue;
-        } 
-        // Then check if it's a numeric value that needs mapping
-        else if (valueMap[rawValue]) {
-          group = valueMap[rawValue];
-        } 
-        // Finally check if it's another column with a different name
-        else {
-          // Try alternate column names that might contain the data
-          const possibleFields = [
-            'life_satisfaction_during_pandemic', 
-            'life_satisfaction',
-            'life_satisfaction_now_group',
-            'q5_response',
-            'satisfaction_comparison'
-          ];
-          
-          for (const field of possibleFields) {
-            if (d[field] && (categoryOrder.includes(d[field]) || valueMap[d[field]])) {
-              group = categoryOrder.includes(d[field]) ? d[field] : valueMap[d[field]];
-              break;
-            }
-          }
-        }
-        
-        if (group && satisfactionGroups.hasOwnProperty(group)) {
-          satisfactionGroups[group]++;
+        if (rawValue && categoryOrder.includes(rawValue)) {
+          strengthGroups[rawValue]++;
           validResponses++;
         }
       });
       
       // Convert counts to array of objects with percentages
       const processedData: DataItem[] = categoryOrder.map(category => {
-        const count = satisfactionGroups[category] || 0;
+        const count = strengthGroups[category] || 0;
         return {
-          life_satisfaction_duringcovid: category,
+          social_connect_strength: categoryLabels[category],
           count,
           percentage: validResponses > 0 ? (count / validResponses) * 100 : 0
         };
@@ -188,7 +150,7 @@ const Q5Visualization: React.FC = () => {
         <div className="bar-chart">
           {data.map((item, index) => (
             <div className="bar-row" key={index}>
-              <div className="label">{item.life_satisfaction_duringcovid}</div>
+              <div className="label">{item.social_connect_strength}</div>
               <div className="bar-container">
                 <div 
                   className="bar" 
@@ -246,11 +208,40 @@ const Q5Visualization: React.FC = () => {
     };
 
     return (
-      <div className="q5-tooltip" style={tooltipStyle}>
-        <div className="tooltip-title">{tooltip.data.life_satisfaction_duringcovid}</div>
+      <div className="q6-tooltip" style={tooltipStyle}>
+        <div className="tooltip-title">{tooltip.data.social_connect_strength}</div>
         <div className="tooltip-content">
-          <div>Responses: {tooltip.data.count.toLocaleString()}</div>
+          <div>Count: {tooltip.data.count.toLocaleString()}</div>
         </div>
+      </div>
+    );
+  };
+
+  // Function to render the summary table
+  const renderSummaryTable = () => {
+    return (
+      <div className="summary-table">
+        <h3>Summary table</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Responses</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, index) => (
+              <tr key={index}>
+                <td style={{ textAlign: 'center' }}>{item.social_connect_strength}</td>
+                <td>{item.count.toLocaleString()}</td>
+              </tr>
+            ))}
+            <tr className="total">
+              <td style={{ textAlign: 'center' }}>Total</td>
+              <td>{totalResponses.toLocaleString()}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     );
   };
@@ -275,13 +266,14 @@ const Q5Visualization: React.FC = () => {
   }
 
   return (
-    <div className="q5-visualization" ref={containerRef}>
-      <h2><strong>How would you compare your current satisfaction with your life to your satisfaction with life </strong><strong>during the pandemic</strong><strong>?</strong></h2>
+    <div className="q6-visualization" ref={containerRef}>
+      <h2><strong>How would you rate your current satisfaction with the following aspects of your life?</strong></h2>
       
       {renderBarChart()}
       {renderTooltip()}
+      {renderSummaryTable()}
     </div>
   );
 };
 
-export default Q5Visualization;
+export default Q6Visualization;

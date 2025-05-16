@@ -1,4 +1,4 @@
-import React, { useState, useEffect, JSX } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -21,6 +21,7 @@ import './Sidebar.scss';
 interface SubHeading {
   name: string;
   path: string;
+  topics?: string[]; // Add this line
 }
 
 /**
@@ -36,7 +37,13 @@ interface Section {
 /**
  * Sidebar component that displays navigation for the dashboard
  */
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  selectedQuestion?: string | null;
+  activeSubheading?: string | null;
+  onTopicClick?: (questionText: string, subheadingSlug?: string) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, onTopicClick }) => {
   const location = useLocation();
   const [expandedSection, setExpandedSection] = useState<number | null>(null);
   
@@ -46,9 +53,24 @@ const Sidebar: React.FC = () => {
       title: 'Lifestyle & Wellbeing',
       path: '/lifestyle',
       subheadings: [
-        { name: 'Personal Preferences', path: '/lifestyle/preferences' },
-        { name: 'Life Satisfaction', path: '/lifestyle/satisfaction' },
-        { name: 'Social & Health Status', path: '/lifestyle/health' },
+        { 
+          name: 'Personal Preferences', 
+          path: '/lifestyle/preferences',
+          topics: ['Q1 – Lifestyle preferences'] // Add topic label(s)
+        },
+        { 
+          name: 'Life Satisfaction', 
+          path: '/lifestyle/satisfaction',
+          topics: [
+            'Q4 – Life satisfaction rating',
+            'Q5 – Life satisfaction compared to during the pandemic'
+          ]
+        },
+        { 
+          name: 'Social & Health Status', 
+          path: '/lifestyle/health',
+          topics: ['Q6 – Social connections strength']
+        },
       ],
       icon: <FontAwesomeIcon icon={faHeart} />,
     },
@@ -127,12 +149,12 @@ const Sidebar: React.FC = () => {
     },
   ];
 
-  // Find the active section based on current path
+  // Auto-expand section based on URL
   useEffect(() => {
     const currentPath = location.pathname;
     const sectionIndex = sections.findIndex(section => 
       currentPath.startsWith(section.path) || 
-      section.subheadings.some(sub => currentPath === sub.path)
+      section.subheadings.some(sub => currentPath.includes(sub.path))
     );
     
     if (sectionIndex !== -1) {
@@ -144,9 +166,33 @@ const Sidebar: React.FC = () => {
     setExpandedSection(expandedSection === index ? null : index);
   };
   
-  const isSubheadingActive = (path: string) => {
-    return location.pathname === path;
+  // Modified isSubheadingActive function to remove all subheading highlighting
+  const isSubheadingActive = (subheading: SubHeading): boolean => {
+    // Always return false to disable all subheading highlighting
+    return false;
   };
+  
+  // Keep the topic highlighting logic as is - it's working correctly
+  const isTopicActive = (topic: string): boolean => {
+    if (!selectedQuestion) return false;
+    
+    // Exact match
+    if (selectedQuestion === topic) {
+      return true;
+    }
+    
+    // Check for question number match (more precise)
+    const topicNumber = topic.split('–')[0].trim(); // e.g., "Q6"
+    const selectedNumber = selectedQuestion.split('–')[0].trim();
+    
+    return topicNumber === selectedNumber;
+  };
+
+  // Debug logging
+  useEffect(() => {
+    console.log("Current selected question:", selectedQuestion);
+    console.log("Current active subheading:", activeSubheading);
+  }, [selectedQuestion, activeSubheading]);
 
   return (
     <aside className="sidebar">
@@ -173,16 +219,42 @@ const Sidebar: React.FC = () => {
                 </span>
               </div>
               <ul className={`subheadings-list ${expandedSection === index ? 'expanded' : ''}`}>
-                {section.subheadings.map((subheading, subIndex) => (
-                  <li key={subIndex} className="subheading-item">
-                    <Link 
-                      to={subheading.path} 
-                      className={`subheading-link ${isSubheadingActive(subheading.path) ? 'active' : ''}`}
-                    >
-                      {subheading.name}
-                    </Link>
-                  </li>
-                ))}
+                {section.subheadings.map((subheading, subIndex) => {
+                  const subheadingActive = isSubheadingActive(subheading);
+                  const subheadingSlug = subheading.path.split('/').pop() || '';
+                  
+                  return (
+                    <li key={subIndex} className="subheading-item">
+                      <Link 
+                        to={subheading.path} 
+                        className={`subheading-link ${subheadingActive ? 'active' : ''}`}
+                      >
+                        {subheading.name}
+                      </Link>
+                      {subheading.topics && (
+                        <ul className="topics-list">
+                          {subheading.topics.map((topic, topicIdx) => {
+                            const isActive = isTopicActive(topic);
+                            
+                            return (
+                              <li
+                                key={topicIdx}
+                                className={`topic-label ${isActive ? 'active' : ''}`}
+                                onClick={() => {
+                                  console.log(`Clicking topic: ${topic} in subheading: ${subheadingSlug}`);
+                                  onTopicClick && onTopicClick(topic, subheadingSlug);
+                                }}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                {topic}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </li>
           ))}

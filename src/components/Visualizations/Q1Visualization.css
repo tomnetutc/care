@@ -16,38 +16,41 @@
 
 .q1-visualization-container svg {
   max-width: 100%;
+  width: 100%; /* Force full width */
   height: auto;
+  display: block; /* Prevents unwanted spacing */
+  overflow: visible; /* Allow content to extend if needed */
 }
 
 .q1-visualization-container h2 {
   font-size: 16px;
   margin-top: 0;
-  margin-bottom: 1px;
+  margin-bottom: 10px;
   font-weight: normal;
-  color: #333;
+  color: #000000;
   font-family: Arial, sans-serif;
 }
 
 /* Header and title styling */
 .chart-title {
-  font-size: 18px;
+  font-size: 1.1rem;
   font-weight: bold;
   font-family: Arial, sans-serif;
 }
 
 .chart-subtitle {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: bold;
   font-family: Arial, sans-serif;
 }
 
 .chart-label {
-  font-size: 14px;
+  font-size: 0.9rem;
   font-family: Arial, sans-serif;
 }
 
 .response-count {
-  font-size: 12px;
+  font-size: 0.8rem;
   font-style: italic;
   fill: #666;
 }
@@ -68,7 +71,8 @@
 
 /* Y-axis text styling */
 .y-axis text {
-  font-weight: bold;
+  font-weight: normal; /* Changed from bold to normal */
+  font-size: 0.85rem;
 }
 
 /* Y-axis tooltip styling for hover effect */
@@ -80,8 +84,8 @@
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   font-family: Arial, sans-serif;
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 12px;
+  font-weight: normal; /* Changed from bold to normal */
   max-width: 300px;
   white-space: normal;
   pointer-events: none;
@@ -120,6 +124,9 @@
   stroke: #fff;
   stroke-width: 0.5;
   transition: opacity 0.3s ease;
+  shape-rendering: crispEdges; /* Ensure crisp edges */
+  /* Add this to fix rendering inconsistencies */
+  vector-effect: non-scaling-stroke;
 }
 
 .bar:hover {
@@ -139,8 +146,8 @@
 /* Tooltip styling */
 .q1-tooltip {
   position: absolute;
-  text-align: center;
-  padding: 8px;
+  text-align: left;
+  padding: 6px 10px;
   font-size: 12px;
   background: white;
   border-radius: 4px;
@@ -151,21 +158,19 @@
   background-color: rgba(255, 255, 255, 0.95) !important;
   border: 1px solid #ddd !important;
   box-shadow: 0 3px 14px rgba(0, 0, 0, 0.15) !important;
-  max-width: 240px !important;
+  max-width: 200px !important;
   transition: opacity 0.2s ease !important;
 }
 
 .tooltip-title {
   font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.tooltip-content {
-  margin-top: 5px;
+  margin-bottom: 2px;
 }
 
 .tooltip-count {
   font-size: 11px;
+  color: #666;
+  margin-top: 2px;
 }
 
 /* Loading and error states */
@@ -240,21 +245,6 @@
   font-family: Arial, sans-serif;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .q1-visualization-container {
-    padding: 10px 5px;
-  }
-  
-  .chart-title {
-    font-size: 14px !important;
-  }
-  
-  .chart-subtitle {
-    font-size: 13px !important;
-  }
-}
-
 /* Summary table styling */
 .summary-table-container {
   margin-top: 40px;
@@ -301,21 +291,6 @@
   background-color: #f0f0f0;
 }
 
-@media screen and (max-width: 768px) {
-  .summary-table-container {
-    margin-top: 20px;
-  }
-  
-  .summary-table {
-    font-size: 0.8rem;
-  }
-  
-  .summary-table th,
-  .summary-table td {
-    padding: 6px 8px;
-  }
-}
-
 .active-filters {
   background-color: #f8f9fa;
   border-radius: 4px;
@@ -344,4 +319,125 @@
   font-style: italic;
   margin-bottom: 0;
   color: #6c757d;
+}
+
+/* Responsive design - new additions */
+/* Large screens */
+@media (min-width: 1200px) {
+  .q1-visualization-container {
+    padding: 20px;
+  }
+  
+  .bar-label {
+    font-size: 12px;
+  }
+}
+
+/* Medium screens */
+@media (max-width: 992px) {
+  .legend-item text {
+    font-size: 11px;
+  }
+  
+  .y-axis text {
+    font-size: 11px;
+  }
+  
+  .summary-table {
+    font-size: 0.85rem;
+  }
+}
+
+/* Small screens */
+@media (max-width: 768px) {
+  .q1-visualization-container {
+    padding: 10px 5px;
+  }
+  
+  .q1-visualization-container h2 {
+    font-size: 14px;
+  }
+  
+  .legend-item text {
+    font-size: 10px;
+  }
+  
+  .bar-label {
+    font-size: 9px;
+  }
+  
+  .summary-table th,
+  .summary-table td {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+  
+  .chart-title {
+    font-size: 0.9rem;
+  }
+  
+  .chart-subtitle {
+    font-size: 0.85rem;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 576px) {
+  .q1-visualization-container {
+    padding: 8px 4px;
+  }
+  
+  .q1-visualization-container h2 {
+    font-size: 13px;
+  }
+  
+  .legend-item text {
+    font-size: 9px;
+  }
+  
+  .y-axis text {
+    font-size: 10px;
+  }
+  
+  .summary-table th,
+  .summary-table td {
+    padding: 4px;
+    font-size: 0.7rem;
+  }
+  
+  .active-filters h4 {
+    font-size: 14px;
+  }
+  
+  .active-filters li {
+    font-size: 12px;
+  }
+}
+
+/* Print media query for better printing */
+@media print {
+  .q1-visualization-container {
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+  
+  .summary-table-container {
+    page-break-inside: avoid;
+  }
+}
+
+/* Add these rules to ensure consistent bar heights */
+.bar {
+  stroke: #fff;
+  stroke-width: 0.5;
+  transition: opacity 0.3s ease;
+  shape-rendering: crispEdges; /* Ensure crisp edges */
+  /* Add this to fix rendering inconsistencies */
+  vector-effect: non-scaling-stroke;
+}
+
+/* Ensure all question groups have consistent spacing */
+[class^="question-group-"] {
+  pointer-events: visible;
+  shape-rendering: geometricPrecision;
 }

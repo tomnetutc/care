@@ -26,9 +26,7 @@ const Q4Visualization: React.FC = () => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const isGitHubPages = window.location.hostname.includes('github.io');
-        const basePath = isGitHubPages ? '/hard' : '';
-        const response = await fetch(`${basePath}/leaphi_final_data.csv`);
+        const response = await fetch('./hard/leaphi_final_data.csv');
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
@@ -358,7 +356,7 @@ const Q4Visualization: React.FC = () => {
 
   return (
     <div className="q4-visualization-container">
-      <h2>Question 4 - Thinking about your life as a whole, how satisfied are you? Please rate from 0 to 10, where 0 = not satisfied at all, and 10 = very satisfied.</h2>
+      <h2><strong>Thinking about your life as a whole, how satisfied are you? Please rate from 0 to 10, where 0 = not satisfied at all, and 10 = very satisfied.</strong></h2>
       <div className="gauge-container">
         <svg ref={svgRef}></svg>
       </div>

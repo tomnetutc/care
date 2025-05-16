@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Q1Visualization, Q4Visualization, Q5Visualization } from '../Visualizations';
+import { Q1Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization } from '../Visualizations';
 import './MainContent.scss';
+import Sidebar from '../Sidebar/Sidebar';
 
 // Type definitions
 interface Question {
@@ -54,13 +55,14 @@ const SLUG_TO_NAME_MAP: Record<string, string> = {
 // Default questions for each section/subsection
 const DEFAULT_QUESTIONS: Record<string, string> = {
   // Lifestyle section
-  'preferences': 'Q1 – Lifestyle preferences',
-  'satisfaction': 'Q5 – Life satisfaction compared to during the pandemic',
+  'preferences': 'Lifestyle preferences',
+  'satisfaction': 'Q4 – Life satisfaction rating', // <-- Change this line to Q4
   'satisfaction-now': 'Q4 – Life satisfaction rating',
   'satisfaction-pandemic': 'Q5 – Life satisfaction compared to during the pandemic',
+  'health': 'Q6 – Social connections strength', // Add this line for Q6
   
   // Community section
-  'health': 'Q10 – Self-rated health status',
+  //'health': 'Q10 – Self-rated health status',
   'awareness': 'Q12 – Community awareness rating',
   'improvement': 'Q15 – Suggestions for community improvement',
   
@@ -109,271 +111,172 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
-
+  const [activeSubheading, setActiveSubheading] = useState<string | null>(null);
+  const [refsReady, setRefsReady] = useState(false);
+  const visualizationRefs = useRef<(HTMLDivElement | null)[]>([]);
+  
+  // Initialize refs array when subHeadings change
   useEffect(() => {
-    // This function finds a default question based on URL
-    const selectDefaultQuestion = () => {
-      const pathSegments = location.pathname.split('/').filter(s => s);
+    const totalQuestions = subHeadings.reduce(
+      (total, subHeading) => total + subHeading.questions.length, 
+      0
+    );
+    visualizationRefs.current = Array(totalQuestions).fill(null);
+    setRefsReady(true);
+  }, [subHeadings]);
+  
+  // Set active subheading based on URL
+  useEffect(() => {
+    const pathParts = location.pathname.split('/');
+    const currentSlug = pathParts[pathParts.length - 1];
+    
+    if (currentSlug && SLUG_TO_NAME_MAP[currentSlug]) {
+      setActiveSubheading(currentSlug);
       
-      // Check if we're on a specific subsection
-      const section = pathSegments[0]; // e.g. "lifestyle"
-      const subsection = pathSegments.length > 1 ? pathSegments[1] : null; // e.g. "preferences"
-      
-      // Special handling for Q1, Q4 and Q5 subsections
-      if (subsection === 'preferences') {
-        // Look specifically for Q1 question in the subheadings
-        for (const subHeading of subHeadings) {
-          const q1Question = subHeading.questions.find(q => q.text.includes('Q1'));
-          if (q1Question) {
-            return q1Question.text;
-          }
-        }
+      // Set default question for this section
+      if (DEFAULT_QUESTIONS[currentSlug]) {
+        setSelectedQuestion(DEFAULT_QUESTIONS[currentSlug]);
       }
-      
-      if (subsection === 'satisfaction-now') {
-        // Look specifically for Q4 question in the subheadings
-        for (const subHeading of subHeadings) {
-          const q4Question = subHeading.questions.find(q => q.text.includes('Q4'));
-          if (q4Question) {
-            return q4Question.text;
-          }
-        }
+    }
+  }, [location.pathname]);
+
+  // Handle scroll position changes to update active question
+  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+    let maxVisibility = 0;
+    let mostVisibleQuestion = null;
+    
+    entries.forEach((entry) => {
+      if (entry.isIntersecting && entry.intersectionRatio > maxVisibility) {
+        maxVisibility = entry.intersectionRatio;
+        mostVisibleQuestion = entry.target.getAttribute('data-question');
       }
-      
-      if (subsection === 'satisfaction-pandemic') {
-        // Look specifically for Q5 question in the subheadings
-        for (const subHeading of subHeadings) {
-          const q5Question = subHeading.questions.find(q => q.text.includes('Q5'));
-          if (q5Question) {
-            return q5Question.text;
-          }
-        }
-      }
-      
-      // If we have a subsection with a defined default question
-      if (subsection && DEFAULT_QUESTIONS[subsection]) {
-        const defaultQuestionText = DEFAULT_QUESTIONS[subsection];
-        
-        // Find the matching question in all subheadings
-        for (const subHeading of subHeadings) {
-          const matchingQuestion = subHeading.questions.find(q => 
-            q.text.includes(defaultQuestionText)
-          );
-          
-          if (matchingQuestion) {
-            return matchingQuestion.text;
-          }
-        }
-      }
-      
-      // If we're on a main section but no subsection is specified
-      // Use the default subsection for this main section
-      if (section && MAIN_SECTION_DEFAULTS[section] && !subsection) {
-        const defaultSubsection = MAIN_SECTION_DEFAULTS[section];
-        if (DEFAULT_QUESTIONS[defaultSubsection]) {
-          const defaultQuestionText = DEFAULT_QUESTIONS[defaultSubsection];
-          
-          // Find the matching question
-          for (const subHeading of subHeadings) {
-            const matchingQuestion = subHeading.questions.find(q => 
-              q.text.includes(defaultQuestionText)
-            );
-            
-            if (matchingQuestion) {
-              return matchingQuestion.text;
-            }
-          }
-        }
-      }
-      
-      return null; // No default question found
+    });
+    
+    if (mostVisibleQuestion && mostVisibleQuestion !== selectedQuestion) {
+      console.log("Changing active question to:", mostVisibleQuestion);
+      setSelectedQuestion(mostVisibleQuestion);
+    }
+  }, [selectedQuestion]);
+  
+  // Setup intersection observer after refs are ready
+  useEffect(() => {
+    if (!refsReady) return;
+    
+    const observer = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: '-80px 0px -300px 0px', // Adjust these values as needed
+      threshold: [0.1, 0.2, 0.3, 0.4, 0.5] // Multiple thresholds for better accuracy
+    });
+    
+    visualizationRefs.current.forEach(ref => {
+      if (ref) observer.observe(ref);
+    });
+    
+    return () => {
+      visualizationRefs.current.forEach(ref => {
+        if (ref) observer.unobserve(ref);
+      });
+      observer.disconnect();
     };
-    
-    const defaultQuestion = selectDefaultQuestion();
-    setSelectedQuestion(defaultQuestion);
-  }, [location.pathname, subHeadings]);
+  }, [handleIntersection, refsReady]);
 
-  // Extract the sub-heading slug from the URL path
-  const pathSegments = location.pathname.split('/');
-  const subHeadingSlug = pathSegments.length > 1 ? pathSegments[1] : null;
-
-  // Find the sub-heading based on the slug in the URL
-  const filteredSubHeading = subHeadingSlug && SLUG_TO_NAME_MAP[subHeadingSlug]
-    ? subHeadings.find(subHeading => subHeading.name === SLUG_TO_NAME_MAP[subHeadingSlug])
-    : null;
-
-  // Handle question selection
-  const handleQuestionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newSelectedQuestion = event.target.value;
-    setSelectedQuestion(newSelectedQuestion);
+  // Scroll to visualization implementation
+  const scrollToVisualization = (questionText: string, subheadingSlug?: string) => {
+    console.log(`Scrolling to: "${questionText}" in subheading: "${subheadingSlug}"`);
     
-    // Special handling for Q1, Q4 and Q5 questions
-    if (newSelectedQuestion.includes('Q1')) {
-      // Directly navigate to the correct section/subsection for Q1
-      navigate('/lifestyle/preferences');
-      return;
-    }
-    
-    if (newSelectedQuestion.includes('Q4')) {
-      // Directly navigate to the correct section/subsection for Q4
-      navigate('/lifestyle/satisfaction-now');
-      return;
-    }
-    
-    if (newSelectedQuestion.includes('Q5')) {
-      // Directly navigate to the correct section/subsection for Q5
-      navigate('/lifestyle/satisfaction-pandemic');
-      return;
-    }
-    
-    // For all other questions, use the existing logic
-    let matchingSubheading = null;
-    
-    // First, find the subheading that contains this question
-    for (const subHeading of subHeadings) {
-      const matchingQuestion = subHeading.questions.find(q => q.text === newSelectedQuestion);
-      if (matchingQuestion) {
-        matchingSubheading = subHeading;
-        break;
-      }
-    }
-    
-    if (matchingSubheading) {
-      // Find the subsection slug based on the subheading name
-      let targetSubsection = null;
-      for (const [slug, name] of Object.entries(SLUG_TO_NAME_MAP)) {
-        if (name === matchingSubheading.name) {
-          targetSubsection = slug;
+    // Update URL if needed
+    if (subheadingSlug && subheadingSlug !== activeSubheading) {
+      for (const sectionKey in MAIN_SECTION_DEFAULTS) {
+        const path = `/${sectionKey}/${subheadingSlug}`;
+        if (Object.keys(SLUG_TO_NAME_MAP).includes(subheadingSlug)) {
+          console.log(`Navigating to: ${path}`);
+          navigate(path);
+          setActiveSubheading(subheadingSlug);
           break;
         }
       }
-      
-      // Find the section slug for this subsection
-      if (targetSubsection) {
-        const subsectionToSection: Record<string, string> = {
-          // Lifestyle section
-          'preferences': 'lifestyle',
-          'satisfaction': 'lifestyle',
-          'satisfaction-now': 'lifestyle',
-          'satisfaction-pandemic': 'lifestyle',
-          
-          // Community section
-          'health': 'community',
-          'awareness': 'community',
-          'improvement': 'community',
-          
-          // Disasters section
-          'exposure': 'disasters',
-          'heat': 'disasters',
-          'cold': 'disasters',
-          'flooding': 'disasters',
-          'earthquake': 'disasters',
-          'power-outage': 'disasters',
-          
-          // Transportation section
-          'employment': 'transportation',
-          'commute': 'transportation',
-          'distance': 'transportation',
-          'choices': 'transportation',
-          'delivery': 'transportation',
-          'decisions': 'transportation',
-          'dining': 'transportation',
-          
-          // Transit section
-          'access': 'transit',
-          'changes': 'transit',
-          'reasons': 'transit',
-          'recent-trip': 'transit',
-          'licensing': 'transit',
-          
-          // Demographics section
-          'housing': 'demographics',
-          'resources': 'demographics',
-          'household': 'demographics',
-          'personal': 'demographics'
-        };
-        
-        const targetSection = subsectionToSection[targetSubsection];
-        
-        if (targetSection) {
-          navigate(`/${targetSection}/${targetSubsection}`);
-        }
+    }
+    
+    // Find the visualization to scroll to
+    const allQuestions = subHeadings.flatMap(sh => sh.questions);
+    const targetIndex = allQuestions.findIndex(q => q.text === questionText);
+    
+    console.log(`Target question index: ${targetIndex}`);
+    
+    if (targetIndex !== -1 && visualizationRefs.current[targetIndex]) {
+      const element = visualizationRefs.current[targetIndex];
+      if (!element) {
+        console.error("Element reference is null");
+        return;
       }
+      
+      // Calculate position
+      const headerOffset = 80; // Adjust based on your layout
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = window.pageYOffset + elementPosition - headerOffset;
+      
+      console.log(`Scrolling to position: ${offsetPosition}`);
+      
+      // Perform scroll
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+      
+      // Update selected question
+      setSelectedQuestion(questionText);
+    } else {
+      console.error(`Could not find element for question: ${questionText}`);
     }
   };
 
-  // Render question options for dropdown
-  const renderQuestionOptions = () => {
-    if (filteredSubHeading) {
-      return filteredSubHeading.questions.map((question) => (
-        <option key={question.id} value={question.text}>
-          {question.text}
-        </option>
-      ));
-    }
-
-    return subHeadings.map((subHeading) => (
-      <optgroup key={subHeading.name} label={subHeading.name}>
-        {subHeading.questions.map((question) => (
-          <option key={question.id} value={question.text}>
-            {question.text}
-          </option>
-        ))}
-      </optgroup>
-    ));
-  };
-
-  // Determine which visualization to render based on selected question
-  const renderVisualization = () => {
-    // If no question is selected or if Q1 is selected, show Q1 visualization
-    if (!selectedQuestion || selectedQuestion.includes('Q1')) {
-      return <Q1Visualization />;
-    }
-    
-    // For other specific questions
-    if (selectedQuestion.includes('Q4')) {
-      return <Q4Visualization />;
-    }
-    
-    if (selectedQuestion.includes('Q5')) {
-      return <Q5Visualization />;
-    }
-
-    // If no matching visualization is found
-    return (
-      <div className="placeholder-visualization">
-        <h3>{selectedQuestion}</h3>
+  // Render visualizations as scrollable sections
+  const renderVisualizations = () => {
+    let refIndex = 0;
+    return subHeadings.flatMap((subHeading) =>
+      subHeading.questions.map((question) => {
+        const VisualizationComponent = getVisualizationComponent(question.text);
+        const currentIndex = refIndex++;
         
-        <div className="placeholder-content">
-          <div className="placeholder-icon">
-            <svg viewBox="0 0 24 24" width="64" height="64">
-              <path fill="currentColor" d="M3,22V8H7V22H3M10,22V2H14V22H10M17,22V14H21V22H17Z" />
-            </svg>
-          </div>
-          <div className="placeholder-info">
-            <p>This visualization is coming soon!</p>
-          </div>
-        </div>
-      </div>
+        return (
+          <React.Fragment key={question.id}>
+            <div
+              ref={el => { visualizationRefs.current[currentIndex] = el; }}
+              data-question={question.text}
+              className="visualization-section"
+            >
+              <h3>{question.text}</h3>
+              <div className="visualization-content">
+                {VisualizationComponent ? <VisualizationComponent /> : <p>Visualization coming soon!</p>}
+              </div>
+            </div>
+            <div className="section-divider" />
+          </React.Fragment>
+        );
+      })
     );
+  };
+
+  // Helper function to map questions to visualization components
+  const getVisualizationComponent = (questionText: string) => {
+    if (questionText.includes('Q1')) return Q1Visualization;
+    if (questionText.includes('Q4')) return Q4Visualization;
+    if (questionText.includes('Q5')) return Q5Visualization;
+    if (questionText.includes('Q6')) return Q6Visualization;
+    // if (questionText.includes('Q7')) return Q7Visualization;
+    return null;
   };
 
   return (
     <div className="main-content">
-      <div className="dropdown-container">
-        <label htmlFor="questions-dropdown">Question:</label>
-        <select 
-          id="questions-dropdown" 
-          onChange={handleQuestionChange} 
-          value={selectedQuestion || ""}
-          className="question-dropdown"
-        >
-          {renderQuestionOptions()}
-        </select>
-      </div>
+      <Sidebar
+        selectedQuestion={selectedQuestion}
+        activeSubheading={activeSubheading}
+        onTopicClick={scrollToVisualization}
+      />
 
       <div className="visualization-container">
-        {renderVisualization()}
+        {renderVisualizations()}
       </div>
     </div>
   );

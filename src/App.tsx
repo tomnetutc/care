@@ -43,7 +43,7 @@ const App: React.FC = () => {
             <div className="app">
               <Navbar />
               <div className="content-wrapper">
-                <Sidebar />
+                {/* <Sidebar /> */}
                 <TopMenu />
                 <main className="main-area">
                   <div className="main-content">
