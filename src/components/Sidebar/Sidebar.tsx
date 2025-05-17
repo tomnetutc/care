@@ -152,6 +152,15 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
   // Auto-expand section based on URL
   useEffect(() => {
     const currentPath = location.pathname;
+    
+    // First check if we're at the root path
+    if (currentPath === '/' || currentPath === '') {
+      // Default to expanding the first section (Lifestyle)
+      setExpandedSection(0);
+      return;
+    }
+    
+    // Otherwise use existing logic to find matching section
     const sectionIndex = sections.findIndex(section => 
       currentPath.startsWith(section.path) || 
       section.subheadings.some(sub => currentPath.includes(sub.path))
@@ -159,6 +168,9 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
     
     if (sectionIndex !== -1) {
       setExpandedSection(sectionIndex);
+    } else {
+      // If no match is found, still default to the first section
+      setExpandedSection(0);
     }
   }, [location.pathname]);
   
