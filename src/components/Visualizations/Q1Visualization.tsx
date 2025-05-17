@@ -109,7 +109,7 @@ const Q1Visualization: React.FC = () => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('./hard/leaphi_final_data.csv');
+        const response = await fetch(`${process.env.PUBLIC_URL}/leaphi_final_data.csv`);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
