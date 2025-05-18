@@ -41,7 +41,7 @@ export class VisualizationDataProvider {
       const sources = [
         // GitHub Pages path
         isGitHubPages ? 
-          '/hard/leaphi_final_data.csv' :
+          '/care/leaphi_final_data.csv' :
           // Local development paths
           '/leaphi_final_data.csv',
         './leaphi_final_data.csv',
@@ -75,7 +75,7 @@ export class VisualizationDataProvider {
       if (!csvData) {
         console.log("Trying fallback GitHub raw URL");
         try {
-          const fallbackUrl = "https://raw.githubusercontent.com/YourGitHubUsername/hard/main/public/leaphi_final_data.csv";
+          const fallbackUrl = "https://raw.githubusercontent.com/YourGitHubUsername/care/main/public/leaphi_final_data.csv";
           const response = await fetch(fallbackUrl);
           if (!response.ok) {
             throw new Error(`Failed to fetch from ${fallbackUrl}: ${response.status}`);

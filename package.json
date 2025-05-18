@@ -1,8 +1,8 @@
 {
-  "name": "hard",
+  "name": "care",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://tomnetutc.github.io/hard",
+  "homepage": "https://tomnetutc.github.io/care",
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
