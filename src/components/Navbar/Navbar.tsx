@@ -17,7 +17,7 @@ export const Navbar: React.FC = () => {
               alt="Dashboard Logo"
               style={{ width: "80px", marginRight: "-8px" }}
             />
-            <h1 className="fw-bold mb-0 text-dark" style={{ marginLeft: "-4px" }}>Community Adaptation and Resilience to Extremes Dashboard</h1>
+            <h1 className="fw-bold mb-0 text-dark" style={{ marginLeft: "-4px" }}>Community Adaptation and Resilience to Extremes (CARE) Dashboard</h1>
           </Link>
         </div>
 

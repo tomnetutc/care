@@ -57,7 +57,7 @@ const App: React.FC = () => {
                         element={<MainContent subHeadings={subHeadingsData.community} />}
                       />
                       <Route
-                        path="/disasters/:subHeadingName?"
+                        path="/disruptions/:subHeadingName?"
                         element={<MainContent subHeadings={subHeadingsData.disruptions} />}
                       />
                       <Route

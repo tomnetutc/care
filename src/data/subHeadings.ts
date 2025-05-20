@@ -42,7 +42,10 @@ export const subHeadingsData = {
       {
         name: 'Extreme Heat',
         questions: [
-          { id: 12, text: 'Q11a–Q18a – Impact, coping, expectations, actions, and home A/C' },
+          {
+            id: 1601,
+            text: 'Q16a - Is there anything else you would do to cope with extreme heat?',
+          },
         ],
       },
       {

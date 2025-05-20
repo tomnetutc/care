@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Q1Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization } from '../Visualizations';
+import { Q1Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q16aVisualization } from '../Visualizations';
 import './MainContent.scss';
 import Sidebar from '../Sidebar/Sidebar';
 
@@ -55,7 +55,7 @@ const SLUG_TO_NAME_MAP: Record<string, string> = {
 // Default questions for each section/subsection
 const DEFAULT_QUESTIONS: Record<string, string> = {
   // Lifestyle section
-  'preferences': 'Lifestyle preferences',
+  'preferences': 'Q1 - Lifestyle preferences',
   'satisfaction': 'Q4 – Life satisfaction rating', // <-- Change this line to Q4
   'satisfaction-now': 'Q4 – Life satisfaction rating',
   'satisfaction-pandemic': 'Q5 – Life satisfaction compared to during the pandemic',
@@ -66,9 +66,9 @@ const DEFAULT_QUESTIONS: Record<string, string> = {
   'awareness': 'Q12 – Community awareness rating',
   'improvement': 'Q15 – Suggestions for community improvement',
   
-  // Disasters section
+  // Disruptions section
   'exposure': 'Q20 – Experience with natural disasters',
-  'heat': 'Q22 – Experience with extreme heat events',
+  'heat': 'Q16a – Experience with extreme heat events',
   'cold': 'Q25 – Experience with extreme cold events',
   'flooding': 'Q28 – Experience with flooding',
   'earthquake': 'Q30 – Experience with earthquakes',
@@ -101,7 +101,7 @@ const DEFAULT_QUESTIONS: Record<string, string> = {
 const MAIN_SECTION_DEFAULTS: Record<string, string> = {
   'lifestyle': 'preferences',
   'community': 'health',
-  'disasters': 'exposure',
+  'disruptions': 'exposure',
   'transportation': 'employment',
   'transit': 'access',
   'demographics': 'housing'
@@ -237,7 +237,10 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
       subHeading.questions.map((question) => {
         const VisualizationComponent = getVisualizationComponent(question.text);
         const currentIndex = refIndex++;
-        
+
+        // Only show heading if NOT Q16a
+        const showHeading = question.text !== 'Q16a - Is there anything else you would do to cope with extreme heat?';
+
         return (
           <React.Fragment key={question.id}>
             <div
@@ -245,7 +248,7 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
               data-question={question.text}
               className="visualization-section"
             >
-              <h3>{question.text}</h3>
+              {showHeading && <h3>{question.text}</h3>}
               <div className="visualization-content">
                 {VisualizationComponent ? <VisualizationComponent /> : <p>Visualization coming soon!</p>}
               </div>
@@ -259,11 +262,12 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
 
   // Helper function to map questions to visualization components
   const getVisualizationComponent = (questionText: string) => {
-    if (questionText.includes('Q1')) return Q1Visualization;
-    if (questionText.includes('Q4')) return Q4Visualization;
-    if (questionText.includes('Q5')) return Q5Visualization;
-    if (questionText.includes('Q6')) return Q6Visualization;
-    // if (questionText.includes('Q7')) return Q7Visualization;
+    if (questionText === 'Q1 – Lifestyle preferences') return Q1Visualization;
+    if (questionText === 'Q4 – Overall life satisfaction') return Q4Visualization;
+    if (questionText === 'Q5 – Life satisfaction compared to during the pandemic') return Q5Visualization;
+    if (questionText === 'Q6 – Social relationships') return Q6Visualization;
+    // if (questionText === 'Q7 – Access to healthcare') return Q7Visualization;
+    if (questionText === 'Q16a - Is there anything else you would do to cope with extreme heat?') return Q16aVisualization;
     return null;
   };
 
