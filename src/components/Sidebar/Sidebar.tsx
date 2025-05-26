@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom'; // Add useNavigate
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faHeart, 
@@ -45,7 +45,9 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, onTopicClick }) => {
   const location = useLocation();
+  const navigate = useNavigate(); // Add this hook
   const [expandedSection, setExpandedSection] = useState<number | null>(null);
+  const [expandedSubheading, setExpandedSubheading] = useState<string | null>(null);
   
   // Dashboard navigation sections with their sub-headings
   const sections: Section[] = [
@@ -56,20 +58,20 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
         { 
           name: 'Personal Preferences', 
           path: '/lifestyle/preferences',
-          topics: ['Q1 – Lifestyle preferences'] // Add topic label(s)
+          topics: ['Lifestyle preferences'] // Add topic label(s)
         },
         { 
           name: 'Life Satisfaction', 
           path: '/lifestyle/satisfaction',
           topics: [
-            'Q4 – Life satisfaction rating',
-            'Q5 – Life satisfaction compared to during the pandemic'
+            'Life satisfaction rating',
+            'Life satisfaction compared to during the pandemic'
           ]
         },
         { 
           name: 'Social & Health Status', 
           path: '/lifestyle/health',
-          topics: ['Q6 – Social connections strength']
+          topics: ['Social relationships', 'Access to healthcare', 'Financial security', 'Caregiving responsibilities']
         },
       ],
       icon: <FontAwesomeIcon icon={faHeart} />,
@@ -168,6 +170,12 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
     
     if (sectionIndex !== -1) {
       setExpandedSection(sectionIndex);
+      
+      // Find and set the expanded subheading based on URL
+      const subheadingSlug = currentPath.split('/').pop() || '';
+      if (subheadingSlug) {
+        setExpandedSubheading(subheadingSlug);
+      }
     } else {
       // If no match is found, still default to the first section
       setExpandedSection(0);
@@ -175,36 +183,87 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
   }, [location.pathname]);
   
   const handleSectionClick = (index: number) => {
+    // Toggle section expansion as before
     setExpandedSection(expandedSection === index ? null : index);
+    
+    // Navigate to section path to show visualizations
+    navigate(sections[index].path);
   };
   
-  // Modified isSubheadingActive function to remove all subheading highlighting
+  const handleSubheadingClick = (subheadingSlug: string) => {
+    setExpandedSubheading(expandedSubheading === subheadingSlug ? null : subheadingSlug);
+  };
+  
+  // Update isSubheadingActive to highlight when a topic within it is active
   const isSubheadingActive = (subheading: SubHeading): boolean => {
-    // Always return false to disable all subheading highlighting
+    // Check if any topic in this subheading is active
+    if (selectedQuestion && subheading.topics) {
+      return subheading.topics.some(topic => isTopicActive(topic));
+    }
     return false;
   };
   
-  // Keep the topic highlighting logic as is - it's working correctly
+  // Simplified isTopicActive function
   const isTopicActive = (topic: string): boolean => {
     if (!selectedQuestion) return false;
     
+    // Add console logging to debug the issue
+    console.log(`Comparing: "${topic}" with "${selectedQuestion}"`);
+    
+    // Simple normalized comparison that focuses on key terms
+    const topicLower = topic.toLowerCase();
+    const selectedLower = selectedQuestion.toLowerCase();
+    
     // Exact match
-    if (selectedQuestion === topic) {
-      return true;
+    if (topicLower === selectedLower) return true;
+    
+    // Check for satisfaction-specific matching (key terms approach)
+    if (topicLower.includes('satisfaction') && selectedLower.includes('satisfaction')) {
+      // For life satisfaction rating
+      if (topicLower.includes('rating') && 
+          (selectedLower.includes('rating') || selectedLower.includes('overall'))) {
+        return true;
+      }
+      
+      // For pandemic comparison
+      if (topicLower.includes('pandemic') && selectedLower.includes('pandemic')) {
+        return true;
+      }
     }
     
-    // Check for question number match (more precise)
-    const topicNumber = topic.split('–')[0].trim(); // e.g., "Q6"
-    const selectedNumber = selectedQuestion.split('–')[0].trim();
+    // Fall back to question number matching
+    if (topic.includes('–') && selectedQuestion.includes('–')) {
+      return topic.split('–')[0].trim() === selectedQuestion.split('–')[0].trim();
+    }
     
-    return topicNumber === selectedNumber;
+    return false;
   };
 
-  // Debug logging
+  // When selectedQuestion changes, expand ONLY the containing subheading
   useEffect(() => {
-    console.log("Current selected question:", selectedQuestion);
-    console.log("Current active subheading:", activeSubheading);
-  }, [selectedQuestion, activeSubheading]);
+    if (selectedQuestion) {
+      let foundMatch = false;
+      
+      // Find which subheading contains this question
+      // Use labeled loops so we can break out of both loops at once
+      sectionLoop: for (const section of sections) {
+        for (const subheading of section.subheadings) {
+          if (subheading.topics && subheading.topics.some((topic) => isTopicActive(topic))) {
+            const subheadingSlug = subheading.path.split('/').pop() || '';
+            setExpandedSubheading(subheadingSlug);
+            foundMatch = true;
+            break sectionLoop; // Exit both loops once we find a match
+          }
+        }
+      }
+      
+      // If no match found, we could optionally collapse all subheadings
+      if (!foundMatch) {
+        // Uncomment if you want to collapse when no match is found
+        // setExpandedSubheading(null);
+      }
+    }
+  }, [selectedQuestion]);
 
   return (
     <aside className="sidebar">
@@ -234,17 +293,23 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
                 {section.subheadings.map((subheading, subIndex) => {
                   const subheadingActive = isSubheadingActive(subheading);
                   const subheadingSlug = subheading.path.split('/').pop() || '';
+                  const isSubheadingExpanded = expandedSubheading === subheadingSlug;
                   
                   return (
                     <li key={subIndex} className="subheading-item">
-                      <Link 
-                        to={subheading.path} 
-                        className={`subheading-link ${subheadingActive ? 'active' : ''}`}
+                      <div 
+                        className={`subheading-container ${subheadingActive ? 'active' : ''}`}
                       >
-                        {subheading.name}
-                      </Link>
+                        <Link 
+                          to={subheading.path} 
+                          className={`subheading-link ${subheadingActive ? 'active' : ''}`}
+                          onClick={() => handleSubheadingClick(subheadingSlug)}
+                        >
+                          {subheading.name}
+                        </Link>
+                      </div>
                       {subheading.topics && (
-                        <ul className="topics-list">
+                        <ul className={`topics-list ${isSubheadingExpanded ? 'expanded' : ''}`}>
                           {subheading.topics.map((topic, topicIdx) => {
                             const isActive = isTopicActive(topic);
                             
@@ -253,8 +318,10 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
                                 key={topicIdx}
                                 className={`topic-label ${isActive ? 'active' : ''}`}
                                 onClick={() => {
-                                  console.log(`Clicking topic: ${topic} in subheading: ${subheadingSlug}`);
+                                  // Remove console.log to fix performance issues
+                                  // console.log(`Clicking topic: ${topic} in subheading: ${subheadingSlug}`);
                                   onTopicClick && onTopicClick(topic, subheadingSlug);
+                                  setExpandedSubheading(subheadingSlug);
                                 }}
                                 style={{ cursor: 'pointer' }}
                               >

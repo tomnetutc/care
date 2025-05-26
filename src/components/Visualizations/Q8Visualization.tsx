@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
-import './Q6Visualization.scss';
+import './Q8Visualization.scss';
 import { useFilters } from '../../context/FilterContext';
 
 interface DataItem {
-  social_connect_strength: string;
+  financial_secure: string;
   count: number;
   percentage: number;
 }
@@ -16,7 +16,7 @@ interface TooltipState {
   data: DataItem | null;
 }
 
-const Q6Visualization: React.FC = () => {
+const Q8Visualization: React.FC = () => {
   const [data, setData] = useState<DataItem[]>([]);
   const [rawData, setRawData] = useState<any[]>([]);  // Store raw data for filtering
   const [isLoading, setIsLoading] = useState(true);
@@ -89,36 +89,36 @@ const Q6Visualization: React.FC = () => {
       // Define the category order and corresponding labels
       const categoryOrder = ["1", "2", "3", "4", "5"];
       const categoryLabels: {[key: string]: string} = {
-        "1": "Very strong",
-        "2": "Somewhat strong",
-        "3": "Neither strong nor weak", 
-        "4": "Somewhat weak",
-        "5": "Very weak"
+        "1": "Very secure",
+        "2": "Somewhat secure",
+        "3": "Neither secure nor insecure", 
+        "4": "Somewhat insecure",
+        "5": "Very insecure"
       };
 
-      // Initialize connection strength groups with zeros
-      const strengthGroups: Record<string, number> = {};
+      // Initialize financial security groups with zeros
+      const securityGroups: Record<string, number> = {};
       for (const category of categoryOrder) {
-        strengthGroups[category] = 0;
+        securityGroups[category] = 0;
       }
 
       // Process the filtered CSV data
       let validResponses = 0;
       
       filteredData.forEach((d: any) => {
-        const rawValue = d.social_connect_strength;
+        const rawValue = d.financial_secure;
         
         if (rawValue && categoryOrder.includes(rawValue)) {
-          strengthGroups[rawValue]++;
+          securityGroups[rawValue]++;
           validResponses++;
         }
       });
       
       // Convert counts to array of objects with percentages
       const processedData: DataItem[] = categoryOrder.map(category => {
-        const count = strengthGroups[category] || 0;
+        const count = securityGroups[category] || 0;
         return {
-          social_connect_strength: categoryLabels[category],
+          financial_secure: categoryLabels[category],
           count,
           percentage: validResponses > 0 ? (count / validResponses) * 100 : 0
         };
@@ -135,19 +135,19 @@ const Q6Visualization: React.FC = () => {
     }
   };
 
+  // Color array for bar segments
+  const barColors = [
+    "#2ba88c",  // Very secure
+    "#93c4b9",  // Somewhat secure
+    "#ead97c",  // Neither secure nor insecure
+    "#f0b3ba",  // Somewhat insecure
+    "#e25b61"   // Very insecure
+  ];
+
   // Function to render the bar chart visualization
   const renderBarChart = () => {
     // Create a fixed formatter for percentages
     const formatPercent = (value: number) => value.toFixed(1) + '%';
-
-    // Define bar colors in order
-    const barColors = [
-      "#2ba88c",  // Very strong
-      "#93c4b9",  // Somewhat strong
-      "#ead97c",  // Neither strong nor weak
-      "#f0b3ba",  // Somewhat weak
-      "#e25b61"   // Very weak
-    ];
     
     return (
       <div className="chart-container">
@@ -159,13 +159,13 @@ const Q6Visualization: React.FC = () => {
         <div className="bar-chart">
           {data.map((item, index) => (
             <div className="bar-row" key={index}>
-              <div className="label">{item.social_connect_strength}</div>
+              <div className="label">{item.financial_secure}</div>
               <div className="bar-container">
                 <div 
                   className="bar" 
                   style={{ 
                     width: `${item.percentage}%`,
-                    backgroundColor: barColors[index] // Set bar color by index
+                    backgroundColor: barColors[index] // <-- assign color by index
                   }}
                   onMouseEnter={(e) => showTooltip(e, item)}
                   onMouseLeave={hideTooltip}
@@ -179,7 +179,7 @@ const Q6Visualization: React.FC = () => {
       </div>
     );
   };
-
+  
   // Tooltip handlers
   const showTooltip = (e: React.MouseEvent, item: DataItem) => {
     if (!containerRef.current) return;
@@ -213,20 +213,17 @@ const Q6Visualization: React.FC = () => {
   const renderTooltip = () => {
     if (!tooltip.visible || !tooltip.data) return null;
 
-    // Adjust offset values to position tooltip closer to cursor
-    const xOffset = 15; // Slightly larger offset to prevent cursor overlap
-    const yOffset = -30; // Move tooltip higher to appear above cursor
-
+    const xOffset = 15;
+    const yOffset = -30;
     const tooltipStyle: React.CSSProperties = {
       top: `${tooltip.y + yOffset}px`,
       left: `${tooltip.x + xOffset}px`,
       opacity: tooltip.visible ? 1 : 0,
-      position: 'absolute', // Ensure absolute positioning
+      position: 'absolute',
     };
-
     return (
-      <div className="q6-tooltip" style={tooltipStyle}>
-        <div className="tooltip-title">{tooltip.data.social_connect_strength}</div>
+      <div className="q8-tooltip" style={tooltipStyle}>
+        <div className="tooltip-title">{tooltip.data.financial_secure}</div>
         <div className="tooltip-content">
           <div>Count: {tooltip.data.count.toLocaleString()}</div>
         </div>
@@ -254,9 +251,8 @@ const Q6Visualization: React.FC = () => {
   }
 
   return (
-    <div className="q6-visualization" ref={containerRef}>
-      <h2><strong>How strong are your current social relationships and
-connections in your neighborhood/community?</strong></h2>
+    <div className="q8-visualization" ref={containerRef}>
+      <h2><strong>How financially secure do you feel, considering your current income, savings, debts, and expenses?</strong></h2>
       
       {renderBarChart()}
       {renderTooltip()}
@@ -264,4 +260,4 @@ connections in your neighborhood/community?</strong></h2>
   );
 };
 
-export default Q6Visualization;
+export default Q8Visualization;

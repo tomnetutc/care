@@ -2,22 +2,22 @@ export const subHeadingsData = {
     lifestyle: [
       {
         name: 'Personal Preferences',
-        questions: [{ id: 1, text: 'Q1 – Lifestyle preferences' }],
+        questions: [{ id: 1, text: 'Lifestyle preferences' }],
       },
       {
         name: 'Life Satisfaction',
         questions: [
-          { id: 2, text: 'Q4 – Overall life satisfaction' },
-          { id: 3, text: 'Q5 – Life satisfaction compared to during the pandemic' },
+          { id: 2, text: 'Overall life satisfaction' },
+          { id: 3, text: 'Life satisfaction compared to during the pandemic' },
         ],
       },
       {
         name: 'Social & Health Status',
         questions: [
-          { id: 4, text: 'Q6 – Social relationships' },
-          { id: 5, text: 'Q7 – Access to healthcare' },
-          { id: 6, text: 'Q8 – Financial security' },
-          { id: 7, text: 'Q9 – Caregiving responsibilities' },
+          { id: 4, text: 'Social relationships' },
+          { id: 5, text: 'Access to healthcare' },
+          { id: 6, text: 'Financial security' },
+          { id: 7, text: 'Caregiving responsibilities' },
         ],
       },
     ],
@@ -25,26 +25,26 @@ export const subHeadingsData = {
       {
         name: 'Community Awareness',
         questions: [
-          { id: 8, text: 'Q2 – Community resources and crisis adaptation' },
-          { id: 9, text: 'Q3 – Resource awareness/use during disruptions' },
+          { id: 8, text: 'Community resources and crisis adaptation' },
+          { id: 9, text: 'Resource awareness/use during disruptions' },
         ],
       },
       {
         name: 'Suggestions for Improvement',
-        questions: [{ id: 10, text: 'Q52 – How community can be better prepared' }],
+        questions: [{ id: 10, text: 'How community can be better prepared' }],
       },
     ],
     disruptions: [
       {
         name: 'General Exposure',
-        questions: [{ id: 11, text: 'Q10 – Personal experience with disruptions' }],
+        questions: [{ id: 11, text: 'Personal experience with disruptions' }],
       },
       {
         name: 'Extreme Heat',
         questions: [
           {
             id: 1601,
-            text: 'Q16a - Is there anything else you would do to cope with extreme heat?',
+            text: 'Is there anything else you would do to cope with extreme heat?',
           },
         ],
       },

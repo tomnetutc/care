@@ -41,8 +41,8 @@
 
 /* Gauge specific styles */
 .gauge-arc {
-  stroke: #e6e6e6;
-  stroke-width: 2px;
+  stroke: none !important;
+  stroke-width: 0 !important;
 }
 
 .gauge-value {

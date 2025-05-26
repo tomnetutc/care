@@ -1,4 +1,4 @@
-.q5-visualization {
+.q9-visualization {
   width: 100%;
   position: relative;
   background-color: #ffffff;
@@ -20,33 +20,28 @@
   }
   
   h2 {
-  font-size: 16px;
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-weight: normal;
-  color: #333;
-  font-family: Arial, sans-serif;
-   // font-weight: bold; // Changed from normal to bold
+    font-size: 16px;
+    margin-top: 0;
   }
 
   h3 {
     font-size: 14px;
     color: #666;
     margin: 25px 0 15px;
-    text-align: center;  /* Center align like Q1 and Q4 */
+    text-align: center;
   }
 
   .chart-container {
     position: relative;
     margin: 25px 0 45px;
-    padding-left: 180px;
-    height: 220px;
-    width: 100%;  /* Ensure full width */
+    padding-left: 320px; // Increased from 280px to 320px
+    height: 170px;
+    width: 100%;
     box-sizing: border-box;
 
     .grid-lines {
       position: absolute;
-      inset: 0 0 0 180px;
+      inset: 0 0 0 320px; // Increased from 280px to 320px
       display: flex;
       justify-content: space-between;
       z-index: 0;
@@ -63,7 +58,7 @@
   .bar-chart {
     position: relative;
     z-index: 1;
-    width: 100%;  /* Ensure full width */
+    width: 100%;
 
     .bar-row {
       display: flex;
@@ -72,10 +67,10 @@
       height: 30px;
 
       .label {
-        width: 180px;
+        width: 320px;      // Increased from 280px to 320px
         font-size: 14px;
         position: absolute;
-        left: -180px;
+        left: -320px;      // Increased from -280px to -320px
       }
 
       .bar-container {
@@ -86,15 +81,8 @@
 
         .bar {
           height: 100%;
-          //background-color: #507dbc; // or remove this line entirely
           transition: width 0.3s ease;
-
-          &:hover {
-            stroke: #333;
-            stroke-width: 1.5;
-            filter: brightness(1.1);
-            cursor: pointer;
-          }
+          background-color: #507dbc; // Set bar color
         }
 
         .value {
@@ -106,63 +94,82 @@
     }
   }
 
-  
-  
-  .loading-container, .error-container {
+  /* Loading and error states */
+  .loading-container, 
+  .error-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 350px;
-    padding: 30px;
-  }
-  
-  .loading-spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #e6b400;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    animation: spin 2s linear infinite;
-    margin-bottom: 15px;
+    min-height: 400px;
+    padding: 50px;
+    color: #555;
+    font-family: Arial, sans-serif;
   }
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  .loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite;
+    margin-bottom: 15px;
   }
 
   .error-container {
     border-left: 4px solid #e41a1c;
     background-color: #fff8f8;
     border-radius: 4px;
-    
+
     h3 {
       color: #e41a1c;
       margin-top: 0;
     }
 
     button {
-      background-color: #e6b400;
+      background-color: #4daf4a;
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 4px;
       cursor: pointer;
       font-weight: bold;
-      margin-top: 15px;
+      margin-top: 10px;
       transition: background-color 0.2s;
       
       &:hover {
-        background-color: #d1a300;
+        background-color: #3d9c3a;
       }
     }
   }
 
-  // Tooltip styling
-  .q5-tooltip {
-    position: absolute; // Change from absolute to fixed
-    text-align: left; // Left align text for better readability
+  // Animation
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 10px 5px;
+    
+    .chart-container {
+      padding-left: 240px; // Increased from 200px to 240px
+      .grid-lines {
+        inset: 0 0 0 240px; // Increased from 200px to 240px
+      }
+      .bar-chart .bar-row .label {
+        width: 240px;      // Increased from 200px to 240px
+        left: -240px;      // Increased from -200px to -240px
+        font-size: 12px;
+      }
+    }
+  }
+
+  .q9-tooltip {
+    position: absolute;
+    text-align: left;
     padding: 8px;
     font-size: 12px;
     background-color: rgba(255, 255, 255, 0.95);
@@ -173,6 +180,7 @@
     border: 1px solid #ddd;
     max-width: 240px;
     transition: opacity 0.2s ease;
+    transform: translate(10px, -50%); // Add this line to offset from cursor
     
     .tooltip-title {
       font-weight: bold;
@@ -181,12 +189,6 @@
     
     .tooltip-content {
       margin-top: 5px;
-    }
-    
-    .tooltip-count {
-      font-size: 11px;
-      margin-top: 8px;
-      color: #666;
     }
   }
 }

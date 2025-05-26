@@ -270,7 +270,7 @@ const Q1Visualization: React.FC = () => {
     // Set up margins with the proper ratio
     const margin = { 
       top: Math.min(80, dimensions.width * 0.06),
-      right: 10, // Fixed small right margin
+      right: 16, // Fixed small right margin
       bottom: Math.min(50, dimensions.width * 0.05),
       left: textWidth
     };
@@ -298,7 +298,9 @@ const Q1Visualization: React.FC = () => {
       .attr('y', -margin.top)
       .attr('width', dimensions.width)
       .attr('height', margin.top)
-      .attr('fill', 'url(#titleBackground)');
+      .attr('fill', 'url(#titleBackground)')
+      .attr('rx', 12) // <-- Add this for horizontal border radius
+      .attr('ry', 12); // <-- Add this for vertical border radius
 
     // Create scales - increase padding between bars for better separation
     const y = d3.scaleBand()
@@ -598,15 +600,15 @@ const Q1Visualization: React.FC = () => {
   const renderSummaryTable = () => {
     return (
       <div className="summary-table-container">
-        <h3>Summary Statistics</h3>
+        <h3>Summary statistics</h3>
         <table className="summary-table">
           <thead>
             <tr>
-              <th>Field</th>
+              <th>Attributes</th>
               <th>Min</th>
               <th>Max</th>
               <th>Mean</th>
-              <th>Standard Deviation</th>
+              <th>Standard deviation</th>
               <th>Variance</th>
               <th>Responses</th>
             </tr>
@@ -651,19 +653,6 @@ const Q1Visualization: React.FC = () => {
   return (
     <div className="q1-visualization-container" ref={containerRef}>
       <h2><strong>First, we want to learn about your lifestyle preferences. Please rate your agreement with the following statements.</strong></h2>
-      
-      {/* Active filters display */}
-      {filters.length > 0 && (
-        <div className="active-filters">
-          <h4>Active Filters:</h4>
-          <ul>
-            {filters.map((filter, index) => (
-              <li key={index}><strong>{filter.field}:</strong> {filter.value}</li>
-            ))}
-          </ul>
-          <p className="filtered-count">Showing data from {totalResponses} responses</p>
-        </div>
-      )}
       
       <svg ref={svgRef}></svg>
       {renderSummaryTable()}

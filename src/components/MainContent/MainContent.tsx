@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Q1Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q16aVisualization } from '../Visualizations';
+import { Q1Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q8Visualization, Q9Visualization, Q16aVisualization } from '../Visualizations';
 import './MainContent.scss';
 import Sidebar from '../Sidebar/Sidebar';
 
@@ -55,11 +55,11 @@ const SLUG_TO_NAME_MAP: Record<string, string> = {
 // Default questions for each section/subsection
 const DEFAULT_QUESTIONS: Record<string, string> = {
   // Lifestyle section
-  'preferences': 'Q1 - Lifestyle preferences',
-  'satisfaction': 'Q4 – Life satisfaction rating', // <-- Change this line to Q4
-  'satisfaction-now': 'Q4 – Life satisfaction rating',
-  'satisfaction-pandemic': 'Q5 – Life satisfaction compared to during the pandemic',
-  'health': 'Q6 – Social connections strength', // Add this line for Q6
+  'preferences': 'Lifestyle preferences',
+  'satisfaction': 'Life satisfaction rating', // <-- Change this line to Q4
+  'satisfaction-now': 'Life satisfaction rating',
+  'satisfaction-pandemic': 'Life satisfaction compared to during the pandemic',
+  'health': 'Social relationships', // Add this line for Q6
   
   // Community section
   //'health': 'Q10 – Self-rated health status',
@@ -68,7 +68,7 @@ const DEFAULT_QUESTIONS: Record<string, string> = {
   
   // Disruptions section
   'exposure': 'Q20 – Experience with natural disasters',
-  'heat': 'Q16a – Experience with extreme heat events',
+  'heat': 'Experience with extreme heat events',
   'cold': 'Q25 – Experience with extreme cold events',
   'flooding': 'Q28 – Experience with flooding',
   'earthquake': 'Q30 – Experience with earthquakes',
@@ -239,7 +239,7 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
         const currentIndex = refIndex++;
 
         // Only show heading if NOT Q16a
-        const showHeading = question.text !== 'Q16a - Is there anything else you would do to cope with extreme heat?';
+        // const showHeading = question.text !== 'Q16a - Is there anything else you would do to cope with extreme heat?';
 
         return (
           <React.Fragment key={question.id}>
@@ -248,7 +248,7 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
               data-question={question.text}
               className="visualization-section"
             >
-              {showHeading && <h3>{question.text}</h3>}
+              { <h3>{question.text}</h3>}
               <div className="visualization-content">
                 {VisualizationComponent ? <VisualizationComponent /> : <p>Visualization coming soon!</p>}
               </div>
@@ -262,12 +262,14 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
 
   // Helper function to map questions to visualization components
   const getVisualizationComponent = (questionText: string) => {
-    if (questionText === 'Q1 – Lifestyle preferences') return Q1Visualization;
-    if (questionText === 'Q4 – Overall life satisfaction') return Q4Visualization;
-    if (questionText === 'Q5 – Life satisfaction compared to during the pandemic') return Q5Visualization;
-    if (questionText === 'Q6 – Social relationships') return Q6Visualization;
-    // if (questionText === 'Q7 – Access to healthcare') return Q7Visualization;
-    if (questionText === 'Q16a - Is there anything else you would do to cope with extreme heat?') return Q16aVisualization;
+    if (questionText === 'Lifestyle preferences') return Q1Visualization;
+    if (questionText === 'Overall life satisfaction') return Q4Visualization;
+    if (questionText === 'Life satisfaction compared to during the pandemic') return Q5Visualization;
+    if (questionText === 'Social relationships') return Q6Visualization;
+    if (questionText === 'Access to healthcare') return Q7Visualization;
+    if (questionText === 'Financial security') return Q8Visualization;
+    if (questionText === 'Caregiving responsibilities') return Q9Visualization;
+    if (questionText === 'Is there anything else you would do to cope with extreme heat?') return Q16aVisualization;
     return null;
   };
 

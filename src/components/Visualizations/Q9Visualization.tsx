@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
-import './Q6Visualization.scss';
+import './Q9Visualization.scss';
 import { useFilters } from '../../context/FilterContext';
 
 interface DataItem {
-  social_connect_strength: string;
+  provide_care: string;
   count: number;
   percentage: number;
 }
@@ -16,7 +16,7 @@ interface TooltipState {
   data: DataItem | null;
 }
 
-const Q6Visualization: React.FC = () => {
+const Q9Visualization: React.FC = () => {
   const [data, setData] = useState<DataItem[]>([]);
   const [rawData, setRawData] = useState<any[]>([]);  // Store raw data for filtering
   const [isLoading, setIsLoading] = useState(true);
@@ -87,38 +87,37 @@ const Q6Visualization: React.FC = () => {
       }
 
       // Define the category order and corresponding labels
-      const categoryOrder = ["1", "2", "3", "4", "5"];
+      const categoryOrder = ["1", "2", "3", "4"];
       const categoryLabels: {[key: string]: string} = {
-        "1": "Very strong",
-        "2": "Somewhat strong",
-        "3": "Neither strong nor weak", 
-        "4": "Somewhat weak",
-        "5": "Very weak"
+        "1": "No, I am not currently responsible for providing care to anyone.",
+        "2": "Yes, I provide care for someone within my household.",
+        "3": "Yes, I provide care for someone outside of my household.", 
+        "4": "Yes, I provide care for someone both within and outside of my household."
       };
 
-      // Initialize connection strength groups with zeros
-      const strengthGroups: Record<string, number> = {};
+      // Initialize care provision groups with zeros
+      const careGroups: Record<string, number> = {};
       for (const category of categoryOrder) {
-        strengthGroups[category] = 0;
+        careGroups[category] = 0;
       }
 
       // Process the filtered CSV data
       let validResponses = 0;
       
       filteredData.forEach((d: any) => {
-        const rawValue = d.social_connect_strength;
+        const rawValue = d.provide_care;
         
         if (rawValue && categoryOrder.includes(rawValue)) {
-          strengthGroups[rawValue]++;
+          careGroups[rawValue]++;
           validResponses++;
         }
       });
       
       // Convert counts to array of objects with percentages
       const processedData: DataItem[] = categoryOrder.map(category => {
-        const count = strengthGroups[category] || 0;
+        const count = careGroups[category] || 0;
         return {
-          social_connect_strength: categoryLabels[category],
+          provide_care: categoryLabels[category],
           count,
           percentage: validResponses > 0 ? (count / validResponses) * 100 : 0
         };
@@ -139,15 +138,6 @@ const Q6Visualization: React.FC = () => {
   const renderBarChart = () => {
     // Create a fixed formatter for percentages
     const formatPercent = (value: number) => value.toFixed(1) + '%';
-
-    // Define bar colors in order
-    const barColors = [
-      "#2ba88c",  // Very strong
-      "#93c4b9",  // Somewhat strong
-      "#ead97c",  // Neither strong nor weak
-      "#f0b3ba",  // Somewhat weak
-      "#e25b61"   // Very weak
-    ];
     
     return (
       <div className="chart-container">
@@ -159,14 +149,11 @@ const Q6Visualization: React.FC = () => {
         <div className="bar-chart">
           {data.map((item, index) => (
             <div className="bar-row" key={index}>
-              <div className="label">{item.social_connect_strength}</div>
+              <div className="label">{item.provide_care}</div>
               <div className="bar-container">
                 <div 
                   className="bar" 
-                  style={{ 
-                    width: `${item.percentage}%`,
-                    backgroundColor: barColors[index] // Set bar color by index
-                  }}
+                  style={{ width: `${item.percentage}%`}}
                   onMouseEnter={(e) => showTooltip(e, item)}
                   onMouseLeave={hideTooltip}
                   onMouseMove={(e) => moveTooltip(e)}
@@ -213,20 +200,17 @@ const Q6Visualization: React.FC = () => {
   const renderTooltip = () => {
     if (!tooltip.visible || !tooltip.data) return null;
 
-    // Adjust offset values to position tooltip closer to cursor
-    const xOffset = 15; // Slightly larger offset to prevent cursor overlap
-    const yOffset = -30; // Move tooltip higher to appear above cursor
-
+    const xOffset = 15;
+    const yOffset = -30;
     const tooltipStyle: React.CSSProperties = {
       top: `${tooltip.y + yOffset}px`,
       left: `${tooltip.x + xOffset}px`,
       opacity: tooltip.visible ? 1 : 0,
-      position: 'absolute', // Ensure absolute positioning
+      position: 'absolute',
     };
-
     return (
-      <div className="q6-tooltip" style={tooltipStyle}>
-        <div className="tooltip-title">{tooltip.data.social_connect_strength}</div>
+      <div className="q9-tooltip" style={tooltipStyle}>
+        <div className="tooltip-title">{tooltip.data.provide_care}</div>
         <div className="tooltip-content">
           <div>Count: {tooltip.data.count.toLocaleString()}</div>
         </div>
@@ -254,9 +238,8 @@ const Q6Visualization: React.FC = () => {
   }
 
   return (
-    <div className="q6-visualization" ref={containerRef}>
-      <h2><strong>How strong are your current social relationships and
-connections in your neighborhood/community?</strong></h2>
+    <div className="q9-visualization" ref={containerRef}>
+      <h2><strong>Are you responsible for providing care for others? This can include caring for young children, aging parents, friends in need, or any other individuals for whom you provide significant support or care.</strong></h2>
       
       {renderBarChart()}
       {renderTooltip()}
@@ -264,4 +247,4 @@ connections in your neighborhood/community?</strong></h2>
   );
 };
 
-export default Q6Visualization;
+export default Q9Visualization;

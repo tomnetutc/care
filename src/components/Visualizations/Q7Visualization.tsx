@@ -1,12 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
 import './Q7Visualization.scss';
 import { useFilters } from '../../context/FilterContext';
+
+const barColors = [
+  "#e25b61",  // 0: Very Poor
+  "#f0b3ba",  // 1: Poor
+  "#ead97c",  // 2: Fair
+  "#93c4b9",  // 3: Good
+  "#2ba88c",  // 4: Very Good
+  "#218066"   // 5: Excellent
+];
 
 interface DataItem {
   healthcare_quality: string;
   count: number;
   percentage: number;
+}
+
+interface TooltipState {
+  visible: boolean;
+  x: number;
+  y: number;
+  data: DataItem | null;
 }
 
 const Q7Visualization: React.FC = () => {
@@ -15,6 +31,14 @@ const Q7Visualization: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalResponses, setTotalResponses] = useState(0);
+  const [tooltip, setTooltip] = useState<TooltipState>({
+    visible: false,
+    x: 0,
+    y: 0,
+    data: null
+  });
+  
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // Get filters from context
   const { filters } = useFilters();
@@ -24,7 +48,7 @@ const Q7Visualization: React.FC = () => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('./leaphi_final_data.csv');
+        const response = await fetch(`${process.env.PUBLIC_URL}/leaphi_final_data.csv`);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
@@ -72,14 +96,13 @@ const Q7Visualization: React.FC = () => {
       }
 
       // Define the category order and corresponding labels
-      const categoryOrder = ["-7", "0", "1", "2", "3", "4", "5"];
+      const categoryOrder = ["0", "1", "2", "3", "4", "5"];
       const categoryLabels: {[key: string]: string} = {
-        "-7": "No response",
         "0": "Very poor",
-        "1": "1",
-        "2": "2", 
-        "3": "3",
-        "4": "4",
+        "1": "Poor",
+        "2": "Fair", 
+        "3": "Good",
+        "4": "Very Good",
         "5": "Excellent"
       };
 
@@ -141,7 +164,13 @@ const Q7Visualization: React.FC = () => {
               <div className="bar-container">
                 <div 
                   className="bar" 
-                  style={{ width: `${item.percentage}%`, backgroundColor: '#28a745' }}
+                  style={{ 
+                    width: `${item.percentage}%`,
+                    backgroundColor: barColors[index] // <-- assign color by index
+                  }}
+                  onMouseEnter={(e) => showTooltip(e, item)}
+                  onMouseLeave={hideTooltip}
+                  onMouseMove={(e) => moveTooltip(e)}
                 ></div>
                 <div className="value">{formatPercent(item.percentage)}</div>
               </div>
@@ -151,32 +180,53 @@ const Q7Visualization: React.FC = () => {
       </div>
     );
   };
+  // Tooltip handlers
+  const showTooltip = (e: React.MouseEvent, item: DataItem) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setTooltip({
+      visible: true,
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      data: item
+    });
+  };
 
-  // Function to render the summary table
-  const renderSummaryTable = () => {
+  const moveTooltip = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setTooltip(prev => ({
+      ...prev,
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    }));
+  };
+
+  const hideTooltip = () => {
+    setTooltip(prev => ({
+      ...prev,
+      visible: false
+    }));
+  };
+
+  // Render tooltip with adjusted positioning
+  const renderTooltip = () => {
+    if (!tooltip.visible || !tooltip.data) return null;
+
+    const xOffset = 15;
+    const yOffset = -30;
+    const tooltipStyle: React.CSSProperties = {
+      top: `${tooltip.y + yOffset}px`,
+      left: `${tooltip.x + xOffset}px`,
+      opacity: tooltip.visible ? 1 : 0,
+      position: 'absolute',
+    };
     return (
-      <div className="summary-table">
-        <h3>Summary table</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Healthcare Quality Rating</th>
-              <th>Count</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index}>
-                <td>{item.healthcare_quality}</td>
-                <td>{item.count.toLocaleString()}</td>
-              </tr>
-            ))}
-            <tr className="total">
-              <td>Total</td>
-              <td>{totalResponses.toLocaleString()}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div className="q7-tooltip" style={tooltipStyle}>
+        <div className="tooltip-title">{tooltip.data.healthcare_quality}</div>
+        <div className="tooltip-content">
+          <div>Count: {tooltip.data.count.toLocaleString()}</div>
+        </div>
       </div>
     );
   };
@@ -201,13 +251,13 @@ const Q7Visualization: React.FC = () => {
   }
 
   return (
-    <div className="q7-visualization">
-      <h2><strong>Did any of the following events cause stress or disruption to your life in the past year?</strong></h2>
+    <div className="q7-visualization" ref={containerRef}>
+      <h2><strong>How would you rate your personal access to quality
+healthcare? Please rate from 0 to 5, where 0 = very poor, and 5 =
+excellent</strong></h2>
       
       {renderBarChart()}
-      
-      {renderSummaryTable()}
-      
+      {renderTooltip()}
     </div>
   );
 };

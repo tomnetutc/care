@@ -49,7 +49,7 @@
       .grid-line {
         position: absolute;
         width: 1px;
-        height: 100%;
+        height: 110%;
         background-color: #eee;
       }
     }
@@ -81,7 +81,6 @@
 
         .bar {
           height: 100%;
-          background-color: #e6b400;
           transition: width 0.3s ease;
 
           &:hover {
@@ -101,57 +100,6 @@
     }
   }
 
-  .summary-table {
-    margin-top: 50px;
-    width: 100%;
-    
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Add shadow like Q1/Q4 */
-      border-radius: 5px;
-      overflow: hidden;
-
-      th, td {
-        text-align: center;  /* Center align by default */
-        padding: 10px;
-        font-size: 14px;
-        font-weight: normal;
-        border: 1px solid #ddd;  /* Match Q1/Q4 border style */
-      }
-
-      th {
-        color: #666;
-        background-color: #f5f5f5;
-        font-weight: 600;  /* Match Q1/Q4 header weight */
-      }
-
-      td {
-        border-bottom: 1px solid #eee;
-        background-color: #ffffff;
-      }
-
-      th:first-child,
-      td:first-child {
-        text-align: left !important; /* Force left alignment for first column */
-      }
-
-      tr:nth-child(even) {
-        background-color: #f9f9f9;  /* Match Q1/Q4 zebra striping */
-      }
-
-      tr:hover {
-        background-color: #f0f0f0;  /* Match Q1/Q4 hover effect */
-      }
-
-      .total td {
-        border-top: 1px solid #ddd;
-        border-bottom: none;
-        font-weight: 600;
-        background-color: #f5f5f5;
-      }
-    }
-  }
 
   /* Loading and error states */
   .loading-container, 
@@ -239,7 +187,7 @@
 
   // Tooltip styling
   .q6-tooltip {
-    position: fixed;
+    position: absolute;
     text-align: left;
     padding: 8px;
     font-size: 12px;

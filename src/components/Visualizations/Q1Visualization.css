@@ -1,13 +1,13 @@
 /* Chart container and general structure */
 .q1-visualization-container {
-  width: 100%;
-  position: relative;
-  background-color: #ffffff;
+  width: 103%; /* Change from 102% to 100% */
+  padding: 15px; /* Uncomment this */
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 15px;
+  /* padding: 15px; */
   margin-bottom: 20px;
   transition: all 0.3s ease;
+  box-sizing : border-box; /* Ensure padding and border are included in width/height */
 }
 
 .q1-visualization-container:hover {
@@ -20,6 +20,7 @@
   height: auto;
   display: block; /* Prevents unwanted spacing */
   overflow: visible; /* Allow content to extend if needed */
+  border-radius: 12px;
 }
 
 .q1-visualization-container h2 {
@@ -352,6 +353,7 @@
 @media (max-width: 768px) {
   .q1-visualization-container {
     padding: 10px 5px;
+    border-radius: 8px !important; /* Force border-radius */
   }
   
   .q1-visualization-container h2 {

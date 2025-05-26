@@ -164,27 +164,27 @@ const Q4Visualization: React.FC = () => {
       .attr("y1", "0%")
       .attr("x2", "100%")
       .attr("y2", "0%");
-      
-    // More refined color gradient
+
+    // Use your custom color stops
     gradient.append("stop")
       .attr("offset", "0%")
-      .attr("stop-color", "#e74c3c");
-      
+      .attr("stop-color", "#e25b61");   // Strong red
+
     gradient.append("stop")
       .attr("offset", "25%")
-      .attr("stop-color", "#f39c12");
-      
+      .attr("stop-color", "#f0b3ba");   // Light red
+
     gradient.append("stop")
       .attr("offset", "50%")
-      .attr("stop-color", "#f1c40f");
-      
+      .attr("stop-color", "#ead97c");   // Yellow
+
     gradient.append("stop")
       .attr("offset", "75%")
-      .attr("stop-color", "#2ecc71");
-      
+      .attr("stop-color", "#93c4b9");   // Light green
+
     gradient.append("stop")
       .attr("offset", "100%")
-      .attr("stop-color", "#27ae60");
+      .attr("stop-color", "#2ba88c");   // Strong green
     
     // Add subtle arc outline
     chartGroup.append("path")
@@ -280,7 +280,7 @@ const Q4Visualization: React.FC = () => {
       .attr("y", 70)
       .attr("text-anchor", "middle")
       .style("opacity", 0)
-      .text("Life Satisfaction Score");
+      .text("Life satisfaction score");
     
     // More professional animation for needle
     needleGroup
@@ -314,7 +314,7 @@ const Q4Visualization: React.FC = () => {
               <th>Min</th>
               <th>Max</th>
               <th>Mean</th>
-              <th>Standard Deviation</th>
+              <th>Standard deviation</th>
               <th>Variance</th>
               <th>Responses</th>
             </tr>
