@@ -88,6 +88,7 @@
           height: 100%;
           //background-color: #507dbc; // or remove this line entirely
           transition: width 0.3s ease;
+          opacity: 1 !important; // Ensure bars are fully opaque
 
           &:hover {
             stroke: #333;

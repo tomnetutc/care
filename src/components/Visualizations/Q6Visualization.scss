@@ -82,6 +82,7 @@
         .bar {
           height: 100%;
           transition: width 0.3s ease;
+          opacity: 1 !important;
 
           &:hover {
             stroke: #333;
