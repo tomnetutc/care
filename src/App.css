@@ -32,7 +32,7 @@
 
 .main-area {
   flex: 1;
-  background-color: black;
+  background-color: #eee;
   overflow-y: auto;
   position: relative;
 }
