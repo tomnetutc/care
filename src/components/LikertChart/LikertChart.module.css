@@ -1,0 +1,311 @@
+/* Chart container and general structure */
+.chartContainer {
+  width: 103%;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.chartContainer:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.chartContainer svg {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+  border-radius: 12px;
+}
+
+.chartContainer h2 {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-weight: normal;
+  color: #000000;
+  font-family: Arial, sans-serif;
+}
+
+/* Y-axis tooltip - CRITICAL FOR TEXT HOVER */
+.yAxisTooltip {
+  position: absolute;
+  background: white;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+  max-width: 300px;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 1000;
+}
+
+/* Axis styling */
+.axis text {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+}
+
+.xAxis text {
+  font-family: Arial, sans-serif;
+}
+
+.yAxis text {
+  font-weight: normal;
+  font-size: 0.85rem;
+  font-family: Arial, sans-serif;
+}
+
+/* Legend styling */
+.legendGroup {
+  cursor: pointer;
+}
+
+.legendItem rect {
+  stroke: #333;
+  stroke-width: 0.5;
+  rx: 2;
+  ry: 2;
+}
+
+.legendItem text {
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+}
+
+.legendItemNeutral text {
+  font-weight: bold;
+}
+
+.legendItemStrong text {
+  font-weight: bold;
+}
+
+/* Bar styling */
+.bar {
+  stroke: #fff;
+  stroke-width: 0.5;
+  transition: opacity 0.3s ease;
+  shape-rendering: crispEdges;
+  vector-effect: non-scaling-stroke;
+}
+
+.bar:hover {
+  stroke: #333;
+  stroke-width: 1.5;
+  filter: brightness(1.1);
+}
+
+/* Bar label styling */
+.barLabel {
+  font-size: 11px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  pointer-events: none;
+}
+
+/* Tooltip styling */
+.tooltip {
+  position: absolute;
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 12px;
+  background: white;
+  border-radius: 4px;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  opacity: 0;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #ddd;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.15);
+  max-width: 200px;
+  transition: opacity 0.2s ease;
+}
+
+.tooltipTitle {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.tooltipCount {
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* Loading and error states */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 50px;
+  color: #555;
+  font-family: Arial, sans-serif;
+}
+
+.loadingSpinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 20px;
+  border-left: 4px solid #e41a1c;
+  background-color: #fff8f8;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+}
+
+.errorContainer h3 {
+  color: #e41a1c;
+  margin-top: 0;
+}
+
+.errorContainer button {
+  background-color: #4daf4a;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+}
+
+.errorContainer button:hover {
+  background-color: #3d9c3a;
+}
+
+/* Summary table styling */
+.summaryTableContainer {
+  margin-top: 40px;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.summaryTableContainer h3 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.summaryTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  border-radius: 10px; /* Add table border radius */
+  overflow: hidden; /* Ensure border radius is applied */
+}
+
+.summaryTable th,
+.summaryTable td {
+  padding: 8px 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+  /* border-radius: 4px; */
+}
+
+.summaryTable th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+/* Add this rule to align the first header (Attributes) to the left */
+.summaryTable th:first-child {
+  text-align: left;
+}
+
+.summaryTable tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.summaryTable td:first-child {
+  text-align: left;
+  font-weight: 500;
+  max-width: 300px;
+}
+
+.summaryTable tr:hover {
+  background-color: #f0f0f0;
+}
+
+/* Responsive design */
+@media (min-width: 1200px) {
+  .chartContainer {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .chartContainer {
+    padding: 10px 5px;
+    border-radius: 8px !important;
+  }
+  
+  .chartContainer h2 {
+    font-size: 14px;
+  }
+  
+  .summaryTable th,
+  .summaryTable td {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .chartContainer {
+    padding: 8px 4px;
+  }
+  
+  .chartContainer h2 {
+    font-size: 13px;
+  }
+  
+  .summaryTable th,
+  .summaryTable td {
+    padding: 4px;
+    font-size: 0.7rem;
+  }
+}
+
+@media print {
+  .chartContainer {
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+  
+  .summaryTableContainer {
+    page-break-inside: avoid;
+  }
+}

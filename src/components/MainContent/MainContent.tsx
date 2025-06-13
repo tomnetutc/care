@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Q1Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q8Visualization, Q9Visualization, Q16aVisualization } from '../Visualizations';
+import { Q1Visualization, Q2Visualization, Q3Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q8Visualization, Q9Visualization, Q10Visualization, Q11aVisualization, Q12aVisualization, Q13aVisualization, Q14aVisualization, Q15aVisualization, Q16aVisualization, Q17aVisualization, Q18aVisualization, Q11bVisualization, Q12bVisualization, Q13bVisualization, Q14bVisualization, Q15bVisualization, Q16bVisualization, Q17bVisualization, Q11cVisualization, Q12cVisualization, Q52Visualization, Q13cVisualization, Q14cVisualization, Q15cVisualization, Q16cVisualization, Q17cVisualization, Q11dVisualization, Q12dVisualization, Q13dVisualization, Q14dVisualization, Q15dVisualization, Q16dVisualization, Q17dVisualization, Q11eVisualization, Q12eVisualization, Q13eVisualization, Q14eVisualization, Q15eVisualization, Q17eVisualization, Q16eVisualization } from '../Visualizations';
 import './MainContent.scss';
 import Sidebar from '../Sidebar/Sidebar';
+import TopMenu from '../TopMenu/TopMenu';
 
 // Type definitions
 interface Question {
@@ -21,19 +22,26 @@ interface MainContentProps {
 
 // URL slug to sub-heading name mapping
 const SLUG_TO_NAME_MAP: Record<string, string> = {
-  'preferences': 'Personal Preferences',
+  'preferences': 'Lifestyle Preferences',
   'satisfaction': 'Life Satisfaction',
-  'satisfaction-now': 'Life Satisfaction Now',
+  'satisfaction-now': 'Life Satisfaction',
   'satisfaction-pandemic': 'Life Satisfaction vs Pandemic',
-  'health': 'Social & Health Status',
-  'awareness': 'Community Awareness',
-  'improvement': 'Suggestions for Improvement',
-  'exposure': 'General Exposure',
-  'heat': 'Extreme Heat',
-  'cold': 'Extreme Cold',
-  'flooding': 'Flooding',
-  'earthquake': 'Earthquake',
-  'power-outage': 'Power Outage',
+  'health': 'Support Systems & Health Access',
+  
+  // Updated community section mappings
+  'resources': 'Community Support & Adaptation',
+  'awareness': 'Resource Awareness & Access',
+  'improvement': 'Suggestions for Preparedness',
+  
+  // Disruptions section
+  'exposure': 'Experience with Disruptions',
+  'heat': 'Impact of Extreme Heat',
+  'cold': 'Impact of Extreme Cold',
+  'flooding': 'Impact of Flooding',
+  'earthquake': 'Impact of Earthquake',
+  'power-outage': 'Impact of Power Outage',
+  
+  // Transportation section
   'employment': 'Employment & Student Status',
   'commute': 'Commute Frequency',
   'distance': 'Distance to Key Locations',
@@ -41,38 +49,42 @@ const SLUG_TO_NAME_MAP: Record<string, string> = {
   'delivery': 'Delivery & Activity Frequency',
   'decisions': 'Decision Making & Concerns',
   'dining': 'Dining Habits',
-  'access': 'Access & Usage',
-  'changes': 'Changes Over Time',
-  'reasons': 'Reasons for Change',
-  'recent-trip': 'Recent Transit Trip',
-  'licensing': 'Licensing & Work',
-  'housing': 'Housing & Ownership',
-  'resources': 'Household Resources',
-  'household': 'Household Composition',
-  'personal': 'Personal Info'
+  
+  // Transit section
+  'access': 'Q60 – Public transit access',
+  'changes': 'Q62 – Changes in transit usage',
+  'reasons': 'Q65 – Reasons for transit usage patterns',
+  'recent-trip': 'Q68 – Recent transit experience',
+  'licensing': 'Q70 – Driver licensing status',
+  
+  // Demographics section
+  'housing': 'Q80 – Housing situation',
+  'resources-household': 'Q83 – Household resources',
+  'household': 'Q85 – Household composition',
+  'personal': 'Q90 – Demographic information'
 };
 
 // Default questions for each section/subsection
 const DEFAULT_QUESTIONS: Record<string, string> = {
   // Lifestyle section
-  'preferences': 'Lifestyle preferences',
-  'satisfaction': 'Life satisfaction rating', // <-- Change this line to Q4
-  'satisfaction-now': 'Life satisfaction rating',
-  'satisfaction-pandemic': 'Life satisfaction compared to during the pandemic',
-  'health': 'Social relationships', // Add this line for Q6
+  'preferences': 'Lifestyle Preferences', // Fixed case here
+  'satisfaction': 'Overall Life Satisfaction',
+  'satisfaction-now': 'Overall Life Satisfaction',
+  'satisfaction-pandemic': 'Change in Satisfaction Since Pandemic',
+  'health': 'Strength of Social Connections',
   
-  // Community section
-  //'health': 'Q10 – Self-rated health status',
-  'awareness': 'Q12 – Community awareness rating',
-  'improvement': 'Q15 – Suggestions for community improvement',
+  // Community section 
+  'resources': 'Community Support & Adaptation',
+  'awareness': 'Resource Awareness & Access', // Fixed case here
+  'improvement': 'Suggestions for Preparedness',
   
   // Disruptions section
-  'exposure': 'Q20 – Experience with natural disasters',
-  'heat': 'Experience with extreme heat events',
-  'cold': 'Q25 – Experience with extreme cold events',
-  'flooding': 'Q28 – Experience with flooding',
-  'earthquake': 'Q30 – Experience with earthquakes',
-  'power-outage': 'Q33 – Experience with power outages',
+  'exposure': 'Experience with Disruptions',
+  'heat': 'Impact of Extreme Heat', // Fixed case here
+  'cold': 'Impact of Extreme Cold', // Fixed case here
+  'flooding': 'Impact of Flooding', // Fixed case here
+  'earthquake': 'Impact of Earthquake', // Fixed case here
+  'power-outage': 'Impact of Power Outage', // Fixed case here
   
   // Transportation section
   'employment': 'Q40 – Current employment status',
@@ -92,7 +104,7 @@ const DEFAULT_QUESTIONS: Record<string, string> = {
   
   // Demographics section
   'housing': 'Q80 – Housing situation',
-  'resources': 'Q83 – Household resources',
+  'resources-household': 'Q83 – Household resources',
   'household': 'Q85 – Household composition',
   'personal': 'Q90 – Demographic information'
 };
@@ -100,11 +112,22 @@ const DEFAULT_QUESTIONS: Record<string, string> = {
 // Default subsection for main sections
 const MAIN_SECTION_DEFAULTS: Record<string, string> = {
   'lifestyle': 'preferences',
-  'community': 'health',
+  'community': 'resources', // Changed from 'health' or 'awareness' to 'resources'
   'disruptions': 'exposure',
   'transportation': 'employment',
   'transit': 'access',
   'demographics': 'housing'
+};
+
+// Mapping of subheading slugs to section keys
+const SUBHEADING_TO_SECTION: Record<string, string> = {
+  'preferences': 'lifestyle',
+  'satisfaction': 'lifestyle',
+  'health': 'lifestyle',
+  'resources': 'community',
+  'awareness': 'community',
+  'improvement': 'community',
+  // Add more mappings for other subheadings
 };
 
 const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
@@ -113,6 +136,8 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
   const [activeSubheading, setActiveSubheading] = useState<string | null>(null);
   const [refsReady, setRefsReady] = useState(false);
+  const [isProgrammaticScrolling, setIsProgrammaticScrolling] = useState(false);
+  const [manuallySelectedQuestion, setManuallySelectedQuestion] = useState<string | null>(null);
   const visualizationRefs = useRef<(HTMLDivElement | null)[]>([]);
   
   // Initialize refs array when subHeadings change
@@ -133,15 +158,18 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
     if (currentSlug && SLUG_TO_NAME_MAP[currentSlug]) {
       setActiveSubheading(currentSlug);
       
-      // Set default question for this section
-      if (DEFAULT_QUESTIONS[currentSlug]) {
+      // Only set default question if no manual selection exists
+      if (DEFAULT_QUESTIONS[currentSlug] && !manuallySelectedQuestion) {
         setSelectedQuestion(DEFAULT_QUESTIONS[currentSlug]);
       }
     }
-  }, [location.pathname]);
+  }, [location.pathname, manuallySelectedQuestion]);
 
   // Handle scroll position changes to update active question
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+    // Skip intersection updates during programmatic scrolling
+    if (isProgrammaticScrolling) return;
+    
     let maxVisibility = 0;
     let mostVisibleQuestion = null;
     
@@ -153,10 +181,9 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
     });
     
     if (mostVisibleQuestion && mostVisibleQuestion !== selectedQuestion) {
-      console.log("Changing active question to:", mostVisibleQuestion);
       setSelectedQuestion(mostVisibleQuestion);
     }
-  }, [selectedQuestion]);
+  }, [selectedQuestion, isProgrammaticScrolling]);
   
   // Setup intersection observer after refs are ready
   useEffect(() => {
@@ -184,49 +211,69 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
   const scrollToVisualization = (questionText: string, subheadingSlug?: string) => {
     console.log(`Scrolling to: "${questionText}" in subheading: "${subheadingSlug}"`);
     
+    // Set both the selected question and track it was manually selected
+    setSelectedQuestion(questionText);
+    setManuallySelectedQuestion(questionText);
+    
+    // Disable intersection updates during programmatic scrolling
+    setIsProgrammaticScrolling(true);
+    
     // Update URL if needed
     if (subheadingSlug && subheadingSlug !== activeSubheading) {
-      for (const sectionKey in MAIN_SECTION_DEFAULTS) {
+      const sectionKey = SUBHEADING_TO_SECTION[subheadingSlug];
+      if (sectionKey) {
         const path = `/${sectionKey}/${subheadingSlug}`;
-        if (Object.keys(SLUG_TO_NAME_MAP).includes(subheadingSlug)) {
-          console.log(`Navigating to: ${path}`);
-          navigate(path);
-          setActiveSubheading(subheadingSlug);
-          break;
-        }
+        console.log(`Navigating to: ${path}`);
+        navigate(path);
+        setActiveSubheading(subheadingSlug);
       }
+      
+      // Small delay to ensure navigation completes before scrolling
+      setTimeout(() => performScroll(), 100);
+    } else {
+      performScroll();
     }
     
-    // Find the visualization to scroll to
-    const allQuestions = subHeadings.flatMap(sh => sh.questions);
-    const targetIndex = allQuestions.findIndex(q => q.text === questionText);
-    
-    console.log(`Target question index: ${targetIndex}`);
-    
-    if (targetIndex !== -1 && visualizationRefs.current[targetIndex]) {
-      const element = visualizationRefs.current[targetIndex];
-      if (!element) {
-        console.error("Element reference is null");
-        return;
+    function performScroll() {
+      // Find the visualization to scroll to
+      const allQuestions = subHeadings.flatMap(sh => sh.questions);
+      const targetIndex = allQuestions.findIndex(q => q.text === questionText);
+      
+      if (targetIndex !== -1 && visualizationRefs.current[targetIndex]) {
+        const element = visualizationRefs.current[targetIndex];
+        if (!element) {
+          console.error("Element reference is null");
+          setIsProgrammaticScrolling(false);
+          return;
+        }
+
+        const mainAreaContainer = document.querySelector('.main-area');
+        if (!mainAreaContainer) {
+          console.error("Main area container not found");
+          setIsProgrammaticScrolling(false);
+          return;
+        }
+
+        const topMenuHeight = 58;
+        const additionalPadding = 20;
+        const totalOffset = topMenuHeight + additionalPadding;
+        
+        const containerRect = mainAreaContainer.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+        const relativePosition = elementRect.top - containerRect.top;
+        
+        mainAreaContainer.scrollTo({
+          top: mainAreaContainer.scrollTop + relativePosition - totalOffset,
+          behavior: 'smooth'
+        });
+
+        // Re-enable intersection observer after scrolling completes
+        setTimeout(() => {
+          setIsProgrammaticScrolling(false);
+        }, 1000); // Adjust timing based on scroll duration
+      } else {
+        setIsProgrammaticScrolling(false);
       }
-      
-      // Calculate position
-      const headerOffset = 80; // Adjust based on your layout
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = window.pageYOffset + elementPosition - headerOffset;
-      
-      console.log(`Scrolling to position: ${offsetPosition}`);
-      
-      // Perform scroll
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-      
-      // Update selected question
-      setSelectedQuestion(questionText);
-    } else {
-      console.error(`Could not find element for question: ${questionText}`);
     }
   };
 
@@ -262,19 +309,60 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
 
   // Helper function to map questions to visualization components
   const getVisualizationComponent = (questionText: string) => {
-    if (questionText === 'Lifestyle preferences') return Q1Visualization;
-    if (questionText === 'Overall life satisfaction') return Q4Visualization;
-    if (questionText === 'Life satisfaction compared to during the pandemic') return Q5Visualization;
-    if (questionText === 'Social relationships') return Q6Visualization;
-    if (questionText === 'Access to healthcare') return Q7Visualization;
-    if (questionText === 'Financial security') return Q8Visualization;
-    if (questionText === 'Caregiving responsibilities') return Q9Visualization;
-    if (questionText === 'Is there anything else you would do to cope with extreme heat?') return Q16aVisualization;
+    if (questionText === 'Lifestyle Preferences') return Q1Visualization; // Fixed case here
+    if (questionText === 'Community Support & Adaptation') return Q2Visualization;
+    if (questionText === 'Resource Awareness & Access') return Q3Visualization;
+    if (questionText === 'Overall Life Satisfaction') return Q4Visualization;
+    if (questionText === 'Change in Satisfaction Since Pandemic') return Q5Visualization;
+    if (questionText === 'Strength of Social Connections') return Q6Visualization;
+    if (questionText === 'Access to Quality Healthcare') return Q7Visualization;
+    if (questionText === 'Perceived Financial Security') return Q8Visualization;
+    if (questionText === 'Caregiving Responsibilities') return Q9Visualization;
+    if (questionText === 'Experience with Disruptions') return Q10Visualization;
+    if (questionText === 'Impact of Extreme Heat') return Q11aVisualization; // Fixed case here
+    if (questionText === 'Coping with Extreme Heat') return Q12aVisualization; // Fixed case here
+    if (questionText === 'Likelihood of Future Extreme Heat') return Q13aVisualization; // Fixed case here
+    if (questionText === 'Expected Personal Impact of Future Extreme Heat') return Q14aVisualization; // Fixed case here
+    if (questionText === 'Intended Actions During Next Extreme Heat') return Q15aVisualization;
+    if (questionText === 'Additional Strategies for Heat') return Q16aVisualization; // Fixed case here
+    if (questionText === 'Activity Change During Heat Events') return Q17aVisualization;
+    if (questionText === 'Home Air Conditioning Status') return Q18aVisualization;
+    if (questionText === 'Suggestions for Preparedness') return Q52Visualization;
+    if (questionText === 'Impact of Extreme Cold') return Q11bVisualization;
+    if (questionText === 'Coping with Extreme Cold') return Q12bVisualization;
+    if (questionText === 'Likelihood of Future Extreme Cold') return Q13bVisualization;
+    if (questionText === 'Expected Personal Impact of Future Extreme Cold') return Q14bVisualization;
+    if (questionText === 'Intended Actions During Next Extreme Cold') return Q15bVisualization;
+    if (questionText === 'Additional Strategies for Cold') return Q16bVisualization;
+    if (questionText === 'Activity Change During Cold Events') return Q17bVisualization;
+    if (questionText === 'Impact of Flooding') return Q11cVisualization;
+    if (questionText === 'Coping with Flooding') return Q12cVisualization;
+    if (questionText === 'Likelihood of Future Flooding') return Q13cVisualization;
+    if (questionText === 'Expected Personal Impact of Future Flooding') return Q14cVisualization;
+    if (questionText === 'Intended Actions During Next Flood') return Q15cVisualization;
+    if (questionText === 'Activity Change During Flood Events') return Q17cVisualization;
+    if (questionText === 'Additional Strategies for Flooding') return Q16cVisualization;
+    if (questionText === 'Impact of Earthquake') return Q11dVisualization;
+    if (questionText === 'Coping with Earthquake') return Q12dVisualization;
+    if (questionText === 'Likelihood of Future Earthquake') return Q13dVisualization;
+    if (questionText === 'Expected Personal Impact of Future Earthquake') return Q14dVisualization;
+    if (questionText === 'Intended Actions During Next Earthquake') return Q15dVisualization;
+    if (questionText === 'Activity Change During Earthquake Events') return Q17dVisualization;
+    if (questionText === 'Additional Strategies for Earthquake') return Q16dVisualization;
+    if (questionText === 'Impact of Power Outage') return Q11eVisualization;
+    if (questionText === 'Coping with Power Outage') return Q12eVisualization;
+    if (questionText === 'Likelihood of Future Outage') return Q13eVisualization;
+    if (questionText === 'Expected Personal Impact of Future Outage') return Q14eVisualization;
+    if (questionText === 'Intended Actions During Next Outage') return Q15eVisualization;
+    if (questionText === 'Activity Change During Outage Events') return Q17eVisualization;
+    if (questionText === 'Additional Strategies for Outages') return Q16eVisualization;
+
     return null;
   };
 
   return (
     <div className="main-content">
+      <TopMenu />
       <Sidebar
         selectedQuestion={selectedQuestion}
         activeSubheading={activeSubheading}

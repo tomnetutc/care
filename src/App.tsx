@@ -1,8 +1,6 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
-import Sidebar from './components/Sidebar/Sidebar';
-import TopMenu from './components/TopMenu/TopMenu';
 import MainContent from './components/MainContent/MainContent';
 import Home from './components/Home/Home';
 import About from './components/About/About';
@@ -44,7 +42,7 @@ const App: React.FC = () => {
               <Navbar />
               <div className="content-wrapper">
                 {/* <Sidebar /> */}
-                <TopMenu />
+                {/* TopMenu has been moved to MainContent */}
                 <main className="main-area">
                   <div className="main-content">
                     <Routes>

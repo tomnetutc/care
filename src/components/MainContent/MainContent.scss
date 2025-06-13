@@ -8,7 +8,7 @@
   .visualization-container {
     display: flex;
     flex-direction: column;
-    gap: 30px; // Add more spacing between visualizations
+    gap: 5px; // Add more spacing between visualizations
     // max-width: 1100px; // Limit the maximum width for larger screens
     // margin: 0 auto; // Center horizontally, no top margin
     padding: 80px 25px 25px 25px; // Equal padding on all sides for consistent borders
@@ -160,4 +160,13 @@
       }
     }
   }
+}
+
+.menu-container {
+  position: fixed;
+  top: 100px;
+  left: 300px;
+  right: 0;
+  height: 65px;
+  /* other styles */
 }

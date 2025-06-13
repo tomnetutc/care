@@ -56,22 +56,22 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
       path: '/lifestyle',
       subheadings: [
         { 
-          name: 'Personal Preferences', 
+          name: 'Lifestyle Preferences', // Changed from 'Personal Preferences'
           path: '/lifestyle/preferences',
-          topics: ['Lifestyle preferences'] // Add topic label(s)
+          topics: ['Lifestyle Preferences'] // Add topic label(s)
         },
         { 
           name: 'Life Satisfaction', 
           path: '/lifestyle/satisfaction',
           topics: [
-            'Life satisfaction rating',
-            'Life satisfaction compared to during the pandemic'
-          ]
+            'Overall Life Satisfaction', // Change from 'Life satisfaction rating'
+            'Change in Satisfaction Since Pandemic' // Changed from 'Life satisfaction compared to during the pandemic'
+          ] 
         },
         { 
-          name: 'Social & Health Status', 
+          name: 'Support Systems & Health Access', // Changed from 'Social & Health Status'
           path: '/lifestyle/health',
-          topics: ['Social relationships', 'Access to healthcare', 'Financial security', 'Caregiving responsibilities']
+          topics: ['Strength of Social Connections', 'Access to Quality Healthcare', 'Perceived Financial Security', 'Caregiving Responsibilities'] // Changed this line
         },
       ],
       icon: <FontAwesomeIcon icon={faHeart} />,
@@ -80,8 +80,21 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
       title: 'Community Resources & Preparedness',
       path: '/community',
       subheadings: [
-        { name: 'Community Awareness', path: '/community/awareness' },
-        { name: 'Suggestions for Improvement', path: '/community/improvement' },
+        { 
+          name: 'Community Support & Adaptation', 
+          path: '/community/resources',
+          topics: ['Community Support & Adaptation']
+        },
+        { 
+          name: 'Resource Awareness & Access', 
+          path: '/community/awareness',
+          topics: ['Resource Awareness & Access']
+        },
+        { 
+          name: 'Suggestions for Preparedness', 
+          path: '/community/improvement',
+          topics: ['Suggestions for Preparedness']
+        },
       ],
       icon: <FontAwesomeIcon icon={faUsers} />,
     },
@@ -89,12 +102,77 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
       title: 'Experiences with Disruptions & Resilience',
       path: '/disruptions',
       subheadings: [
-        { name: 'General Exposure', path: '/disruptions/exposure' },
-        { name: 'Extreme Heat', path: '/disruptions/heat' },
-        { name: 'Extreme Cold', path: '/disruptions/cold' },
-        { name: 'Flooding', path: '/disruptions/flooding' },
-        { name: 'Earthquake', path: '/disruptions/earthquake' },
-        { name: 'Power Outage', path: '/disruptions/power-outage' },
+        { 
+          name: 'Experience with Disruptions', 
+          path: '/disruptions/exposure',
+          topics: ['Experience with Disruptions'] 
+        },
+        { 
+          name: 'Extreme Heat', 
+          path: '/disruptions/heat',
+          topics: [
+            'Impact of Extreme Heat',
+            'Coping with Extreme Heat',
+            'Likelihood of Future Extreme Heat',
+            'Expected Personal Impact of Future Extreme Heat',
+            'Intended Actions During Next Extreme Heat',
+            'Additional Strategies for Heat',
+            'Activity Change During Heat Events',
+            'Home Air Conditioning Status'
+          ] 
+        },
+        { 
+          name: 'Extreme Cold', 
+          path: '/disruptions/cold',
+          topics: [
+            'Impact of Extreme Cold',
+            'Coping with Extreme Cold',
+            'Likelihood of Future Extreme Cold',
+            'Expected Personal Impact of Future Extreme Cold',
+            'Intended Actions During Next Extreme Cold',
+            'Additional Strategies for Cold',
+            'Activity Change During Cold Events'
+          ] 
+        },
+        { 
+          name: 'Flooding', 
+          path: '/disruptions/flooding',
+          topics: [
+            'Impact of Flooding',
+            'Coping with Flooding',
+            'Likelihood of Future Flooding',
+            'Expected Personal Impact of Future Flooding',
+            'Intended Actions During Next Flood',
+            'Additional Strategies for Flooding',
+            'Activity Change During Flood Events'
+          ]
+        },
+        { 
+          name: 'Earthquake', 
+          path: '/disruptions/earthquake',
+          topics: [
+            'Impact of Earthquake',
+            'Coping with Earthquake',
+            'Likelihood of Future Earthquake',
+            'Expected Personal Impact of Future Earthquake',
+            'Intended Actions During Next Earthquake',
+            'Additional Strategies for Earthquake',
+            'Activity Change During Earthquake Events'
+          ]
+        },
+        { 
+          name: 'Power Outage', 
+          path: '/disruptions/power-outage',
+          topics: [
+            'Impact of Power Outage',
+            'Coping with Power Outage',
+            'Likelihood of Future Outage',
+            'Expected Personal Impact of Future Outage',
+            'Intended Actions During Next Outage',
+            'Additional Strategies for Outages',
+            'Activity Change During Outage Events'
+          ]
+        }
       ],
       icon: <FontAwesomeIcon icon={faExclamationCircle} />,
     },
@@ -183,15 +261,60 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
   }, [location.pathname]);
   
   const handleSectionClick = (index: number) => {
-    // Toggle section expansion as before
-    setExpandedSection(expandedSection === index ? null : index);
+    // Always expand this section
+    setExpandedSection(index);
     
-    // Navigate to section path to show visualizations
-    navigate(sections[index].path);
+    // Get the section and its first subheading
+    const section = sections[index];
+    const firstSubheading = section.subheadings[0];
+    
+    // Reset scroll position
+    const mainArea = document.querySelector('.main-area');
+    if (mainArea) {
+      mainArea.scrollTop = 0;
+    }
+    
+    // Navigate to the first subheading path instead of just the section
+    navigate(firstSubheading.path);
+    
+    // Explicitly expand the first subheading
+    const subheadingSlug = firstSubheading.path.split('/').pop() || '';
+    setExpandedSubheading(subheadingSlug);
+    
+    // If we have topics for this subheading, trigger the first topic click
+    if (firstSubheading.topics && firstSubheading.topics.length > 0 && onTopicClick) {
+      onTopicClick(firstSubheading.topics[0], subheadingSlug);
+    }
   };
   
-  const handleSubheadingClick = (subheadingSlug: string) => {
+  const handleSubheadingClick = (subheadingSlug: string, e?: React.MouseEvent) => {
+    // Prevent default navigation behavior if event is provided
+    if (e) {
+      e.preventDefault();
+    }
+    
+    // Keep existing toggle functionality
     setExpandedSubheading(expandedSubheading === subheadingSlug ? null : subheadingSlug);
+    
+    // Add new scroll-to-visualization functionality:
+    // Find the subheading in the sections array
+    let currentSubheading = null;
+    for (const section of sections) {
+      const subheading = section.subheadings.find(sub => {
+        const slug = sub.path.split('/').pop() || '';
+        return slug === subheadingSlug;
+      });
+      
+      if (subheading) {
+        currentSubheading = subheading;
+        break;
+      }
+    }
+    
+    // If subheading has topics, trigger click on the first topic to scroll to visualization
+    if (currentSubheading?.topics?.length && onTopicClick) {
+      onTopicClick(currentSubheading.topics[0], subheadingSlug);
+    }
   };
   
   // Update isSubheadingActive to highlight when a topic within it is active
@@ -294,21 +417,42 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
                   const subheadingActive = isSubheadingActive(subheading);
                   const subheadingSlug = subheading.path.split('/').pop() || '';
                   const isSubheadingExpanded = expandedSubheading === subheadingSlug;
+                  const hasSingleTopic = subheading.topics && subheading.topics.length === 1;
                   
                   return (
                     <li key={subIndex} className="subheading-item">
-                      <div 
-                        className={`subheading-container ${subheadingActive ? 'active' : ''}`}
-                      >
-                        <Link 
-                          to={subheading.path} 
-                          className={`subheading-link ${subheadingActive ? 'active' : ''}`}
-                          onClick={() => handleSubheadingClick(subheadingSlug)}
+                      {hasSingleTopic ? (
+                        // Single topic case - display the topic directly
+                        <div 
+                          className={`subheading-container ${subheadingActive ? 'active' : ''}`}
+                          onClick={() => {
+                            // Navigate directly to the topic visualization
+                            onTopicClick && onTopicClick(subheading.topics![0], subheadingSlug);
+                            setExpandedSubheading(subheadingSlug);
+                          }}
+                          style={{ cursor: 'pointer' }}
                         >
-                          {subheading.name}
-                        </Link>
-                      </div>
-                      {subheading.topics && (
+                          <div className={`subheading-link ${subheadingActive ? 'active' : ''}`}>
+                            {subheading.name}
+                          </div>
+                        </div>
+                      ) : (
+                        // Multiple topics case - keep existing expandable behavior
+                        <div 
+                          className={`subheading-container ${subheadingActive ? 'active' : ''}`}
+                        >
+                          <Link 
+                            to={subheading.path} 
+                            className={`subheading-link ${subheadingActive ? 'active' : ''}`}
+                            onClick={(e) => handleSubheadingClick(subheadingSlug, e)}
+                          >
+                            {subheading.name}
+                          </Link>
+                        </div>
+                      )}
+                      
+                      {/* Only render topics list for multi-topic subsections */}
+                      {!hasSingleTopic && subheading.topics && (
                         <ul className={`topics-list ${isSubheadingExpanded ? 'expanded' : ''}`}>
                           {subheading.topics.map((topic, topicIdx) => {
                             const isActive = isTopicActive(topic);
@@ -318,8 +462,6 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
                                 key={topicIdx}
                                 className={`topic-label ${isActive ? 'active' : ''}`}
                                 onClick={() => {
-                                  // Remove console.log to fix performance issues
-                                  // console.log(`Clicking topic: ${topic} in subheading: ${subheadingSlug}`);
                                   onTopicClick && onTopicClick(topic, subheadingSlug);
                                   setExpandedSubheading(subheadingSlug);
                                 }}
