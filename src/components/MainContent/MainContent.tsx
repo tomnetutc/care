@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Q1Visualization, Q2Visualization, Q3Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q8Visualization, Q9Visualization, Q10Visualization, Q11aVisualization, Q12aVisualization, Q13aVisualization, Q14aVisualization, Q15aVisualization, Q16aVisualization, Q17aVisualization, Q18aVisualization, Q11bVisualization, Q12bVisualization, Q13bVisualization, Q14bVisualization, Q15bVisualization, Q16bVisualization, Q17bVisualization, Q11cVisualization, Q12cVisualization, Q52Visualization, Q13cVisualization, Q14cVisualization, Q15cVisualization, Q16cVisualization, Q17cVisualization, Q11dVisualization, Q12dVisualization, Q13dVisualization, Q14dVisualization, Q15dVisualization, Q16dVisualization, Q17dVisualization, Q11eVisualization, Q12eVisualization, Q13eVisualization, Q14eVisualization, Q15eVisualization, Q17eVisualization, Q16eVisualization } from '../Visualizations';
+import { Q1Visualization, Q2Visualization, Q3Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q8Visualization, Q9Visualization, Q10Visualization, Q11aVisualization, Q12aVisualization, Q13aVisualization, Q14aVisualization, Q15aVisualization, Q16aVisualization, Q17aVisualization, Q18aVisualization, Q11bVisualization, Q12bVisualization, Q13bVisualization, Q14bVisualization, Q15bVisualization, Q16bVisualization, Q17bVisualization, Q11cVisualization, Q12cVisualization, Q52Visualization, Q13cVisualization, Q14cVisualization, Q15cVisualization, Q16cVisualization, Q17cVisualization, Q11dVisualization, Q12dVisualization, Q13dVisualization, Q14dVisualization, Q15dVisualization, Q16dVisualization, Q17dVisualization, Q11eVisualization, Q12eVisualization, Q13eVisualization, Q14eVisualization, Q15eVisualization, Q17eVisualization, Q16eVisualization, Q19Visualization, Q20Visualization, Q21aVisualization, Q21bVisualization } from '../Visualizations';
 import './MainContent.scss';
 import Sidebar from '../Sidebar/Sidebar';
 import TopMenu from '../TopMenu/TopMenu';
@@ -34,7 +34,7 @@ const SLUG_TO_NAME_MAP: Record<string, string> = {
   'improvement': 'Suggestions for Preparedness',
   
   // Disruptions section
-  'exposure': 'Experience with Disruptions',
+  'exposure': 'Prior Experience',
   'heat': 'Impact of Extreme Heat',
   'cold': 'Impact of Extreme Cold',
   'flooding': 'Impact of Flooding',
@@ -43,7 +43,7 @@ const SLUG_TO_NAME_MAP: Record<string, string> = {
   
   // Transportation section
   'employment': 'Employment & Student Status',
-  'commute': 'Commute Frequency',
+  'commute': 'Travel Frequency for Work/School',
   'distance': 'Distance to Key Locations',
   'choices': 'Transportation Choices',
   'delivery': 'Delivery & Activity Frequency',
@@ -79,7 +79,7 @@ const DEFAULT_QUESTIONS: Record<string, string> = {
   'improvement': 'Suggestions for Preparedness',
   
   // Disruptions section
-  'exposure': 'Experience with Disruptions',
+  'exposure': 'Prior Experience',
   'heat': 'Impact of Extreme Heat', // Fixed case here
   'cold': 'Impact of Extreme Cold', // Fixed case here
   'flooding': 'Impact of Flooding', // Fixed case here
@@ -309,7 +309,7 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
 
   // Helper function to map questions to visualization components
   const getVisualizationComponent = (questionText: string) => {
-    if (questionText === 'Lifestyle Preferences') return Q1Visualization; // Fixed case here
+    if (questionText === 'Lifestyle Preferences') return Q1Visualization;
     if (questionText === 'Community Support & Adaptation') return Q2Visualization;
     if (questionText === 'Resource Awareness & Access') return Q3Visualization;
     if (questionText === 'Overall Life Satisfaction') return Q4Visualization;
@@ -318,13 +318,13 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
     if (questionText === 'Access to Quality Healthcare') return Q7Visualization;
     if (questionText === 'Perceived Financial Security') return Q8Visualization;
     if (questionText === 'Caregiving Responsibilities') return Q9Visualization;
-    if (questionText === 'Experience with Disruptions') return Q10Visualization;
-    if (questionText === 'Impact of Extreme Heat') return Q11aVisualization; // Fixed case here
-    if (questionText === 'Coping with Extreme Heat') return Q12aVisualization; // Fixed case here
-    if (questionText === 'Likelihood of Future Extreme Heat') return Q13aVisualization; // Fixed case here
-    if (questionText === 'Expected Personal Impact of Future Extreme Heat') return Q14aVisualization; // Fixed case here
+    if (questionText === 'Prior Experience') return Q10Visualization;
+    if (questionText === 'Impact of Extreme Heat') return Q11aVisualization;
+    if (questionText === 'Coping with Extreme Heat') return Q12aVisualization;
+    if (questionText === 'Likelihood of Future Extreme Heat') return Q13aVisualization;
+    if (questionText === 'Expected Personal Impact of Future Extreme Heat') return Q14aVisualization;
     if (questionText === 'Intended Actions During Next Extreme Heat') return Q15aVisualization;
-    if (questionText === 'Additional Strategies for Heat') return Q16aVisualization; // Fixed case here
+    if (questionText === 'Additional Strategies for Heat') return Q16aVisualization;
     if (questionText === 'Activity Change During Heat Events') return Q17aVisualization;
     if (questionText === 'Home Air Conditioning Status') return Q18aVisualization;
     if (questionText === 'Suggestions for Preparedness') return Q52Visualization;
@@ -356,6 +356,12 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
     if (questionText === 'Intended Actions During Next Outage') return Q15eVisualization;
     if (questionText === 'Activity Change During Outage Events') return Q17eVisualization;
     if (questionText === 'Additional Strategies for Outages') return Q16eVisualization;
+    if (questionText === 'Employment & Student Status') return Q19Visualization;
+    if (questionText === 'Travel Frequency for Work/School') return Q20Visualization;
+    if (questionText === 'Distance to Work') return Q21aVisualization;
+    if (questionText === 'Distance to School') return Q21bVisualization;
+    // if (questionText === 'Transportation Choices') return Q22Visualization;
+
 
     return null;
   };

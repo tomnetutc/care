@@ -99,13 +99,13 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
       icon: <FontAwesomeIcon icon={faUsers} />,
     },
     {
-      title: 'Experiences with Disruptions & Resilience',
+      title: 'Experiences and Responses to Disruptions',
       path: '/disruptions',
       subheadings: [
         { 
-          name: 'Experience with Disruptions', 
+          name: 'Prior Experience', 
           path: '/disruptions/exposure',
-          topics: ['Experience with Disruptions'] 
+          topics: ['Prior Experience'] 
         },
         { 
           name: 'Extreme Heat', 
@@ -180,9 +180,24 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
       title: 'Work, School & Commuting',
       path: '/work',
       subheadings: [
-        { name: 'Employment & Student Status', path: '/work/employment' },
-        { name: 'Commute Frequency', path: '/work/commute' },
-        { name: 'Distance to Key Locations', path: '/work/distance' },
+        { 
+          name: 'Employment & Student Status', 
+          path: '/work/employment',
+          topics: ['Employment & Student Status']
+        },
+        { 
+          name: 'Travel Frequency for Work/School', 
+          path: '/work/commute',
+          topics: ['Travel Frequency for Work/School']  // Changed to match the exact case
+        },
+        { 
+          name: 'Distance to Key Locations', 
+          path: '/work/distance',
+          topics: [
+            'Distance to Work',
+            'Distance to School'
+          ]
+        },
       ],
       icon: <FontAwesomeIcon icon={faBriefcase} />,
     },

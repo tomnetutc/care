@@ -44,11 +44,16 @@ export interface LikertChartProps {
   questionLabels?: Record<string, string>;
   responseCategories?: string[];
   categoryColors?: string[];
+  categoryLabels?: string[];
   showSummaryTable?: boolean;
+  dataProcessor?: (data: ProcessedDataItem[]) => ProcessedDataItem[];
+  sourceCategories?: string[];
 }
 
 export interface LikertDataOptions {
   questionOrder: string[];
   questionLabels: Record<string, string>;
   responseCategories: string[];
+  sourceCategories?: string[];
+  dataProcessor?: (data: ProcessedDataItem[]) => ProcessedDataItem[];
 }

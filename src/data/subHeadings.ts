@@ -41,9 +41,9 @@ export const subHeadingsData = {
     ],
     disruptions: [
       {
-        name: 'Experience with Disruptions',
+        name: 'Prior Experience',
         questions: [
-          { id: 11, text: 'Experience with Disruptions' }
+          { id: 11, text: 'Prior Experience' }
         ],
       },
       {
@@ -111,24 +111,24 @@ export const subHeadingsData = {
     work: [
       {
         name: 'Employment & Student Status',
-        questions: [{ id: 17, text: 'Q19 – Current Status (Worker/Student)' }],
+        questions: [{ id: 17, text: 'Employment & Student Status' }],
       },
       {
-        name: 'Commute Frequency',
-        questions: [{ id: 18, text: 'Q20 – Travel Frequency for Work/School' }],
+        name: 'Travel Frequency for Work/School',
+        questions: [{ id: 18, text: 'Travel Frequency for Work/School' }],
       },
       {
         name: 'Distance to Key Locations',
         questions: [
-          { id: 19, text: 'Q21a – Distance to Work' },
-          { id: 20, text: 'Q21b – Distance to School' },
+          { id: 19, text: 'Distance to Work' },
+          { id: 20, text: 'Distance to School' },
         ],
       },
     ],
     transportation: [
       {
         name: 'Transportation Choices',
-        questions: [{ id: 21, text: 'Q22 – Most-Used Transport for Various Activities' }],
+        questions: [{ id: 21, text: 'Transportation Choices' }],
       },
       {
         name: 'Delivery & Activity Frequency',

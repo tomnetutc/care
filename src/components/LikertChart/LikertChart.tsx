@@ -24,7 +24,10 @@ const LikertChart: React.FC<LikertChartProps> = ({
     "#93c4b9", // Light green for somewhat agree
     "#2ba88c"  // Strong green for strongly agree
   ],
-  showSummaryTable = true
+  categoryLabels,
+  showSummaryTable = true,
+  dataProcessor,
+  sourceCategories
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -36,7 +39,9 @@ const LikertChart: React.FC<LikertChartProps> = ({
   const { data, summaryStats, isLoading, error, totalResponses } = useLikertData({
     questionOrder,
     questionLabels,
-    responseCategories
+    responseCategories,
+    sourceCategories,
+    dataProcessor
   });
 
   // Update dimensions on resize

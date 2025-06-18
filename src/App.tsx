@@ -70,6 +70,14 @@ const App: React.FC = () => {
                         path="/demographics/:subHeadingName?"
                         element={<MainContent subHeadings={subHeadingsData.demographics} />}
                       />
+                      <Route
+                        path="/work/:subHeadingName?"
+                        element={<MainContent subHeadings={subHeadingsData.work} />}
+                      />
+                      <Route
+                        path="/driving/:subHeadingName?"
+                        element={<MainContent subHeadings={subHeadingsData.driving} />}
+                      />
                       {/* Default redirect if needed */}
                       <Route path="/" element={<MainContent subHeadings={subHeadingsData.lifestyle} />} />
                     </Routes>

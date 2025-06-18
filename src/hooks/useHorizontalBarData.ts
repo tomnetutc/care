@@ -93,23 +93,49 @@ export const useHorizontalBarData = (options: UseHorizontalBarDataOptions) => {
       filteredData.forEach((d: any) => {
         const rawValue = d[dataField];
         
-        // Try to determine the correct category
+        // Skip empty or invalid values (but NOT "0")
+        if (!rawValue || rawValue === '-8' || (rawValue.trim && rawValue.trim() === '')) {
+          return;
+        }
+        
         let category: string | undefined;
         
-        // Direct match in category order
-        if (categoryOrder.includes(rawValue)) {
-          category = rawValue;
-        }
-        // Check if value exists in valueMap
-        else if (valueMap[rawValue]) {
-          category = valueMap[rawValue];
-        }
-        // Try alternate fields
-        else {
-          for (const field of alternateFields) {
-            if (d[field] && (categoryOrder.includes(d[field]) || valueMap[d[field]])) {
-              category = categoryOrder.includes(d[field]) ? d[field] : valueMap[d[field]];
-              break;
+        // Special handling for distance fields - use numeric categorization
+        if (dataField === 'work_dist' || dataField === 'school_dist') {
+          const numValue = parseFloat(String(rawValue).trim());
+          
+          if (!isNaN(numValue)) {
+            // Categorize based on numeric value
+            if (numValue >= 0 && numValue < 2) category = "0-1 miles";
+            else if (numValue >= 2 && numValue <= 5) category = "2-5 miles";
+            else if (numValue > 5 && numValue <= 10) category = "6-10 miles";
+            else if (numValue > 10 && numValue <= 20) category = "11-20 miles";
+            else if (numValue > 20 && numValue <= 50) category = "21-50 miles";
+            else if (numValue > 50) category = "50+ miles";
+          } else {
+            // Handle text values through valueMap for distance fields
+            const textValue = String(rawValue).toLowerCase().trim();
+            if (valueMap[textValue]) {
+              category = valueMap[textValue];
+            }
+          }
+        } else {
+          // For other fields, use existing logic
+          // Direct match in category order
+          if (categoryOrder.includes(rawValue)) {
+            category = rawValue;
+          }
+          // Check if value exists in valueMap
+          else if (valueMap[rawValue]) {
+            category = valueMap[rawValue];
+          }
+          // Try alternate fields
+          else {
+            for (const field of alternateFields) {
+              if (d[field] && (categoryOrder.includes(d[field]) || valueMap[d[field]])) {
+                category = categoryOrder.includes(d[field]) ? d[field] : valueMap[d[field]];
+                break;
+              }
             }
           }
         }

@@ -15,7 +15,7 @@ export const useLikertData = (options: LikertDataOptions) => {
   const { filters } = useFilters();
 
   // Extract options
-  const { questionOrder, questionLabels, responseCategories } = options;
+  const { questionOrder, questionLabels, responseCategories, sourceCategories, dataProcessor } = options;
 
   // Load data on hook initialization
   useEffect(() => {
@@ -51,7 +51,7 @@ export const useLikertData = (options: LikertDataOptions) => {
     if (rawData.length > 0) {
       processData(rawData);
     }
-  }, [filters, rawData, questionOrder, questionLabels, responseCategories]);
+  }, [filters, rawData, questionOrder, questionLabels, responseCategories, dataProcessor]);
 
   // Process data with filters applied
   const processData = (parsedData: DataItem[]) => {
@@ -71,17 +71,31 @@ export const useLikertData = (options: LikertDataOptions) => {
     // Set total responses after filtering
     setTotalResponses(filteredData.length);
     
+    // Use sourceCategories if provided, otherwise use responseCategories
+    const categoriesToUse = sourceCategories || responseCategories;
+    
     // Process data to get distribution percentages for each question
     const processedData: ProcessedDataItem[] = questionOrder.map((column: string) => {
-      // Count responses in each category (1-5)
-      const responseCounts = new Array(responseCategories.length).fill(0);
+      // Count responses in each category
+      const responseCounts = new Array(categoriesToUse.length).fill(0);
       let validResponses = 0;
       
       filteredData.forEach(d => {
         const value = parseInt(d[column] as string);
-        if (!isNaN(value) && value >= 1 && value <= responseCategories.length) {
-          responseCounts[value - 1]++;
-          validResponses++;
+        const isZeroBased = categoriesToUse.includes("0");
+        
+        if (isZeroBased) {
+          // For 0-based scales (0,1,2,3,4,5,6,7)
+          if (!isNaN(value) && value >= 0 && value < categoriesToUse.length) {
+            responseCounts[value]++;
+            validResponses++;
+          }
+        } else {
+          // For 1-based scales (1,2,3,4,5) - existing logic
+          if (!isNaN(value) && value >= 1 && value <= categoriesToUse.length) {
+            responseCounts[value - 1]++;
+            validResponses++;
+          }
         }
       });
       
@@ -92,7 +106,7 @@ export const useLikertData = (options: LikertDataOptions) => {
       
       return {
         question: questionLabels[column] || column,
-        values: responseCategories.map((category: string, i: number) => ({
+        values: categoriesToUse.map((category: string, i: number) => ({
           category,
           value: responsePercentages[i],
           count: responseCounts[i]
@@ -100,14 +114,19 @@ export const useLikertData = (options: LikertDataOptions) => {
       };
     });
 
-    // Calculate summary statistics
+    // Apply custom data processor if provided (only affects visualization data)
+    const finalData = dataProcessor ? dataProcessor(processedData) : processedData;
+    setData(finalData);
+    
+    // Calculate summary statistics using the ORIGINAL data (not the processed ones)
+    // This preserves the accurate statistics based on individual responses
     const calculatedStats: SummaryStatistic[] = questionOrder.map((column: string) => {
       const values: number[] = [];
       let validResponses = 0;
       
       filteredData.forEach(d => {
         const value = parseInt(d[column] as string);
-        if (!isNaN(value) && value >= 1 && value <= responseCategories.length) {
+        if (!isNaN(value) && value >= 0) {
           values.push(value);
           validResponses++;
         }
@@ -131,7 +150,6 @@ export const useLikertData = (options: LikertDataOptions) => {
       };
     });
 
-    setData(processedData);
     setSummaryStats(calculatedStats);
     setIsLoading(false);
   };

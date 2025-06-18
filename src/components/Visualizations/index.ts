@@ -45,3 +45,7 @@ export { default as Q13eVisualization } from './Q13eVisualization';
 export { default as Q14eVisualization } from './Q14eVisualization';
 export { default as Q17eVisualization } from './Q17eVisualization';
 export { default as Q16eVisualization } from './Q16eVisualization';
+export { default as Q19Visualization } from './Q19Visualization';
+export { default as Q20Visualization } from './Q20Visualization';
+export { default as Q21aVisualization } from './Q21aVisualization';
+export { default as Q21bVisualization } from './Q21bVisualization';

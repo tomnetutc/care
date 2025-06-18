@@ -35,7 +35,7 @@ const responseCategories = [
 ];
 
 const categoryColors = [
-  "#E2E2DC",  // Light Gray
+  "#b6bebc",  // Light Gray
   "#F4E9AA",  // Lightest Yellow
   "#EAD97C",  // Anchor Yellow
   "#D1B856",  // Darker Yellow
