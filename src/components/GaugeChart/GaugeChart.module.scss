@@ -121,13 +121,30 @@
     background-color: #f9f9f9;
   }
   
-  td:first-child, th:first-child {
+  tr:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Field column gets 50% of the table width */
+  th:first-child,
+  td:first-child {
+    width: 50%;
     text-align: left;
+    font-weight: 500;
     max-width: 300px;
   }
   
-  tr:hover {
-    background-color: #f0f0f0;
+  /* All other columns share the remaining 50% equally */
+  th:not(:first-child),
+  td:not(:first-child) {
+    width: 10%; /* Each of the 6 remaining columns gets 1/6 of 50% */
+    text-align: center;
+  }
+  
+  /* Standard Deviation header text wrapping */
+  th:nth-child(5) {
+    padding: 8px 4px;
+    white-space: normal;
   }
 }
 

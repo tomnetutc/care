@@ -17,7 +17,6 @@ export interface SummaryStatistic {
   max: number;
   mean: number;
   stdDev: number;
-  variance: number;
   responses: number;
 }
 

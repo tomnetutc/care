@@ -259,6 +259,25 @@
   background-color: #f0f0f0;
 }
 
+/* Column width distribution for summary table */
+.summaryTable th:first-child,
+.summaryTable td:first-child {
+  width: 50%; /* Attributes column gets 50% of the table width */
+  text-align: left;
+}
+
+/* All other columns share the remaining 50% equally */
+.summaryTable th:not(:first-child),
+.summaryTable td:not(:first-child) {
+  width: 10%; /* Each of the 5 remaining columns gets 10% */
+  text-align: center;
+}
+
+/* For Standard Deviation, let's make the header text fit better */
+.summaryTable th:nth-child(5) {
+  padding: 8px 4px; /* Slightly reduced padding to help with text fitting */
+}
+
 /* Responsive design */
 @media (min-width: 1200px) {
   .chartContainer {

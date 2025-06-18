@@ -189,7 +189,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
       .attr("y", 70)
       .attr("text-anchor", "middle")
       .style("opacity", 0)
-      .text("Life satisfaction score");
+      .text("Life Satisfaction Score");
     
     // Animate needle
     needleGroup
@@ -214,7 +214,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
     
     return (
       <div className={styles.summaryTableContainer}>
-        <h3>Summary table</h3>
+        <h3>Summary Table</h3>
         <table className={styles.summaryTable}>
           <thead>
             <tr>
@@ -222,8 +222,10 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
               <th>Min</th>
               <th>Max</th>
               <th>Mean</th>
-              <th>Standard deviation</th>
-              <th>Variance</th>
+              <th>
+                Standard<br />Deviation
+              </th>
+              {/* Optional: Keep or remove variance column */}
               <th>Responses</th>
             </tr>
           </thead>
@@ -234,7 +236,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
               <td>{summary.max.toFixed(2)}</td>
               <td>{summary.mean.toFixed(2)}</td>
               <td>{summary.stdDev.toFixed(2)}</td>
-              <td>{summary.variance.toFixed(2)}</td>
+              {/* Optional: Keep or remove variance column */}
               <td>{summary.responses}</td>
             </tr>
           </tbody>

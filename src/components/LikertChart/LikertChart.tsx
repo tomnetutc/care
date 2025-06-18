@@ -442,12 +442,12 @@ const LikertChart: React.FC<LikertChartProps> = ({
   }
 
   // Render summary table
-  const renderSummaryTable = () => {
+  function renderSummaryTable() {
     if (!showSummaryTable) return null;
     
     return (
       <div className={styles.summaryTableContainer}>
-        <h3>Summary statistics</h3>
+        <h3>Summary Table</h3>
         <table className={styles.summaryTable}>
           <thead>
             <tr>
@@ -455,8 +455,9 @@ const LikertChart: React.FC<LikertChartProps> = ({
               <th>Min</th>
               <th>Max</th>
               <th>Mean</th>
-              <th>Standard deviation</th>
-              <th>Variance</th>
+                <th>
+                Standard<br />Deviation
+                </th>
               <th>Responses</th>
             </tr>
           </thead>
@@ -468,7 +469,6 @@ const LikertChart: React.FC<LikertChartProps> = ({
                 <td>{stat.max.toFixed(2)}</td>
                 <td>{stat.mean.toFixed(2)}</td>
                 <td>{stat.stdDev.toFixed(2)}</td>
-                <td>{stat.variance.toFixed(2)}</td>
                 <td>{stat.responses}</td>
               </tr>
             ))}
