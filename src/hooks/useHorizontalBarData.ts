@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import * as d3 from 'd3';
 import { useFilters } from '../context/FilterContext';
+import DataService from '../services/DataService';
 
 export interface BarDataItem {
   category: string;
@@ -28,27 +28,16 @@ export const useHorizontalBarData = (options: UseHorizontalBarDataOptions) => {
   const { dataField, categoryOrder, categoryLabels, valueMap = {}, alternateFields = [] } = options;
   
   // Get filters from context
-  const { filters } = useFilters();
+  const { filters, isDataLoading, dataError } = useFilters();
 
-  // Load data once on hook initialization
+  // Load data once using the data service
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${process.env.PUBLIC_URL}/leaphi_final_data.csv`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        
-        const csvText = await response.text();
-        const parsedData = d3.csvParse(csvText);
-        
-        // Store the raw parsed data
+        const parsedData = await DataService.getInstance().getData();
         setRawData(parsedData);
-        
-        // Process the data with applied filters
         processData(parsedData);
-        
       } catch (err) {
         console.error('Error loading data:', err);
         setError((err as Error).message);
@@ -56,8 +45,15 @@ export const useHorizontalBarData = (options: UseHorizontalBarDataOptions) => {
       }
     };
 
-    loadData();
-  }, []);
+    if (!isDataLoading) {
+      if (dataError) {
+        setError(dataError);
+        setIsLoading(false);
+      } else {
+        loadData();
+      }
+    }
+  }, [isDataLoading, dataError]);
 
   // Reprocess data when filters change
   useEffect(() => {

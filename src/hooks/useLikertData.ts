@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import * as d3 from 'd3';
 import { useFilters } from '../context/FilterContext';
 import { DataItem, ProcessedDataItem, SummaryStatistic, LikertDataOptions } from '../types/Helpers';
+import DataService from '../services/DataService';
 
 export const useLikertData = (options: LikertDataOptions) => {
   const [data, setData] = useState<ProcessedDataItem[]>([]);
@@ -11,31 +11,17 @@ export const useLikertData = (options: LikertDataOptions) => {
   const [totalResponses, setTotalResponses] = useState<number>(0);
   const [rawData, setRawData] = useState<DataItem[]>([]);
   
-  // Get filters from context
-  const { filters } = useFilters();
-
-  // Extract options
+  const { filters, isDataLoading, dataError } = useFilters();
   const { questionOrder, questionLabels, responseCategories, sourceCategories, dataProcessor } = options;
 
-  // Load data on hook initialization
+  // Load data using the data service
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${process.env.PUBLIC_URL}/leaphi_final_data.csv`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        
-        const csvText = await response.text();
-        const parsedData = d3.csvParse(csvText) as unknown as DataItem[];
-        
-        // Store the raw parsed data
-        setRawData(parsedData);
-        
-        // Process the data with applied filters
-        processData(parsedData);
-        
+        const parsedData = await DataService.getInstance().getData();
+        setRawData(parsedData as unknown as DataItem[]);
+        processData(parsedData as unknown as DataItem[]);
       } catch (err) {
         console.error('Error loading data:', err);
         setError((err as Error).message);
@@ -43,8 +29,16 @@ export const useLikertData = (options: LikertDataOptions) => {
       }
     };
 
-    loadData();
-  }, []);
+    // Only load if global data loading is complete
+    if (!isDataLoading) {
+      if (dataError) {
+        setError(dataError);
+        setIsLoading(false);
+      } else {
+        loadData();
+      }
+    }
+  }, [isDataLoading, dataError]);
 
   // Reprocess data when filters change
   useEffect(() => {
