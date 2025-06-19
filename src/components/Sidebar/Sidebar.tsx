@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom'; // Add useNavigate
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faHeart, 
@@ -15,13 +15,18 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import './Sidebar.scss';
 
+// Generate scoped key helper function (same as in MainContent)
+const generateScopedKey = (section: string, subSection: string, topicLabel: string): string => {
+  return `${section}-${subSection}-${topicLabel}`.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
+};
+
 /**
  * Interface for sub-heading items in the sidebar
  */
 interface SubHeading {
   name: string;
   path: string;
-  topics?: string[]; // Add this line
+  topics?: string[];
 }
 
 /**
@@ -38,14 +43,14 @@ interface Section {
  * Sidebar component that displays navigation for the dashboard
  */
 interface SidebarProps {
-  selectedQuestion?: string | null;
+  selectedQuestion?: string | null; // Now receives scoped key
   activeSubheading?: string | null;
-  onTopicClick?: (questionText: string, subheadingSlug?: string) => void;
+  onTopicClick?: (topicLabel: string, subheadingSlug?: string) => void; // Still receives readable topic label
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, onTopicClick }) => {
   const location = useLocation();
-  const navigate = useNavigate(); // Add this hook
+  const navigate = useNavigate();
   const [expandedSection, setExpandedSection] = useState<number | null>(null);
   const [expandedSubheading, setExpandedSubheading] = useState<string | null>(null);
   
@@ -56,22 +61,22 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
       path: '/lifestyle',
       subheadings: [
         { 
-          name: 'Lifestyle Preferences', // Changed from 'Personal Preferences'
+          name: 'Lifestyle Preferences',
           path: '/lifestyle/preferences',
-          topics: ['Lifestyle Preferences'] // Add topic label(s)
+          topics: ['Lifestyle Preferences']
         },
         { 
           name: 'Life Satisfaction', 
           path: '/lifestyle/satisfaction',
           topics: [
-            'Overall Life Satisfaction', // Change from 'Life satisfaction rating'
-            'Change in Satisfaction Since Pandemic' // Changed from 'Life satisfaction compared to during the pandemic'
+            'Overall Life Satisfaction',
+            'Change in Satisfaction Since Pandemic'
           ] 
         },
         { 
-          name: 'Support Systems & Health Access', // Changed from 'Social & Health Status'
+          name: 'Support Systems & Health Access',
           path: '/lifestyle/health',
-          topics: ['Strength of Social Connections', 'Access to Quality Healthcare', 'Perceived Financial Security', 'Caregiving Responsibilities'] // Changed this line
+          topics: ['Strength of Social Connections', 'Access to Quality Healthcare', 'Perceived Financial Security', 'Caregiving Responsibilities']
         },
       ],
       icon: <FontAwesomeIcon icon={faHeart} />,
@@ -111,66 +116,66 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
           name: 'Extreme Heat', 
           path: '/disruptions/heat',
           topics: [
-            'Impact of Extreme Heat',
-            'Coping with Extreme Heat',
-            'Likelihood of Future Extreme Heat',
-            'Expected Personal Impact of Future Extreme Heat',
-            'Intended Actions During Next Extreme Heat',
-            'Additional Strategies for Heat',
-            'Activity Change During Heat Events',
-            'Home Air Conditioning Status'
+            'Impact on Daily Life',
+            'Coping Ability',
+            'Chance of Future Event',
+            'Impact of Next Event',
+            'Anticipated Responses',
+            'Other Coping Strategies',
+            'Changes in Daily Activities',
+            'Air Conditioning at Home'
           ] 
         },
         { 
           name: 'Extreme Cold', 
           path: '/disruptions/cold',
           topics: [
-            'Impact of Extreme Cold',
-            'Coping with Extreme Cold',
-            'Likelihood of Future Extreme Cold',
-            'Expected Personal Impact of Future Extreme Cold',
-            'Intended Actions During Next Extreme Cold',
-            'Additional Strategies for Cold',
-            'Activity Change During Cold Events'
+            'Impact on Daily Life',
+            'Coping Ability',
+            'Chance of Future Event',
+            'Impact of Next Event',
+            'Anticipated Responses',
+            'Other Coping Strategies',
+            'Changes in Daily Activities'
           ] 
         },
         { 
           name: 'Flooding', 
           path: '/disruptions/flooding',
           topics: [
-            'Impact of Flooding',
-            'Coping with Flooding',
-            'Likelihood of Future Flooding',
-            'Expected Personal Impact of Future Flooding',
-            'Intended Actions During Next Flood',
-            'Additional Strategies for Flooding',
-            'Activity Change During Flood Events'
+            'Impact on Daily Life',
+            'Coping Ability',
+            'Chance of Future Event',
+            'Impact of Next Event',
+            'Anticipated Responses',
+            'Other Coping Strategies',
+            'Changes in Daily Activities'
           ]
         },
         { 
           name: 'Earthquake', 
           path: '/disruptions/earthquake',
           topics: [
-            'Impact of Earthquake',
-            'Coping with Earthquake',
-            'Likelihood of Future Earthquake',
-            'Expected Personal Impact of Future Earthquake',
-            'Intended Actions During Next Earthquake',
-            'Additional Strategies for Earthquake',
-            'Activity Change During Earthquake Events'
+            'Impact on Daily Life',
+            'Coping Ability',
+            'Chance of Future Event',
+            'Impact of Next Event',
+            'Anticipated Responses',
+            'Other Coping Strategies',
+            'Changes in Daily Activities'
           ]
         },
         { 
           name: 'Power Outage', 
           path: '/disruptions/power-outage',
           topics: [
-            'Impact of Power Outage',
-            'Coping with Power Outage',
-            'Likelihood of Future Outage',
-            'Expected Personal Impact of Future Outage',
-            'Intended Actions During Next Outage',
-            'Additional Strategies for Outages',
-            'Activity Change During Outage Events'
+            'Impact on Daily Life',
+            'Coping Ability',
+            'Chance of Future Event',
+            'Impact of Next Event',
+            'Anticipated Responses',
+            'Other Coping Strategies',
+            'Changes in Daily Activities'
           ]
         }
       ],
@@ -188,7 +193,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
         { 
           name: 'Travel Frequency for Work/School', 
           path: '/work/commute',
-          topics: ['Travel Frequency for Work/School']  // Changed to match the exact case
+          topics: ['Travel Frequency for Work/School']
         },
         { 
           name: 'Distance to Key Locations', 
@@ -332,76 +337,69 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
     }
   };
   
-  // Update isSubheadingActive to highlight when a topic within it is active
+  // Helper to get section from the current path
+  const getCurrentSection = () => {
+    const pathParts = location.pathname.split('/');
+    return pathParts[1] || 'lifestyle';
+  };
+
+  // Update isSubheadingActive to work with main section context
   const isSubheadingActive = (subheading: SubHeading): boolean => {
     // Check if any topic in this subheading is active
     if (selectedQuestion && subheading.topics) {
-      return subheading.topics.some(topic => isTopicActive(topic));
+      const currentSection = getCurrentSection();
+      const subheadingSlug = subheading.path.split('/').pop() || '';
+      
+      // Only check if we're in the same section
+      const subheadingSection = subheading.path.split('/')[1];
+      if (subheadingSection !== currentSection) {
+        return false;
+      }
+      
+      return subheading.topics.some(topic => {
+        const scopedKey = generateScopedKey(currentSection, subheadingSlug, topic);
+        return scopedKey === selectedQuestion;
+      });
     }
     return false;
   };
   
-  // Simplified isTopicActive function
-  const isTopicActive = (topic: string): boolean => {
+  // Updated isTopicActive function to work with main section context
+  const isTopicActive = (topic: string, subheadingSlug: string): boolean => {
     if (!selectedQuestion) return false;
     
-    // Add console logging to debug the issue
-    console.log(`Comparing: "${topic}" with "${selectedQuestion}"`);
+    const currentSection = getCurrentSection();
+    const scopedKey = generateScopedKey(currentSection, subheadingSlug, topic);
     
-    // Simple normalized comparison that focuses on key terms
-    const topicLower = topic.toLowerCase();
-    const selectedLower = selectedQuestion.toLowerCase();
-    
-    // Exact match
-    if (topicLower === selectedLower) return true;
-    
-    // Check for satisfaction-specific matching (key terms approach)
-    if (topicLower.includes('satisfaction') && selectedLower.includes('satisfaction')) {
-      // For life satisfaction rating
-      if (topicLower.includes('rating') && 
-          (selectedLower.includes('rating') || selectedLower.includes('overall'))) {
-        return true;
-      }
-      
-      // For pandemic comparison
-      if (topicLower.includes('pandemic') && selectedLower.includes('pandemic')) {
-        return true;
-      }
-    }
-    
-    // Fall back to question number matching
-    if (topic.includes('–') && selectedQuestion.includes('–')) {
-      return topic.split('–')[0].trim() === selectedQuestion.split('–')[0].trim();
-    }
-    
-    return false;
+    return scopedKey === selectedQuestion;
   };
 
-  // When selectedQuestion changes, expand ONLY the containing subheading
+  // When selectedQuestion changes, expand ONLY the containing subheading in current section
   useEffect(() => {
     if (selectedQuestion) {
+      const currentSection = getCurrentSection();
       let foundMatch = false;
       
-      // Find which subheading contains this question
-      // Use labeled loops so we can break out of both loops at once
-      sectionLoop: for (const section of sections) {
-        for (const subheading of section.subheadings) {
-          if (subheading.topics && subheading.topics.some((topic) => isTopicActive(topic))) {
+      // Find which subheading contains this question in the current section
+      sectionLoop: for (const sectionData of sections) {
+        // Only check the current section
+        if (sectionData.path !== `/${currentSection}`) continue;
+        
+        for (const subheading of sectionData.subheadings) {
+          if (subheading.topics) {
             const subheadingSlug = subheading.path.split('/').pop() || '';
-            setExpandedSubheading(subheadingSlug);
-            foundMatch = true;
-            break sectionLoop; // Exit both loops once we find a match
+            
+            // Check if any topic in this subheading matches the selected question
+            if (subheading.topics.some((topic) => isTopicActive(topic, subheadingSlug))) {
+              setExpandedSubheading(subheadingSlug);
+              foundMatch = true;
+              break sectionLoop;
+            }
           }
         }
       }
-      
-      // If no match found, we could optionally collapse all subheadings
-      if (!foundMatch) {
-        // Uncomment if you want to collapse when no match is found
-        // setExpandedSubheading(null);
-      }
     }
-  }, [selectedQuestion]);
+  }, [selectedQuestion, location.pathname]);
 
   return (
     <aside className="sidebar">
@@ -470,7 +468,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
                       {!hasSingleTopic && subheading.topics && (
                         <ul className={`topics-list ${isSubheadingExpanded ? 'expanded' : ''}`}>
                           {subheading.topics.map((topic, topicIdx) => {
-                            const isActive = isTopicActive(topic);
+                            const isActive = isTopicActive(topic, subheadingSlug);
                             
                             return (
                               <li

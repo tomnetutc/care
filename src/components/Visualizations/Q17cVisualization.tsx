@@ -50,7 +50,7 @@ const Q17cVisualization: React.FC = () => {
       questionLabels={questionLabels}
       responseCategories={responseCategories}
       categoryColors={categoryColors}
-      showSummaryTable={true}
+      showSummaryTable={false}
     />
   );
 };

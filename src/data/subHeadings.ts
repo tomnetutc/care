@@ -49,62 +49,62 @@ export const subHeadingsData = {
       {
         name: 'Extreme Heat',
         questions: [
-          { id: 12001, text: 'Impact of Extreme Heat' },
-          { id: 12002, text: 'Coping with Extreme Heat' },
-          { id: 12003, text: 'Likelihood of Future Extreme Heat' },
-          { id: 12004, text: 'Expected Personal Impact of Future Extreme Heat' },
-          { id: 12005, text: 'Intended Actions During Next Extreme Heat' },
-          { id: 12006, text: 'Additional Strategies for Heat' },
-          { id: 12007, text: 'Activity Change During Heat Events' },
-          { id: 12008, text: 'Home Air Conditioning Status' }
+          { id: 12001, text: 'Impact on Daily Life' },
+          { id: 12002, text: 'Coping Ability' },
+          { id: 12003, text: 'Chance of Future Event' },
+          { id: 12004, text: 'Impact of Next Event' },
+          { id: 12005, text: 'Anticipated Responses' },
+          { id: 12006, text: 'Other Coping Strategies' },
+          { id: 12007, text: 'Changes in Daily Activities' },
+          { id: 12008, text: 'Air Conditioning at Home'}
         ],
       },
       {
         name: 'Extreme Cold',
         questions: [
-          { id: 13001, text: 'Impact of Extreme Cold' },
-          { id: 13002, text: 'Coping with Extreme Cold' },
-          { id: 13003, text: 'Likelihood of Future Extreme Cold' },
-          { id: 13004, text: 'Expected Personal Impact of Future Extreme Cold' },
-          { id: 13005, text: 'Intended Actions During Next Extreme Cold' },
-          { id: 13006, text: 'Additional Strategies for Cold' },
-          { id: 13007, text: 'Activity Change During Cold Events' }
+          { id: 13001, text: 'Impact on Daily Life' },
+          { id: 13002, text: 'Coping Ability' },
+          { id: 13003, text: 'Chance of Future Event' },
+          { id: 13004, text: 'Impact of Next Event' },
+          { id: 13005, text: 'Anticipated Responses' },
+          { id: 13006, text: 'Other Coping Strategies' },
+          { id: 13007, text: 'Changes in Daily Activities' }
         ],
       },
       {
         name: 'Flooding',
         questions: [
-          { id: 14001, text: 'Impact of Flooding' },
-          { id: 14002, text: 'Coping with Flooding' },
-          { id: 14003, text: 'Likelihood of Future Flooding' },
-          { id: 14004, text: 'Expected Personal Impact of Future Flooding' },
-          { id: 14005, text: 'Intended Actions During Next Flood' },
-          { id: 14006, text: 'Additional Strategies for Flooding' },
-          { id: 14007, text: 'Activity Change During Flood Events' }
+          { id: 14001, text: 'Impact on Daily Life' },
+          { id: 14002, text: 'Coping Ability' },
+          { id: 14003, text: 'Chance of Future Event' },
+          { id: 14004, text: 'Impact of Next Event' },
+          { id: 14005, text: 'Anticipated Responses' },
+          { id: 14006, text: 'Other Coping Strategies' },
+          { id: 14007, text: 'Changes in Daily Activities' }
         ],
       },
       {
         name: 'Earthquake',
         questions: [
-          { id: 15001, text: 'Impact of Earthquake' },
-          { id: 15002, text: 'Coping with Earthquake' },
-          { id: 15003, text: 'Likelihood of Future Earthquake' },
-          { id: 15004, text: 'Expected Personal Impact of Future Earthquake' },
-          { id: 15005, text: 'Intended Actions During Next Earthquake' },
-          { id: 15006, text: 'Additional Strategies for Earthquake' },
-          { id: 15007, text: 'Activity Change During Earthquake Events' }
+          { id: 15001, text: 'Impact on Daily Life' },
+          { id: 15002, text: 'Coping Ability' },
+          { id: 15003, text: 'Chance of Future Event' },
+          { id: 15004, text: 'Impact of Next Event' },
+          { id: 15005, text: 'Anticipated Responses' },
+          { id: 15006, text: 'Other Coping Strategies' },
+          { id: 15007, text: 'Changes in Daily Activities' }
         ],
       },
       {
         name: 'Power Outage',
         questions: [
-          { id: 16001, text: 'Impact of Power Outage' },
-          { id: 16002, text: 'Coping with Power Outage' },
-          { id: 16003, text: 'Likelihood of Future Outage' },
-          { id: 16004, text: 'Expected Personal Impact of Future Outage' },
-          { id: 16005, text: 'Intended Actions During Next Outage' },
-          { id: 16006, text: 'Additional Strategies for Outages' },
-          { id: 16007, text: 'Activity Change During Outage Events' }
+          { id: 16001, text: 'Impact on Daily Life' },
+          { id: 16002, text: 'Coping Ability' },
+          { id: 16003, text: 'Chance of Future Event' },
+          { id: 16004, text: 'Impact of Next Event' },
+          { id: 16005, text: 'Anticipated Responses' },
+          { id: 16006, text: 'Other Coping Strategies' },
+          { id: 16007, text: 'Changes in Daily Activities' }
         ],
       },
     ],

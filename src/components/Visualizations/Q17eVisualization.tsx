@@ -55,7 +55,7 @@ const Q17eVisualization: React.FC = () => {
       questionLabels={questionLabels}
       responseCategories={responseCategories}
       categoryColors={categoryColors}
-      showSummaryTable={true}
+      showSummaryTable={false}
     />
   );
 };
