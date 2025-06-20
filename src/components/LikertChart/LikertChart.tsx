@@ -455,9 +455,9 @@ const LikertChart: React.FC<LikertChartProps> = ({
               <th>Min</th>
               <th>Max</th>
               <th>Mean</th>
-                <th>
+              <th>
                 Standard<br />Deviation
-                </th>
+              </th>
               <th>Responses</th>
             </tr>
           </thead>
@@ -465,8 +465,8 @@ const LikertChart: React.FC<LikertChartProps> = ({
             {summaryStats.map((stat, index) => (
               <tr key={index}>
                 <td>{stat.question}</td>
-                <td>{stat.min.toFixed(2)}</td>
-                <td>{stat.max.toFixed(2)}</td>
+                <td>{Number.isInteger(stat.min) ? stat.min : stat.min.toFixed(2)}</td>
+                <td>{Number.isInteger(stat.max) ? stat.max : stat.max.toFixed(2)}</td>
                 <td>{stat.mean.toFixed(2)}</td>
                 <td>{stat.stdDev.toFixed(2)}</td>
                 <td>{stat.responses}</td>

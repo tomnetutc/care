@@ -2,24 +2,24 @@ import React from 'react';
 import HorizontalBarChart from '../HorizontalBarChart/HorizontalBarChart';
 
 const Q14aVisualization: React.FC = () => {
-  const categoryOrder = ["0", "1", "2", "3", "4", "5"];
+  const categoryOrder = ["5", "4", "3", "2", "1", "0"];
   
   const categoryLabels: {[key: string]: string} = {
-    "0": "0",
+    "0": "0 - Not at all",
     "1": "1",
     "2": "2",
     "3": "3",
     "4": "4",
-    "5": "5"
+    "5": "5 - Very much"
   };
   
   const categoryColors = [
-    "#218066",  // 0
-    "#2ba88c",  // 1
-    "#93c4b9",  // 2
-    "#ead97c",  // 3 (neutral/yellow)
-    "#f0b3ba",  // 4
-    "#e25b61"   // Very much (warm/red)
+    "#e25b61",   // 5 (Very much - warm/red)
+    "#f0b3ba",   // 4
+    "#ead97c",   // 3 (neutral/yellow)
+    "#93c4b9",   // 2
+    "#2ba88c",   // 1
+    "#218066"    // 0 (Not at all - cool/green)
   ];
   
   return (

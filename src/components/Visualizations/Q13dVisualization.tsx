@@ -2,7 +2,7 @@ import React from 'react';
 import HorizontalBarChart from '../HorizontalBarChart/HorizontalBarChart';
 
 const Q13dVisualization: React.FC = () => {
-  const categoryOrder = ["1", "2", "3", "4", "5", "6"];
+  const categoryOrder = ["5", "4", "3", "2", "1", "6"];
   
   const categoryLabels: {[key: string]: string} = {
     "1": "Very unlikely",
@@ -13,13 +13,14 @@ const Q13dVisualization: React.FC = () => {
     "6": "I'm not sure"
   };
   
+  // Reversed colors to match semantic meaning
   const categoryColors = [
-    "#2ba88c",  // Very unlikely - green
-    "#93c4b9",  // Somewhat unlikely - light green
-    "#ead97c",  // Neither likely nor unlikely - yellow
-    "#f0b3ba",  // Somewhat likely - light red
-    "#e25b61",  // Very likely - red
-    "#a0a0a0"   // I'm not sure - gray
+    "#e25b61",   // Very likely (5) - warm/red
+    "#f0b3ba",   // Somewhat likely (4)
+    "#ead97c",   // Neither likely nor unlikely (3) - neutral/yellow
+    "#93c4b9",   // Somewhat unlikely (2)
+    "#2ba88c",   // Very unlikely (1) - cool/green
+    "#AAAAAA"    // I'm not sure (6) - gray
   ];
   
   return (

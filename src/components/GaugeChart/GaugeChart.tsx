@@ -232,8 +232,8 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
           <tbody>
             <tr>
               <td>{summary.field}</td>
-              <td>{summary.min.toFixed(2)}</td>
-              <td>{summary.max.toFixed(2)}</td>
+              <td>{Number.isInteger(summary.min) ? summary.min : summary.min.toFixed(2)}</td>
+              <td>{Number.isInteger(summary.max) ? summary.max : summary.max.toFixed(2)}</td>
               <td>{summary.mean.toFixed(2)}</td>
               <td>{summary.stdDev.toFixed(2)}</td>
               {/* Optional: Keep or remove variance column */}

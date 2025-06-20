@@ -2,22 +2,22 @@ import React from 'react';
 import HorizontalBarChart from '../HorizontalBarChart/HorizontalBarChart';
 
 const Q11eVisualization: React.FC = () => {
-  const categoryOrder = ["1", "2", "3", "4", "5"]; // Order from least to most severe
+  const categoryOrder = ["5", "4", "3", "2", "1"];
   
   const categoryLabels: {[key: string]: string} = {
     "1": "Not severe at all",
     "2": "Slightly severe",
-    "3": "Moderately severe", 
+    "3": "Moderately severe",
     "4": "Very severe",
     "5": "Extremely severe"
   };
   
   const categoryColors = [
-    "#2ba88c",  // Not severe at all - green
-    "#93c4b9",  // Slightly severe - light green
-    "#ead97c",  // Moderately severe - yellow
-    "#f0b3ba",  // Very severe - light red
-    "#e25b61"   // Extremely severe - red
+    "#e25b61",   // Extreme impact (warm)
+    "#f0b3ba",   // Significant impact
+    "#ead97c",   // Moderate impact
+    "#93c4b9",   // Minimal impact
+    "#2ba88c"    // No impact (cool)
   ];
   
   return (
