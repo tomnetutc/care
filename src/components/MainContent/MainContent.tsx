@@ -524,31 +524,89 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
   const scrollToVisualization = (topicLabel: string, subheadingSlug?: string) => {
     console.log(`Scrolling to topic label: "${topicLabel}" in subheading: "${subheadingSlug}"`);
     
-    // Get current section from the URL or active subheading
-    const pathParts = location.pathname.split('/');
-    const currentSection = pathParts[1] || 'lifestyle';
-    const currentSubheading = subheadingSlug || activeSubheading || pathParts[2] || '';
+    if (!subheadingSlug) {
+      console.warn('No subheading slug provided for navigation');
+      return;
+    }
+
+    // First, determine the target section from the subheadingSlug
+    const targetSection = SUBHEADING_TO_SECTION[subheadingSlug];
+    if (!targetSection) {
+      console.warn(`Could not find section for subheading: ${subheadingSlug}`);
+      return;
+    }
     
-    // Generate the scoped key
-    const scopedKey = generateScopedKey(currentSection, currentSubheading, topicLabel);
-    
+    // Generate the scoped key using the TARGET section (not current section)
+    const scopedKey = generateScopedKey(targetSection, subheadingSlug, topicLabel);
     console.log(`Generated scoped key: "${scopedKey}"`);
     
+    // Always update state with the correct target
     setSelectedQuestion(scopedKey);
     setManuallySelectedQuestion(scopedKey);
     setIsProgrammaticScrolling(true);
     
-    // Update URL if needed
-    if (subheadingSlug && subheadingSlug !== activeSubheading) {
-      const sectionKey = SUBHEADING_TO_SECTION[subheadingSlug];
-      if (sectionKey) {
-        const path = `/${sectionKey}/${subheadingSlug}`;
-        navigate(path);
-        setActiveSubheading(subheadingSlug);
-      }
+    // Check if we need to navigate to a different section/subheading
+    const pathParts = location.pathname.split('/');
+    const currentSection = pathParts[1] || 'lifestyle';
+    const currentSubheading = pathParts[2] || '';
+    
+    const needsNavigation = targetSection !== currentSection || subheadingSlug !== currentSubheading;
+    
+    if (needsNavigation) {
+      // Navigate to the new path
+      const path = `/${targetSection}/${subheadingSlug}`;
+      navigate(path);
+      setActiveSubheading(subheadingSlug);
       
-      setTimeout(() => performScroll(), 100);
+      // Wait a bit longer when changing sections to ensure rendering completes
+      setTimeout(() => {
+        // After navigation, we need to recalculate currentQuestions
+        const updatedQuestions = Object.entries(SCOPED_TOPIC_DATA)
+          .filter(([_, data]) => data.section === targetSection)
+          .map(([scopedKey, data], index) => ({
+            id: index + 1,
+            text: data.text,
+            scopedKey: scopedKey,
+            section: data.section,
+            subSection: data.subSection
+          }));
+        
+        // Find the target in the updated questions
+        const targetIndex = updatedQuestions.findIndex(q => q.scopedKey === scopedKey);
+        
+        if (targetIndex !== -1) {
+          // Wait for DOM to update
+          setTimeout(() => {
+            // Find the element with the matching ID
+            const element = document.getElementById(scopedKey);
+            if (element) {
+              const mainAreaContainer = document.querySelector('.main-area');
+              if (mainAreaContainer) {
+                const topMenuHeight = 58;
+                const additionalPadding = 20;
+                const totalOffset = topMenuHeight + additionalPadding;
+                
+                mainAreaContainer.scrollTo({
+                  top: element.offsetTop - totalOffset,
+                  behavior: 'smooth'
+                });
+                
+                setTimeout(() => {
+                  setIsProgrammaticScrolling(false);
+                }, 1000);
+              }
+            } else {
+              console.warn(`Element not found for scoped key: ${scopedKey}`);
+              setIsProgrammaticScrolling(false);
+            }
+          }, 100);
+        } else {
+          console.warn(`Could not find question with scoped key: ${scopedKey}`);
+          setIsProgrammaticScrolling(false);
+        }
+      }, 300); // Longer delay for section changes
     } else {
+      // Same section, use existing logic
       performScroll();
     }
     

@@ -14,6 +14,7 @@ import {
   faChevronUp 
 } from '@fortawesome/free-solid-svg-icons';
 import './Sidebar.scss';
+import SidebarSearch from '../SidebarSearch/SidebarSearch';
 
 // Generate scoped key helper function (same as in MainContent)
 const generateScopedKey = (section: string, subSection: string, topicLabel: string): string => {
@@ -403,6 +404,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
 
   return (
     <aside className="sidebar">
+      <SidebarSearch sections={sections} onTopicClick={onTopicClick} />
       <nav className="sidebar-nav">
         <ul className="sections-list">
           {sections.map((section, index) => (
