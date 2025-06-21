@@ -1,6 +1,7 @@
 .sidebar-search {
-  padding: 10px 15px;
+  padding: 0 15px 10px 15px; // Remove top padding, match horizontal padding
   position: relative;
+  margin-top: -10px; // Add negative top margin to move it up
   
   .search-input-container {
     position: relative;

@@ -1,5 +1,5 @@
 import React from 'react';
-import HorizontalBarChart from '../HorizontalBarChart/HorizontalBarChart';
+import PieChart from '../PieChart/PieChart';
 
 const Q18aVisualization: React.FC = () => {
   const categoryOrder = [
@@ -18,12 +18,12 @@ const Q18aVisualization: React.FC = () => {
   };
   
   const categoryColors: { [key: string]: string } = {
-    "Yes": "#507dbc", // Orange color as shown in image
-    "No": "#507dbc"   // Same color for both bars
+    "Yes": "#2ba88c", // Green for Yes
+    "No": "#e25b61"   // Red for No
   };
   
   return (
-    <HorizontalBarChart
+    <PieChart
       questionId="Q18a"
       title="Is your current residence equipped with air conditioning?"
       dataField="ext_heat_ac_equipped"
@@ -36,6 +36,8 @@ const Q18aVisualization: React.FC = () => {
         'q18a'
       ]}
       tooltipCountLabel="Responses"
+      showLegend={true}
+      showLabel={true}
     />
   );
 };

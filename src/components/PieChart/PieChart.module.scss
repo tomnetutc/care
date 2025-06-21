@@ -1,0 +1,251 @@
+.pieChartContainer {
+  width: 99%;
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  h2 {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-weight: normal;
+    color: #333;
+  }
+
+  .chartContent {
+    display: flex;
+    flex-direction: row;
+    justify-content: center; // Center the content
+    align-items: center;
+    width: 100%;
+  }
+
+  .chartWrapper {
+    width: 65%;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .pieSlice {
+    stroke: #fff;
+    stroke-width: 1;
+    transition: opacity 0.2s ease, filter 0.2s ease;
+    
+    &:hover {
+      opacity: 0.9;
+      filter: brightness(1.05);
+      stroke-width: 2;
+      stroke: #fff;
+    }
+  }
+
+  .pieLabel {
+    font-size: 16px;
+    font-weight: 600;
+    font-family: Arial, sans-serif;
+    pointer-events: none;
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+  }
+
+  .legendContainer {
+    display: flex;
+    flex-direction: row; // Changed from column to row
+    align-items: center; // Center align items
+    gap: 15px; // Spacing between legend items
+    margin-left: -20px; // Space between chart and legend
+  }
+
+  .legendItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+
+  .legendColor {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    margin-right: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .legendText {
+    font-size: 14px;
+    color: #333;
+  }
+
+  .totalResponses {
+    font-size: 12px;
+    color: #666;
+    text-align: right;
+    margin-top: 15px;
+    font-style: italic;
+  }
+  
+  .customTooltip {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.15);
+    
+    .tooltipLabel {
+      font-weight: bold;
+      margin: 0 0 5px;
+    }
+    
+    .tooltipValue {
+      margin: 2px 0;
+      font-size: 14px;
+    }
+    
+    .tooltipCount {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: #666;
+    }
+  }
+
+  .loadingContainer, .errorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    padding: 30px;
+    color: #555;
+    font-family: Arial, sans-serif;
+  }
+
+  .loadingSpinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite;
+    margin-bottom: 15px;
+  }
+
+  .errorContainer {
+    text-align: center;
+    
+    h3 {
+      color: #e41a1c;
+      margin-top: 0;
+    }
+
+    button {
+      background-color: #4daf4a;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: #3d9c3a;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .pieChartContainer {
+    padding: 15px;
+    
+    .chartWrapper {
+      height: 350px;
+    }
+    
+    .legendContainer {
+      gap: 10px;
+    }
+    
+    .legendColor {
+      width: 16px;
+      height: 16px;
+    }
+    
+    .legendText {
+      font-size: 13px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .pieChartContainer {
+    padding: 8px 4px;
+    
+    .chartWrapper {
+      height: 300px;
+      margin: 10px 0 15px;
+    }
+    
+    h2 {
+      font-size: 13px;
+      margin-bottom: 15px;
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .pieChartContainer {
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+}
+
+.container {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 20px;
+  margin-bottom: 20px;
+  
+  h2 {
+    font-size: 16px;
+    margin: 0 0 20px 0;
+    font-weight: bold;
+    color: #333;
+  }
+}
+
+.totalResponses {
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+.loading, .error, .noData {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #666;
+}
+
+.error {
+  color: #e41a1c;
+}
