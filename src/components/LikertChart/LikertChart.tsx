@@ -335,7 +335,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
               const tooltipContent = `
                 <div class="${styles.tooltipTitle}">${segment.category}</div>
                 ${segment.value.toFixed(1)}%
-                <div class="${styles.tooltipCount}">Responses: ${segment.count.toLocaleString()}</div>
+                <div class="${styles.tooltipCount}">n = ${segment.count.toLocaleString()}</div>
               `;
               
               d3.select(tooltipRef.current)

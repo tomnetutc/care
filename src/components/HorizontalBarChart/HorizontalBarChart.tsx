@@ -156,7 +156,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       <div className={styles.tooltip} style={tooltipStyle}>
         <div className={styles.tooltipTitle}>{tooltip.data.label}</div>
         <div className={styles.tooltipContent}>
-          <div>{tooltipCountLabel}: {tooltip.data.count.toLocaleString()}</div>
+          <div>n = {tooltip.data.count.toLocaleString()}</div>
         </div>
       </div>
     );

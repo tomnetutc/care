@@ -237,7 +237,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
               <td>{summary.mean.toFixed(2)}</td>
               <td>{summary.stdDev.toFixed(2)}</td>
               {/* Optional: Keep or remove variance column */}
-              <td>{summary.responses}</td>
+              <td>{summary.responses.toLocaleString()}</td>
             </tr>
           </tbody>
         </table>
