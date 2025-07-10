@@ -1,4 +1,4 @@
-  import React from "react";
+import React from "react";
 import "./Navbar.scss";
 import { Navbar as NavbarBs } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
@@ -24,8 +24,8 @@ export const Navbar: React.FC = () => {
         <div className="utility-links">
           <Link to="/home" className={`nav-link ${location.pathname === '/home' ? 'active' : ''}`}>Home</Link>
           <Link to="/about" className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`}>About</Link>
-          <Link to="/" className={`nav-link ${
-  location.pathname === '/' || 
+          <Link to="/lifestyle/preferences" className={`nav-link ${
+  location.pathname === '/lifestyle/preferences' || 
   location.pathname.includes('/lifestyle') ||
   location.pathname.includes('/community') ||
   location.pathname.includes('/disruptions') ||

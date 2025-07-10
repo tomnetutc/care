@@ -108,11 +108,7 @@ export const subHeadingsData = {
         ],
       },
     ],
-    work: [
-      {
-        name: 'Employment & Student Status',
-        questions: [{ id: 17, text: 'Employment & Student Status' }],
-      },
+    transportation: [
       {
         name: 'Travel Frequency for Work/School',
         questions: [{ id: 18, text: 'Travel Frequency for Work/School' }],
@@ -120,12 +116,9 @@ export const subHeadingsData = {
       {
         name: 'Distance to Key Locations',
         questions: [
-          { id: 19, text: 'Distance to Work' },
-          { id: 20, text: 'Distance to School' },
+          { id: 19, text: 'Distance to Work or School' },
         ],
       },
-    ],
-    transportation: [
       {
         name: 'Transportation Choices',
         questions: [{ id: 21, text: 'Transportation Choices' }],
@@ -133,24 +126,45 @@ export const subHeadingsData = {
       {
         name: 'Delivery & Activity Frequency',
         questions: [
-          { id: 22, text: 'Q23 – Delivery Frequency to Home' },
-          { id: 23, text: 'Q24 – Frequency of Other Activities' },
+          { id: 22, text: 'Delivery Frequency to Home' },
+          { id: 23, text: 'Frequency of Other Activities' },
         ],
       },
       {
         name: 'Decision Making & Concerns',
         questions: [
-          { id: 24, text: 'Q25 – Factors Influencing Out-of-Home Activity' },
-          { id: 25, text: 'Q26 – Motivations for Leaving Home' },
-          { id: 26, text: 'Q27 – Concerns About Going Out' },
+          { id: 24, text: 'Factors influencing out-of-home activity' },
+          { id: 26, text: 'Motivations for Leaving Home' },
+          { id: 27, text: 'Concerns About Going Out' },
         ],
       },
       {
         name: 'Dining Habits',
         questions: [
-          { id: 27, text: 'Q28 – Dining Preferences' },
-          { id: 28, text: 'Q29 – Dining Changes During COVID-19' },
-          { id: 29, text: 'Q30 – Restaurant Adaptations During COVID-19' },
+          { id: 28, text: 'Dining Preferences' },
+          { id: 29, text: 'Dining Changes During COVID-19' },
+          { id: 30, text: 'Restaurant Adaptations During COVID-19' },
+        ],
+      },
+      {
+        name: 'Changes Over Time',
+        questions: [
+          { id: 33, text: 'Transit Use Before COVID-19' },
+          { id: 34, text: 'Transit Use During COVID-19' },
+        ],
+      },
+      {
+        name: 'Reasons for Change',
+        questions: [
+          { id: 35, text: 'Reasons for Using Transit Less' },
+          { id: 36, text: 'Reasons for Using Transit More' },
+        ],
+      },
+      {
+        name: 'Recent Transit Trip',
+        questions: [
+          { id: 37, text: 'Trip Purpose' },
+          { id: 38, text: 'Alternate Travel Method if No Transit' },
         ],
       },
     ],
@@ -158,30 +172,30 @@ export const subHeadingsData = {
       {
         name: 'Access & Usage',
         questions: [
-          { id: 30, text: 'Q31 – Available Public Transit' },
-          { id: 31, text: 'Q32 – Current Public Transit Use' },
-          { id: 32, text: 'Q33 – Regular Transit Modes' },
+          { id: 30, text: 'Available Public Transit' },
+          { id: 31, text: 'Current Public Transit Use' },
+          { id: 32, text: 'Regular Transit Modes' },
         ],
       },
       {
         name: 'Changes Over Time',
         questions: [
-          { id: 33, text: 'Q34 – Transit Use Before COVID-19' },
-          { id: 34, text: 'Q35 – Transit Use During COVID-19' },
+          { id: 33, text: 'Transit Use Before COVID-19' },
+          { id: 34, text: 'Transit Use During COVID-19' },
         ],
       },
       {
         name: 'Reasons for Change',
         questions: [
-          { id: 35, text: 'Q36a – Reasons for Using Transit Less' },
-          { id: 36, text: 'Q36b – Reasons for Using Transit More' },
+          { id: 35, text: 'Reasons for Using Transit Less' },
+          { id: 36, text: 'Reasons for Using Transit More' },
         ],
       },
       {
         name: 'Recent Transit Trip',
         questions: [
-          { id: 37, text: 'Q37a – Trip Purpose' },
-          { id: 38, text: 'Q37b – Alternate Travel Method if No Transit' },
+          { id: 37, text: 'Trip Purpose' },
+          { id: 38, text: 'Alternate Travel Method if No Transit' },
         ],
       },
     ],
@@ -216,6 +230,7 @@ export const subHeadingsData = {
       {
         name: 'Personal Info',
         questions: [
+          { id: 17, text: 'Employment & Student Status' },
           { id: 46, text: 'Q45 – Year of Birth' },
           { id: 47, text: 'Q46 – Gender' },
           { id: 48, text: 'Q47 – Hispanic/Latino Origin' },

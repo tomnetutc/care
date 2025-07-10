@@ -328,3 +328,22 @@
     page-break-inside: avoid;
   }
 }
+
+.legendWrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 24px; /* row gap, column gap */
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+.q22CardBackground {
+  background: #fafbfc;
+}
+
+.q22TightLegend {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}

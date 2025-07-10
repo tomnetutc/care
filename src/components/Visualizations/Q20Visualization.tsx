@@ -85,7 +85,7 @@ const Q20Visualization: React.FC = () => {
       responseCategories={categories}
       categoryColors={colors}
       categoryLabels={labels}
-      showSummaryTable={true}
+      showSummaryTable={false}
       dataProcessor={processData}
       sourceCategories={sourceCategories}
     />

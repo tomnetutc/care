@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useHorizontalBarData, BarDataItem } from '../../hooks/useHorizontalBarData';
+import { useHorizontalBarData, BarDataItem, UseHorizontalBarDataOptions } from '../../hooks/useHorizontalBarData';
 import styles from './HorizontalBarChart.module.scss';
 
 interface TooltipState {
@@ -21,6 +21,10 @@ export interface HorizontalBarChartProps {
   labelWidth?: number;
   tooltipTitle?: string;
   tooltipCountLabel?: string;
+  dataProcessor?: UseHorizontalBarDataOptions['dataProcessor'];
+  multiSelectFields?: Record<string, string>;
+  percentageDenominator?: 'uniqueRespondents' | 'totalSelections';
+  customTotalResponses?: number;
 }
 
 const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
@@ -34,7 +38,11 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   alternateFields = [],
   labelWidth = 180,
   tooltipTitle = "Category",
-  tooltipCountLabel = "Count"
+  tooltipCountLabel = "Count",
+  dataProcessor,
+  multiSelectFields,
+  percentageDenominator,
+  customTotalResponses
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -50,7 +58,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     categoryOrder,
     categoryLabels,
     valueMap,
-    alternateFields
+    alternateFields,
+    dataProcessor,
+    multiSelectFields,
+    percentageDenominator
   });
 
   // Determine color for a bar
@@ -187,7 +198,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       {renderBarChart()}
       {renderTooltip()}
       <div className={styles.totalResponses}>
-        Number of respondents: {totalResponses.toLocaleString()}
+        Number of respondents: {(customTotalResponses ?? totalResponses).toLocaleString()}
       </div>
     </div>
   );

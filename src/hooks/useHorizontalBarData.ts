@@ -15,6 +15,9 @@ export interface UseHorizontalBarDataOptions {
   categoryLabels: Record<string, string>;
   valueMap?: Record<string, string>;
   alternateFields?: string[];
+  dataProcessor?: (filteredData: any[], options: UseHorizontalBarDataOptions) => BarDataItem[];
+  multiSelectFields?: Record<string, string>; // Map of field names to category labels for multi-select questions
+  percentageDenominator?: 'uniqueRespondents' | 'totalSelections'; // New option
 }
 
 export const useHorizontalBarData = (options: UseHorizontalBarDataOptions) => {
@@ -25,7 +28,7 @@ export const useHorizontalBarData = (options: UseHorizontalBarDataOptions) => {
   const [totalResponses, setTotalResponses] = useState(0);
   
   // Extract options
-  const { dataField, categoryOrder, categoryLabels, valueMap = {}, alternateFields = [] } = options;
+  const { dataField, categoryOrder, categoryLabels, valueMap = {}, alternateFields = [], dataProcessor, multiSelectFields } = options;
   
   // Get filters from context
   const { filters, isDataLoading, dataError } = useFilters();
@@ -75,6 +78,71 @@ export const useHorizontalBarData = (options: UseHorizontalBarDataOptions) => {
             return rowValue === String(filter.value);
           });
         });
+      }
+
+      setTotalResponses(filteredData.length);
+
+      // If a custom dataProcessor is provided, use it
+      if (dataProcessor) {
+        setData(dataProcessor(filteredData, options));
+        setIsLoading(false);
+        return;
+      }
+
+      // Handle multi-select questions
+      if (multiSelectFields) {
+        // Initialize category counts with zeros
+        const categoryGroups: Record<string, number> = {};
+        for (const category of categoryOrder) {
+          categoryGroups[category] = 0;
+        }
+
+        // Track all bar counts (total selections) and unique respondents
+        let totalSelections = 0;
+        let validRespondents = 0;
+
+        filteredData.forEach((row: any) => {
+          let selectedAny = false;
+          Object.entries(multiSelectFields).forEach(([fieldName, categoryLabel]) => {
+            if (categoryLabel === "Other") {
+              if (
+                row[fieldName] === "1" ||
+                (row[fieldName] && String(row[fieldName]).trim() !== "" && row[fieldName] !== "0" && row[fieldName] !== "-8")
+              ) {
+                categoryGroups[categoryLabel]++;
+                totalSelections++;
+                selectedAny = true;
+              }
+            } else {
+              if (row[fieldName] === "1") {
+                categoryGroups[categoryLabel]++;
+                totalSelections++;
+                selectedAny = true;
+              }
+            }
+          });
+          if (selectedAny) validRespondents++;
+        });
+
+        // Choose denominator based on option
+        const denominatorType = options.percentageDenominator || 'uniqueRespondents';
+        const denominator = denominatorType === 'totalSelections' ? totalSelections : validRespondents;
+
+        // Convert counts to array of objects with percentages
+        const processedData: BarDataItem[] = categoryOrder.map(category => {
+          const count = categoryGroups[category] || 0;
+          return {
+            category,
+            label: categoryLabels[category] || category,
+            count,
+            percentage: denominator > 0 ? (count / denominator) * 100 : 0
+          };
+        });
+
+        setData(processedData);
+        setIsLoading(false);
+        setTotalResponses(totalSelections);
+        return;
       }
 
       // Initialize category counts with zeros
@@ -154,7 +222,6 @@ export const useHorizontalBarData = (options: UseHorizontalBarDataOptions) => {
       });
       
       setData(processedData);
-      setTotalResponses(validResponses);
       setIsLoading(false);
       
     } catch (err) {

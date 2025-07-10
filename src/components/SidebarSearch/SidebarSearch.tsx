@@ -109,7 +109,18 @@ const SidebarSearch: React.FC<SidebarSearchProps> = ({ sections, onTopicClick })
       });
     });
 
-    setSearchResults(results);
+    // After building results array
+    // De-duplicate by topicLabel + subheadingSlug + sectionKey
+    const uniqueResults = results.filter(
+      (result, index, self) =>
+        index === self.findIndex(
+          (r) =>
+            r.topicLabel === result.topicLabel &&
+            r.subheadingSlug === result.subheadingSlug &&
+            r.sectionKey === result.sectionKey
+        )
+    );
+    setSearchResults(uniqueResults);
   }, [searchQuery, sections]);
 
   // Handle click outside to close dropdown

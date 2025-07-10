@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Q1Visualization, Q2Visualization, Q3Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q8Visualization, Q9Visualization, Q10Visualization, Q11aVisualization, Q12aVisualization, Q13aVisualization, Q14aVisualization, Q15aVisualization, Q16aVisualization, Q17aVisualization, Q18aVisualization, Q11bVisualization, Q12bVisualization, Q13bVisualization, Q14bVisualization, Q15bVisualization, Q16bVisualization, Q17bVisualization, Q11cVisualization, Q12cVisualization, Q52Visualization, Q13cVisualization, Q14cVisualization, Q15cVisualization, Q16cVisualization, Q17cVisualization, Q11dVisualization, Q12dVisualization, Q13dVisualization, Q14dVisualization, Q15dVisualization, Q16dVisualization, Q17dVisualization, Q11eVisualization, Q12eVisualization, Q13eVisualization, Q14eVisualization, Q15eVisualization, Q17eVisualization, Q16eVisualization, Q19Visualization, Q20Visualization, Q21aVisualization, Q21bVisualization } from '../Visualizations';
+import { Q1Visualization, Q2Visualization, Q3Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q8Visualization, Q9Visualization, Q10Visualization, Q11aVisualization, Q12aVisualization, Q13aVisualization, Q14aVisualization, Q15aVisualization, Q16aVisualization, Q17aVisualization, Q18aVisualization, Q11bVisualization, Q12bVisualization, Q13bVisualization, Q14bVisualization, Q15bVisualization, Q16bVisualization, Q17bVisualization, Q11cVisualization, Q12cVisualization, Q52Visualization, Q13cVisualization, Q14cVisualization, Q15cVisualization, Q16cVisualization, Q17cVisualization, Q11dVisualization, Q12dVisualization, Q13dVisualization, Q14dVisualization, Q15dVisualization, Q16dVisualization, Q17dVisualization, Q11eVisualization, Q12eVisualization, Q13eVisualization, Q14eVisualization, Q15eVisualization, Q17eVisualization, Q16eVisualization, Q19Visualization, Q20Visualization, Q21CombinedVisualization, Q22Visualization, Q23Visualization, Q24Visualization, Q25Visualization, Q26Visualization, Q27Visualization, Q28Visualization, Q29Visualization, Q30Visualization, Q31Visualization, Q32Visualization, Q33Visualization, Q34Visualization, Q35Visualization, Q36aVisualization, Q36bVisualization, Q37aVisualization, Q37bVisualization } from '../Visualizations';
 import './MainContent.scss';
 import Sidebar from '../Sidebar/Sidebar';
 import TopMenu from '../TopMenu/TopMenu';
@@ -311,29 +311,132 @@ const SCOPED_TOPIC_DATA: Record<string, { text: string; component: React.Compone
   },
   
   // Work section
-  [generateScopedKey('work', 'employment', 'Employment & Student Status')]: { 
-    text: 'Employment & Student Status', 
-    component: Q19Visualization, 
-    section: 'work', 
-    subSection: 'employment' 
-  },
-  [generateScopedKey('work', 'commute', 'Travel Frequency for Work/School')]: { 
+  [generateScopedKey('transportation', 'commute', 'Travel Frequency for Work/School')]: { 
     text: 'Travel Frequency for Work/School', 
     component: Q20Visualization, 
-    section: 'work', 
+    section: 'transportation', 
     subSection: 'commute' 
   },
-  [generateScopedKey('work', 'distance', 'Distance to Work')]: { 
-    text: 'Distance to Work', 
-    component: Q21aVisualization, 
-    section: 'work', 
-    subSection: 'distance' 
+  [generateScopedKey('transportation', 'distance', 'Distance to Work or School')]: {
+    text: 'Distance to Work or School',
+    component: Q21CombinedVisualization,
+    section: 'transportation',
+    subSection: 'distance'
   },
-  [generateScopedKey('work', 'distance', 'Distance to School')]: { 
-    text: 'Distance to School', 
-    component: Q21bVisualization, 
-    section: 'work', 
-    subSection: 'distance' 
+  [generateScopedKey('transportation', 'choices', 'Transportation Choices')]: {
+    text: 'Transportation Choices',
+    component: Q22Visualization,
+    section: 'transportation',
+    subSection: 'choices'
+  },
+  [generateScopedKey('transportation', 'delivery', 'Delivery Frequency to Home')]: {
+    text: 'Delivery Frequency to Home',
+    component: Q23Visualization,
+    section: 'transportation',
+    subSection: 'delivery'
+  },
+  [generateScopedKey('transportation', 'delivery', 'Frequency of Other Activities')]: {
+    text: 'Frequency of Other Activities',
+    component: Q24Visualization,
+    section: 'transportation',
+    subSection: 'delivery'
+  },
+  [generateScopedKey('transportation', 'decisions', 'Factors influencing out-of-home activity')]: {
+    text: 'Factors influencing out-of-home activity',
+    component: Q25Visualization,
+    section: 'transportation',
+    subSection: 'decisions'
+  },
+  [generateScopedKey('transportation', 'decisions', 'Motivations for Leaving Home')]: {
+    text: 'Motivations for Leaving Home',
+    component: Q26Visualization,
+    section: 'transportation',
+    subSection: 'decisions'
+  },
+  [generateScopedKey('transportation', 'decisions', 'Concerns About Going Out')]: {
+    text: 'Concerns About Going Out',
+    component: Q27Visualization,
+    section: 'transportation',
+    subSection: 'decisions'
+  },
+  [generateScopedKey('transportation', 'dining', 'Dining Preferences')]: {
+    text: 'Dining Preferences',
+    component: Q28Visualization,
+    section: 'transportation',
+    subSection: 'dining'
+  },
+  [generateScopedKey('transportation', 'dining', 'Dining Changes During COVID-19')]: {
+    text: 'Dining Changes During COVID-19',
+    component: Q29Visualization,
+    section: 'transportation',
+    subSection: 'dining'
+  },
+  [generateScopedKey('transportation', 'dining', 'Restaurant Adaptations During COVID-19')]: {
+    text: 'Restaurant Adaptations During COVID-19',
+    component: Q30Visualization,
+    section: 'transportation',
+    subSection: 'dining'
+  },
+  [generateScopedKey('transit', 'access', 'Available Public Transit')]: {
+    text: 'Available Public Transit',
+    component: Q31Visualization,
+    section: 'transit',
+    subSection: 'access'
+  },
+  [generateScopedKey('transit', 'access', 'Current Public Transit Use')]: {
+    text: 'Current Public Transit Use',
+    component: Q32Visualization,
+    section: 'transit',
+    subSection: 'access'
+  },
+  [generateScopedKey('transit', 'access', 'Regular Transit Modes')]: {
+    text: 'Regular Transit Modes',
+    component: Q33Visualization,
+    section: 'transit',
+    subSection: 'access'
+  },
+  [generateScopedKey('transit', 'changes', 'Transit Use Before COVID-19')]: {
+    text: 'Transit Use Before COVID-19',
+    component: Q34Visualization,
+    section: 'transit',
+    subSection: 'changes'
+  },
+  [generateScopedKey('transit', 'changes', 'Transit Use During COVID-19')]: {
+    text: 'Transit Use During COVID-19',
+    component: Q35Visualization,
+    section: 'transit',
+    subSection: 'changes'
+  },
+  [generateScopedKey('transit', 'reasons', 'Reasons for using transit less')]: {
+    text: 'Reasons for using transit less',
+    component: Q36aVisualization,
+    section: 'transit',
+    subSection: 'reasons'
+  },
+  [generateScopedKey('transit', 'reasons', 'Reasons for using transit more')]: {
+    text: 'Reasons for using transit more',
+    component: Q36bVisualization,
+    section: 'transit',
+    subSection: 'reasons'
+  },
+  [generateScopedKey('transit', 'recent-trip', 'Trip purpose')]: {
+    text: 'Trip purpose',
+    component: Q37aVisualization,
+    section: 'transit',
+    subSection: 'recent-trip'
+  },
+  [generateScopedKey('transit', 'recent-trip', 'Alternate travel method if no transit')]: {
+    text: 'Alternate travel method if no transit',
+    component: Q37bVisualization,
+    section: 'transit',
+    subSection: 'recent-trip'
+  },
+  // Demographics section (add Employment & Student Status to Personal Info)
+  [generateScopedKey('demographics', 'personal', 'Employment & Student Status')]: {
+    text: 'Employment & Student Status',
+    component: Q19Visualization,
+    section: 'demographics',
+    subSection: 'personal'
   },
 };
 
@@ -351,9 +454,12 @@ const DEFAULT_SCOPED_KEYS: Record<string, string> = {
   'flooding': generateScopedKey('disruptions', 'flooding', 'Impact on Daily Life'),
   'earthquake': generateScopedKey('disruptions', 'earthquake', 'Impact on Daily Life'),
   'power-outage': generateScopedKey('disruptions', 'power-outage', 'Impact on Daily Life'),
-  'employment': generateScopedKey('work', 'employment', 'Employment & Student Status'),
-  'commute': generateScopedKey('work', 'commute', 'Travel Frequency for Work/School'),
-  'distance': generateScopedKey('work', 'distance', 'Distance to Work'),
+  'employment': generateScopedKey('transportation', 'employment', 'Employment & Student Status'),
+  'commute': generateScopedKey('transportation', 'commute', 'Travel Frequency for Work/School'),
+  'distance': generateScopedKey('transportation', 'distance', 'Distance to Work or School'),
+  'choices': generateScopedKey('transportation', 'choices', 'Transportation Choices'),
+  'access': generateScopedKey('transit', 'access', 'Available Public Transit'),
+  'changes': generateScopedKey('transit', 'changes', 'Transit Use Before COVID-19'),
 };
 
 // Type definitions
@@ -394,7 +500,7 @@ const SLUG_TO_NAME_MAP: Record<string, string> = {
   'delivery': 'Delivery & Activity Frequency',
   'decisions': 'Decision Making & Concerns',
   'dining': 'Dining Habits',
-  'access': 'Q60 – Public transit access',
+  'access': 'Available Public Transit',
   'changes': 'Q62 – Changes in transit usage',
   'reasons': 'Q65 – Reasons for transit usage patterns',
   'recent-trip': 'Q68 – Recent transit experience',
@@ -419,9 +525,12 @@ const SUBHEADING_TO_SECTION: Record<string, string> = {
   'flooding': 'disruptions',
   'earthquake': 'disruptions',
   'power-outage': 'disruptions',
-  'employment': 'work',
-  'commute': 'work',
-  'distance': 'work',
+  'employment': 'transportation',
+  'commute': 'transportation',
+  'distance': 'transportation',
+  'choices': 'transportation',
+  'access': 'transit',
+  'changes': 'transit',
 };
 
 const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
@@ -522,45 +631,27 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
 
   // Updated scroll function to use scoped keys
   const scrollToVisualization = (topicLabel: string, subheadingSlug?: string) => {
-    console.log(`Scrolling to topic label: "${topicLabel}" in subheading: "${subheadingSlug}"`);
-    
-    if (!subheadingSlug) {
-      console.warn('No subheading slug provided for navigation');
-      return;
-    }
+    // Always use the correct section for the subheadingSlug
+    const targetSection = SUBHEADING_TO_SECTION[subheadingSlug || ''] || getCurrentSection();
+    const scopedKey = generateScopedKey(targetSection, subheadingSlug || '', topicLabel);
 
-    // First, determine the target section from the subheadingSlug
-    const targetSection = SUBHEADING_TO_SECTION[subheadingSlug];
-    if (!targetSection) {
-      console.warn(`Could not find section for subheading: ${subheadingSlug}`);
-      return;
-    }
-    
-    // Generate the scoped key using the TARGET section (not current section)
-    const scopedKey = generateScopedKey(targetSection, subheadingSlug, topicLabel);
-    console.log(`Generated scoped key: "${scopedKey}"`);
-    
-    // Always update state with the correct target
+    // Always set highlight and expanded subheading state
     setSelectedQuestion(scopedKey);
     setManuallySelectedQuestion(scopedKey);
+    setActiveSubheading(subheadingSlug || '');
     setIsProgrammaticScrolling(true);
-    
+
     // Check if we need to navigate to a different section/subheading
     const pathParts = location.pathname.split('/');
     const currentSection = pathParts[1] || 'lifestyle';
     const currentSubheading = pathParts[2] || '';
-    
     const needsNavigation = targetSection !== currentSection || subheadingSlug !== currentSubheading;
-    
+
     if (needsNavigation) {
       // Navigate to the new path
       const path = `/${targetSection}/${subheadingSlug}`;
       navigate(path);
-      setActiveSubheading(subheadingSlug);
-      
-      // Wait a bit longer when changing sections to ensure rendering completes
       setTimeout(() => {
-        // After navigation, we need to recalculate currentQuestions
         const updatedQuestions = Object.entries(SCOPED_TOPIC_DATA)
           .filter(([_, data]) => data.section === targetSection)
           .map(([scopedKey, data], index) => ({
@@ -570,14 +661,9 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
             section: data.section,
             subSection: data.subSection
           }));
-        
-        // Find the target in the updated questions
         const targetIndex = updatedQuestions.findIndex(q => q.scopedKey === scopedKey);
-        
         if (targetIndex !== -1) {
-          // Wait for DOM to update
           setTimeout(() => {
-            // Find the element with the matching ID
             const element = document.getElementById(scopedKey);
             if (element) {
               const mainAreaContainer = document.querySelector('.main-area');
@@ -585,65 +671,50 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
                 const topMenuHeight = 58;
                 const additionalPadding = 20;
                 const totalOffset = topMenuHeight + additionalPadding;
-                
                 mainAreaContainer.scrollTo({
                   top: element.offsetTop - totalOffset,
                   behavior: 'smooth'
                 });
-                
                 setTimeout(() => {
                   setIsProgrammaticScrolling(false);
                 }, 1000);
               }
             } else {
-              console.warn(`Element not found for scoped key: ${scopedKey}`);
               setIsProgrammaticScrolling(false);
             }
           }, 100);
         } else {
-          console.warn(`Could not find question with scoped key: ${scopedKey}`);
           setIsProgrammaticScrolling(false);
         }
-      }, 300); // Longer delay for section changes
+      }, 300);
     } else {
       // Same section, use existing logic
-      performScroll();
-    }
-    
-    function performScroll() {
       const targetIndex = currentQuestions.findIndex(q => q.scopedKey === scopedKey);
-      
       if (targetIndex !== -1 && visualizationRefs.current[targetIndex]) {
         const element = visualizationRefs.current[targetIndex];
         if (!element) {
           setIsProgrammaticScrolling(false);
           return;
         }
-
         const mainAreaContainer = document.querySelector('.main-area');
         if (!mainAreaContainer) {
           setIsProgrammaticScrolling(false);
           return;
         }
-
         const topMenuHeight = 58;
         const additionalPadding = 20;
         const totalOffset = topMenuHeight + additionalPadding;
-        
         const containerRect = mainAreaContainer.getBoundingClientRect();
         const elementRect = element.getBoundingClientRect();
         const relativePosition = elementRect.top - containerRect.top;
-        
         mainAreaContainer.scrollTo({
           top: mainAreaContainer.scrollTop + relativePosition - totalOffset,
           behavior: 'smooth'
         });
-
         setTimeout(() => {
           setIsProgrammaticScrolling(false);
         }, 1000);
       } else {
-        console.warn(`Could not find visualization for scoped key: ${scopedKey}`);
         setIsProgrammaticScrolling(false);
       }
     }

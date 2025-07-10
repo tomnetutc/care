@@ -183,38 +183,27 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
       icon: <FontAwesomeIcon icon={faExclamationCircle} />,
     },
     {
-      title: 'Work, School & Commuting',
-      path: '/work',
-      subheadings: [
-        { 
-          name: 'Employment & Student Status', 
-          path: '/work/employment',
-          topics: ['Employment & Student Status']
-        },
-        { 
-          name: 'Travel Frequency for Work/School', 
-          path: '/work/commute',
-          topics: ['Travel Frequency for Work/School']
-        },
-        { 
-          name: 'Distance to Key Locations', 
-          path: '/work/distance',
-          topics: [
-            'Distance to Work',
-            'Distance to School'
-          ]
-        },
-      ],
-      icon: <FontAwesomeIcon icon={faBriefcase} />,
-    },
-    {
-      title: 'Transportation Habits & Daily Activities',
+      title: 'Activity Travel Patterns',
       path: '/transportation',
       subheadings: [
-        { name: 'Transportation Choices', path: '/transportation/choices' },
-        { name: 'Delivery & Activity Frequency', path: '/transportation/delivery' },
-        { name: 'Decision Making & Concerns', path: '/transportation/decisions' },
-        { name: 'Dining Habits', path: '/transportation/dining' },
+        { name: 'Travel Frequency for Work/School', path: '/transportation/commute', topics: ['Travel Frequency for Work/School'] },
+        { name: 'Distance to Key Locations', path: '/transportation/distance', topics: ['Distance to Work or School'] },
+        { name: 'Transportation Choices', path: '/transportation/choices', topics: ['Transportation Choices']},
+        { name: 'Delivery & Activity Frequency', path: '/transportation/delivery', topics: [
+          'Delivery Frequency to Home',
+          'Frequency of Other Activities',
+          
+        ] },
+        { name: 'Decision Making & Concerns', path: '/transportation/decisions', topics: [
+          'Factors influencing out-of-home activity',
+          'Motivations for Leaving Home',
+          'Concerns About Going Out',
+        ] },
+        { name: 'Dining Habits', path: '/transportation/dining' , topics: [
+          'Dining Preferences',
+          'Dining Changes During COVID-19',
+          'Restaurant Adaptations During COVID-19',
+        ] },
       ],
       icon: <FontAwesomeIcon icon={faTruck} />,
     },
@@ -222,10 +211,23 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
       title: 'Public Transit Access & Usage',
       path: '/transit',
       subheadings: [
-        { name: 'Access & Usage', path: '/transit/access' },
-        { name: 'Changes Over Time', path: '/transit/changes' },
-        { name: 'Reasons for Change', path: '/transit/reasons' },
-        { name: 'Recent Transit Trip', path: '/transit/recent-trip' },
+        { name: 'Access & Usage', path: '/transit/access', topics: [
+          'Available Public Transit',
+          'Current Public Transit Use',
+          'Regular Transit Modes',
+        ] },
+        { name: 'Changes Over Time', path: '/transit/changes', topics: [
+          'Transit Use Before COVID-19',
+          'Transit Use During COVID-19'
+        ] },
+        { name: 'Reasons for Change', path: '/transit/reasons', topics: [
+          'Reasons for using transit less',
+          'Reasons for using transit more'
+        ] },
+        { name: 'Recent Transit Trip', path: '/transit/recent-trip', topics: [
+          'Trip purpose',
+          'Alternate travel method if no transit'
+        ] },
       ],
       icon: <FontAwesomeIcon icon={faBus} />,
     },
@@ -244,7 +246,16 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
       path: '/demographics',
       subheadings: [
         { name: 'Household Composition', path: '/demographics/household' },
-        { name: 'Personal Info', path: '/demographics/personal' },
+        { name: 'Personal Info', path: '/demographics/personal', topics: [
+          'Employment & Student Status',
+          'Q45 – Year of Birth',
+          'Q46 – Gender',
+          'Q47 – Hispanic/Latino Origin',
+          'Q48 – Race',
+          'Q49 – Education Level',
+          'Q50 – Disability Affecting Travel',
+          'Q51 – Household Income',
+        ] },
       ],
       icon: <FontAwesomeIcon icon={faUser} />,
     },

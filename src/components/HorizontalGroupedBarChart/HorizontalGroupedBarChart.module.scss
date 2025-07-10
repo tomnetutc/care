@@ -1,0 +1,312 @@
+.horizontalGroupedBarChart {
+  width: 100%;
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  h2 {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-weight: normal;
+    color: #333;
+  }
+
+  .legendGroup {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-left: 8px;
+  }
+  .legendItem {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    font-weight: 500;
+    gap: 8px;
+  }
+  .legendSwatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    margin-right: 4px;
+    display: inline-block;
+    border: 1px solid #ccc;
+  }
+
+  .chartContainer {
+    position: relative;
+    margin: 25px 0 45px;
+    height: auto;
+    width: 100%;
+    box-sizing: border-box;
+
+    .gridLines {
+      position: absolute;
+      display: flex;
+      justify-content: space-between;
+      z-index: 0;
+
+      .gridLine {
+        position: absolute;
+        width: 1px;
+        height: 110%;
+        background-color: #eee;
+      }
+    }
+  }
+
+  .barChart {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+
+    .barRow {
+      display: flex;
+      align-items: center;
+      margin-bottom: 22px;
+      position: relative;
+      height: 30px;
+
+      .label {
+        font-size: 14px;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        height: 100%;
+        text-align: left;
+      }
+
+      .barGroupContainer {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+        height: 30px;
+        width: 100%;
+      }
+      .barWithValue {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        height: 30px;
+        min-width: 0;
+        flex: 1 1 0;
+      }
+      .bar {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.3s ease;
+        opacity: 1 !important;
+        min-width: 2px;
+        max-width: 100%;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding-left: 8px;
+      }
+      .valueLabel {
+        font-size: 13px;
+        color: #222;
+        font-weight: 500;
+        white-space: nowrap;
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+      }
+    }
+
+    .barRowStacked {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 22px;
+      position: relative;
+      min-height: 60px;
+    }
+    .labelStacked {
+      font-size: 14px;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100%;
+      text-align: left;
+      top: 0;
+    }
+    .barStackedGroup {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+      width: 100%;
+      margin-left: 0;
+    }
+    .barWithValueStacked {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-width: 0;
+      height: 30px;
+    }
+    .barStacked {
+      height: 30px;
+      //border-radius: 6px;
+      transition: width 0.3s ease;
+      opacity: 1 !important;
+      min-width: 2px;
+      max-width: 100%;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding-left: 0;
+    }
+    .valueLabelStacked {
+      font-size: 14px;
+      color: #333;
+      min-width: 50px;
+      margin-left: 12px;
+      line-height: 30px;
+      text-align: left;
+      position: static;
+      left: auto;
+      top: auto;
+      transform: none;
+      pointer-events: none;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+  }
+
+  .tooltip {
+    position: absolute;
+    text-align: left;
+    padding: 8px;
+    font-size: 12px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 4px;
+    pointer-events: none;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.15);
+    z-index: 100;
+    border: 1px solid #ddd;
+    max-width: 240px;
+    transition: opacity 0.2s ease;
+    color: #222;
+    font-family: Arial, sans-serif;
+    .tooltipTitle {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+  }
+}
+
+.barRowFlex {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 22px;
+  min-height: 68px;
+}
+.labelFlex {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 68px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #111;
+  margin-right: 24px;
+  text-align: right;
+}
+.barFlexGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  width: 340px;
+  min-width: 0;
+}
+.barWithValueFlex {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+}
+.barFlex {
+  height: 30px;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+  opacity: 1 !important;
+  min-width: 2px;
+  max-width: 100%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 0;
+}
+.valueFlexGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  margin-left: 16px;
+  min-width: 60px;
+}
+.valueLabelFlex {
+  font-size: 16px;
+  color: #333;
+  min-width: 50px;
+  line-height: 30px;
+  text-align: left;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.summaryString {
+  position: absolute;
+  right: 24px;
+  bottom: 16px;
+  font-size: 13px;
+  color: #888;
+  font-weight: 400;
+  font-style: italic;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .horizontalGroupedBarChart {
+    padding: 10px 5px;
+    h2 {
+      font-size: 14px;
+    }
+    .legendGroup {
+      gap: 12px;
+    }
+    .barChart .barRow .label {
+      width: 140px !important;
+      left: -140px !important;
+      font-size: 12px;
+    }
+  }
+} 

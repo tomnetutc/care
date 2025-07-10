@@ -70,25 +70,41 @@ export const useLikertData = (options: LikertDataOptions) => {
     
     // Process data to get distribution percentages for each question
     const processedData: ProcessedDataItem[] = questionOrder.map((column: string) => {
-      // Count responses in each category
-      const responseCounts = new Array(categoriesToUse.length).fill(0);
+      // Special mapping for Q23-style delivery frequency questions
+      const isQ23Style = Array.isArray(responseCategories) && responseCategories.length === 6 &&
+        responseCategories[0] === '0' &&
+        responseCategories[1] === '1' &&
+        responseCategories[2] === '2–3' &&
+        responseCategories[3] === '4–6' &&
+        responseCategories[4] === '7–10' &&
+        responseCategories[5] === '>10';
+
+      const responseCounts = new Array(responseCategories.length).fill(0);
       let validResponses = 0;
-      
+
       filteredData.forEach(d => {
-        const value = parseInt(d[column] as string);
-        const isZeroBased = categoriesToUse.includes("0");
-        
-        if (isZeroBased) {
-          // For 0-based scales (0,1,2,3,4,5,6,7)
-          if (!isNaN(value) && value >= 0 && value < categoriesToUse.length) {
-            responseCounts[value]++;
+        let value = d[column];
+        if (isQ23Style) {
+          // Map CSV values 1-6 to indices 0-5
+          const intVal = parseInt(value as string);
+          if (!isNaN(intVal) && intVal >= 1 && intVal <= 6) {
+            responseCounts[intVal - 1]++;
             validResponses++;
           }
         } else {
-          // For 1-based scales (1,2,3,4,5) - existing logic
-          if (!isNaN(value) && value >= 1 && value <= categoriesToUse.length) {
-            responseCounts[value - 1]++;
-            validResponses++;
+          // Default Likert logic
+          const parsed = parseInt(value as string);
+          const isZeroBased = responseCategories.includes("0");
+          if (isZeroBased) {
+            if (!isNaN(parsed) && parsed >= 0 && parsed < responseCategories.length) {
+              responseCounts[parsed]++;
+              validResponses++;
+            }
+          } else {
+            if (!isNaN(parsed) && parsed >= 1 && parsed <= responseCategories.length) {
+              responseCounts[parsed - 1]++;
+              validResponses++;
+            }
           }
         }
       });
@@ -100,7 +116,7 @@ export const useLikertData = (options: LikertDataOptions) => {
       
       return {
         question: questionLabels[column] || column,
-        values: categoriesToUse.map((category: string, i: number) => ({
+        values: responseCategories.map((category: string, i: number) => ({
           category,
           value: responsePercentages[i],
           count: responseCounts[i]

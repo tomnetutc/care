@@ -27,7 +27,8 @@ const LikertChart: React.FC<LikertChartProps> = ({
   categoryLabels,
   showSummaryTable = true,
   dataProcessor,
-  sourceCategories
+  sourceCategories,
+  legendWrap
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -90,7 +91,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
     
     // Set up margins with the proper ratio
     const margin = { 
-      top: Math.min(80, dimensions.width * 0.06),
+      top: legendWrap ? 28 : Math.min(80, dimensions.width * 0.06),
       right: 16, // Fixed small right margin
       bottom: Math.min(50, dimensions.width * 0.05),
       left: textWidth
@@ -139,7 +140,9 @@ const LikertChart: React.FC<LikertChartProps> = ({
       .range(categoryColors);
 
     // Add styled legend with responsive positioning
-    addLegend(svg, width, color, setHighlightedCategory, responseCategories);
+    if (!legendWrap) {
+      addLegend(svg, width, color, setHighlightedCategory, responseCategories);
+    }
 
     // Stack the data
     const stackedData = prepareStackedData(data);
@@ -157,7 +160,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
         tooltipRef.current = null;
       }
     };
-  }, [data, highlightedCategory, totalResponses, dimensions, responseCategories, categoryColors]);
+  }, [data, highlightedCategory, totalResponses, dimensions, responseCategories, categoryColors, legendWrap]);
 
   // Helper functions for D3 visualization components
   function createBackgroundGradient(svg: d3.Selection<SVGGElement, unknown, null, undefined>) {
@@ -458,7 +461,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
               <th>
                 Standard<br />Deviation
               </th>
-              <th>Responses</th>
+              <th>Sample Size</th>
             </tr>
           </thead>
           <tbody>
@@ -469,7 +472,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
                 <td>{Number.isInteger(stat.max) ? stat.max : stat.max.toFixed(2)}</td>
                 <td>{stat.mean.toFixed(2)}</td>
                 <td>{stat.stdDev.toFixed(2)}</td>
-                <td>{stat.responses}</td>
+                <td>{stat.responses.toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
@@ -477,6 +480,45 @@ const LikertChart: React.FC<LikertChartProps> = ({
       </div>
     );
   };
+
+  // --- HTML Legend for legendWrap ---
+  function HTMLLegend() {
+    return (
+      <div
+        className={styles.legendGroup + ' ' + styles.legendWrap + ' ' + styles.q22TightLegend}
+        style={{ marginTop: 8, width: '100%' }}
+      >
+        {responseCategories.map((category, i) => (
+          <div
+            key={category}
+            className={styles.legendItem}
+            data-category={sanitizeForCssSelector(category)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              opacity: highlightedCategory && highlightedCategory !== category ? 0.4 : 1,
+              cursor: 'pointer',
+              transition: 'opacity 0.2s',
+            }}
+            onMouseEnter={() => setHighlightedCategory(category)}
+            onMouseLeave={() => setHighlightedCategory(null)}
+          >
+            <div
+              style={{
+                width: 14,
+                height: 14,
+                background: categoryColors[i],
+                border: '1px solid #333',
+                borderRadius: 2,
+                marginRight: 8,
+              }}
+            />
+            <span style={{fontSize: 12, color: '#333'}}>{category}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -498,10 +540,10 @@ const LikertChart: React.FC<LikertChartProps> = ({
   }
 
   return (
-    <div className={styles.chartContainer} ref={containerRef}>
+    <div className={styles.chartContainer + (legendWrap ? ' ' + styles.q22CardBackground : '')} ref={containerRef}>
       <h2><strong>{title}</strong></h2>
       {subtitle && <p>{subtitle}</p>}
-      
+      {legendWrap ? <HTMLLegend /> : null}
       <svg ref={svgRef}></svg>
       {renderSummaryTable()}
     </div>

@@ -226,7 +226,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
                 Standard<br />Deviation
               </th>
               {/* Optional: Keep or remove variance column */}
-              <th>Responses</th>
+              <th>Sample Size</th>
             </tr>
           </thead>
           <tbody>
