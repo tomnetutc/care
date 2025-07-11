@@ -19,11 +19,11 @@ const Q33Visualization: React.FC = () => {
   };
   
   const categoryColors = [
-    "#ff9800",  // Bus (orange)
-    "#ffb74d",  // Light rail (lighter orange)
-    "#8d8d8d",  // Intercity rail (gray)
-    "#4fc3f7",  // Ferry (blue)
-    "#bdbdbd"   // Other (light gray)
+    "#507dbc",  // Bus
+    "#507dbc",  // Light rail
+    "#507dbc",  // Intercity rail
+    "#507dbc",  // Ferry
+    "#507dbc"   // Other
   ];
 
   return (

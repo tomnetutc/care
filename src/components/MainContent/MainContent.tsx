@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Q1Visualization, Q2Visualization, Q3Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q8Visualization, Q9Visualization, Q10Visualization, Q11aVisualization, Q12aVisualization, Q13aVisualization, Q14aVisualization, Q15aVisualization, Q16aVisualization, Q17aVisualization, Q18aVisualization, Q11bVisualization, Q12bVisualization, Q13bVisualization, Q14bVisualization, Q15bVisualization, Q16bVisualization, Q17bVisualization, Q11cVisualization, Q12cVisualization, Q52Visualization, Q13cVisualization, Q14cVisualization, Q15cVisualization, Q16cVisualization, Q17cVisualization, Q11dVisualization, Q12dVisualization, Q13dVisualization, Q14dVisualization, Q15dVisualization, Q16dVisualization, Q17dVisualization, Q11eVisualization, Q12eVisualization, Q13eVisualization, Q14eVisualization, Q15eVisualization, Q17eVisualization, Q16eVisualization, Q19Visualization, Q20Visualization, Q21CombinedVisualization, Q22Visualization, Q23Visualization, Q24Visualization, Q25Visualization, Q26Visualization, Q27Visualization, Q28Visualization, Q29Visualization, Q30Visualization, Q31Visualization, Q32Visualization, Q33Visualization, Q34Visualization, Q35Visualization, Q36aVisualization, Q36bVisualization, Q37aVisualization, Q37bVisualization } from '../Visualizations';
+import { Q1Visualization, Q2Visualization, Q3Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q8Visualization, Q9Visualization, Q10Visualization, Q11aVisualization, Q12aVisualization, Q13aVisualization, Q14aVisualization, Q15aVisualization, Q16aVisualization, Q17aVisualization, Q18aVisualization, Q11bVisualization, Q12bVisualization, Q13bVisualization, Q14bVisualization, Q15bVisualization, Q16bVisualization, Q17bVisualization, Q11cVisualization, Q12cVisualization, Q52Visualization, Q13cVisualization, Q14cVisualization, Q15cVisualization, Q16cVisualization, Q17cVisualization, Q11dVisualization, Q12dVisualization, Q13dVisualization, Q14dVisualization, Q15dVisualization, Q16dVisualization, Q17dVisualization, Q11eVisualization, Q12eVisualization, Q13eVisualization, Q14eVisualization, Q15eVisualization, Q17eVisualization, Q16eVisualization, Q19Visualization, Q20Visualization, Q21CombinedVisualization, Q22Visualization, Q23Visualization, Q24Visualization, Q25Visualization, Q26Visualization, Q27Visualization, Q28Visualization, Q29Visualization, Q30Visualization, Q31Visualization, Q32Visualization, Q33Visualization, Q34Visualization, Q35Visualization, Q36aVisualization, Q36bVisualization, Q37aVisualization, Q37bVisualization, Q38Visualization, Q39Visualization, Q40Visualization, Q41Visualization, Q46Visualization, Q47Visualization, Q48Visualization, Q49Visualization, Q50Visualization, Q51Visualization } from '../Visualizations';
 import './MainContent.scss';
 import Sidebar from '../Sidebar/Sidebar';
 import TopMenu from '../TopMenu/TopMenu';
@@ -438,6 +438,66 @@ const SCOPED_TOPIC_DATA: Record<string, { text: string; component: React.Compone
     section: 'demographics',
     subSection: 'personal'
   },
+  [generateScopedKey('demographics', 'personal', 'Gender')]: {
+    text: 'Gender',
+    component: Q46Visualization,
+    section: 'demographics',
+    subSection: 'personal'
+  },
+  [generateScopedKey('demographics', 'personal', 'Hispanic/Latino origin')]: {
+    text: 'Hispanic/Latino origin',
+    component: Q47Visualization,
+    section: 'demographics',
+    subSection: 'personal'
+  },
+  [generateScopedKey('demographics', 'personal', 'Race')]: {
+    text: 'Race',
+    component: Q48Visualization,
+    section: 'demographics',
+    subSection: 'personal'
+  },
+  [generateScopedKey('demographics', 'personal', 'Education level')]: {
+    text: 'Education level',
+    component: Q49Visualization,
+    section: 'demographics',
+    subSection: 'personal'
+  },
+  [generateScopedKey('demographics', 'personal', 'Disability affecting travel')]: {
+    text: 'Disability affecting travel',
+    component: Q50Visualization,
+    section: 'demographics',
+    subSection: 'personal'
+  },
+  [generateScopedKey('demographics', 'personal', 'Household income')]: {
+    text: 'Household income',
+    component: Q51Visualization,
+    section: 'demographics',
+    subSection: 'personal'
+  },
+  [generateScopedKey('driving', 'licensing', "Driver’s license status")]: {
+    text: "Driver’s license status",
+    component: Q38Visualization,
+    section: 'driving',
+    subSection: 'licensing'
+  },
+  [generateScopedKey('driving', 'licensing', "Work environment")]: {
+    text: "Work environment",
+    component: Q39Visualization,
+    section: 'driving',
+    subSection: 'licensing'
+  },
+  [generateScopedKey('driving', 'housing', "Housing type")]: {
+    text: "Housing type",
+    component: Q40Visualization,
+    section: 'driving',
+    subSection: 'housing'
+  },
+  [generateScopedKey('driving', 'housing', "Home ownership")]: {
+    text: "Home ownership",
+    component: Q41Visualization,
+    section: 'driving',
+    subSection: 'housing'
+  },
 };
 
 // Default scoped keys for each URL slug
@@ -495,7 +555,7 @@ const SLUG_TO_NAME_MAP: Record<string, string> = {
   'power-outage': 'Impact of Power Outage',
   'employment': 'Employment & Student Status',
   'commute': 'Travel Frequency for Work/School',
-  'distance': 'Distance to Key Locations',
+  'distance': 'Distance to Work/School',
   'choices': 'Transportation Choices',
   'delivery': 'Delivery & Activity Frequency',
   'decisions': 'Decision Making & Concerns',

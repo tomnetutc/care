@@ -21,12 +21,12 @@ const Q31Visualization: React.FC = () => {
   };
   
   const categoryColors = [
-    "#2ba88c",  // Bus
-    "#93c4b9",  // Light rail, subway, or other local/regional rail
-    "#ead97c",  // Intercity rail (e.g., Amtrak)
-    "#f0b3ba",  // Ferry
-    "#e25b61",  // Other
-    "#218066"   // None
+    "#507dbc",  // Bus
+    "#507dbc",  // Light rail, subway, or other local/regional rail
+    "#507dbc",  // Intercity rail (e.g., Amtrak)
+    "#507dbc",  // Ferry
+    "#507dbc",  // Other
+    "#507dbc"   // None
   ];
   
   return (

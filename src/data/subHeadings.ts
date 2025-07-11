@@ -114,7 +114,7 @@ export const subHeadingsData = {
         questions: [{ id: 18, text: 'Travel Frequency for Work/School' }],
       },
       {
-        name: 'Distance to Key Locations',
+        name: 'Distance to Work/School',
         questions: [
           { id: 19, text: 'Distance to Work or School' },
         ],
@@ -203,15 +203,16 @@ export const subHeadingsData = {
       {
         name: 'Licensing & Work',
         questions: [
-          { id: 39, text: "Q38 – Driver's License Status" },
+          { id: 38, text: "Driver’s license status" },
+          { id: 39, text: "Work environment" },
           { id: 40, text: 'Q39 – Work Environment' },
         ],
       },
       {
         name: 'Housing & Ownership',
         questions: [
-          { id: 41, text: 'Q40 – Housing Type' },
-          { id: 42, text: 'Q41 – Home Ownership' },
+          { id: 41, text: "Housing type" },
+          { id: 42, text: "Home ownership" },
         ],
       },
       {
@@ -231,13 +232,12 @@ export const subHeadingsData = {
         name: 'Personal Info',
         questions: [
           { id: 17, text: 'Employment & Student Status' },
-          { id: 46, text: 'Q45 – Year of Birth' },
-          { id: 47, text: 'Q46 – Gender' },
-          { id: 48, text: 'Q47 – Hispanic/Latino Origin' },
-          { id: 49, text: 'Q48 – Race' },
-          { id: 50, text: 'Q49 – Education Level' },
-          { id: 51, text: 'Q50 – Disability Affecting Travel' },
-          { id: 52, text: 'Q51 – Household Income' },
+          { id: 46, text: 'Gender' },
+          { id: 47, text: 'Hispanic/Latino origin' },
+          { id: 48, text: 'Race' },
+          { id: 49, text: 'Education level' },
+          { id: 50, text: 'Disability affecting travel' },
+          { id: 51, text: 'Household income' },
         ],
       },
     ],

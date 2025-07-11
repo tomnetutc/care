@@ -24,14 +24,14 @@ const categoryLabels: { [key: string]: string } = {
 };
 
 const categoryColors: { [key: string]: string } = {
-  'tm_out_of_house': '#e25b61',
-  'tm_fresh_air': '#f0b3ba',
-  'tm_socialize': '#ead97c',
-  'tm_social_visibility': '#93c4b9',
-  'tm_sense_of_belonging': '#2ba88c',
+  'tm_out_of_house': '#507dbc',
+  'tm_fresh_air': '#507dbc',
+  'tm_socialize': '#507dbc',
+  'tm_social_visibility': '#507dbc',
+  'tm_sense_of_belonging': '#507dbc',
   'tm_meet_friends_family': '#507dbc',
-  'tm_activities_enjoy': '#b6bebc',
-  'travel_motivation_other': '#a3923d',
+  'tm_activities_enjoy': '#507dbc',
+  'travel_motivation_other': '#507dbc',
 };
 
 // Custom processor for Q26
