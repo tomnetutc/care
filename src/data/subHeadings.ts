@@ -114,7 +114,7 @@ export const subHeadingsData = {
         questions: [{ id: 18, text: 'Travel Frequency for Work/School' }],
       },
       {
-        name: 'Distance to Work/School',
+        name: 'Distance to Work or School',
         questions: [
           { id: 19, text: 'Distance to Work or School' },
         ],

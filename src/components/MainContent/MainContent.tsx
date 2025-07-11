@@ -498,6 +498,12 @@ const SCOPED_TOPIC_DATA: Record<string, { text: string; component: React.Compone
     section: 'driving',
     subSection: 'housing'
   },
+  [generateScopedKey('demographics', 'household', 'Employment & Student Status')]: {
+    text: 'Employment & Student Status',
+    component: Q19Visualization,
+    section: 'demographics',
+    subSection: 'household'
+  },
 };
 
 // Default scoped keys for each URL slug
@@ -518,8 +524,18 @@ const DEFAULT_SCOPED_KEYS: Record<string, string> = {
   'commute': generateScopedKey('transportation', 'commute', 'Travel Frequency for Work/School'),
   'distance': generateScopedKey('transportation', 'distance', 'Distance to Work or School'),
   'choices': generateScopedKey('transportation', 'choices', 'Transportation Choices'),
+  'delivery': generateScopedKey('transportation', 'delivery', 'Delivery Frequency to Home'),
+  'decisions': generateScopedKey('transportation', 'decisions', 'Factors influencing out-of-home activity'),
+  'dining': generateScopedKey('transportation', 'dining', 'Dining Preferences'),
   'access': generateScopedKey('transit', 'access', 'Available Public Transit'),
   'changes': generateScopedKey('transit', 'changes', 'Transit Use Before COVID-19'),
+  'reasons': generateScopedKey('transit', 'reasons', 'Reasons for using transit less'),
+  'recent-trip': generateScopedKey('transit', 'recent-trip', 'Trip purpose'),
+  'licensing': generateScopedKey('driving', 'licensing', "Driver's license status"),
+  'housing': generateScopedKey('driving', 'housing', "Housing type"),
+
+  'household': generateScopedKey('demographics', 'household', 'Employment & Student Status'),
+  'personal': generateScopedKey('demographics', 'personal', 'Employment & Student Status'),
 };
 
 // Type definitions
@@ -555,7 +571,7 @@ const SLUG_TO_NAME_MAP: Record<string, string> = {
   'power-outage': 'Impact of Power Outage',
   'employment': 'Employment & Student Status',
   'commute': 'Travel Frequency for Work/School',
-  'distance': 'Distance to Work/School',
+  'distance': 'Distance to Work or School',
   'choices': 'Transportation Choices',
   'delivery': 'Delivery & Activity Frequency',
   'decisions': 'Decision Making & Concerns',
@@ -589,8 +605,18 @@ const SUBHEADING_TO_SECTION: Record<string, string> = {
   'commute': 'transportation',
   'distance': 'transportation',
   'choices': 'transportation',
+  'delivery': 'transportation',
+  'decisions': 'transportation',
+  'dining': 'transportation',
   'access': 'transit',
   'changes': 'transit',
+  'reasons': 'transit',
+  'recent-trip': 'transit',
+  'licensing': 'driving',
+  'housing': 'driving',
+
+  'household': 'demographics',
+  'personal': 'demographics',
 };
 
 const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
@@ -695,6 +721,8 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
     const targetSection = SUBHEADING_TO_SECTION[subheadingSlug || ''] || getCurrentSection();
     const scopedKey = generateScopedKey(targetSection, subheadingSlug || '', topicLabel);
 
+    console.log('scrollToVisualization called:', { topicLabel, subheadingSlug, targetSection, scopedKey });
+
     // Always set highlight and expanded subheading state
     setSelectedQuestion(scopedKey);
     setManuallySelectedQuestion(scopedKey);
@@ -711,6 +739,8 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
       // Navigate to the new path
       const path = `/${targetSection}/${subheadingSlug}`;
       navigate(path);
+      
+      // Wait for navigation and DOM update, then scroll to the target
       setTimeout(() => {
         const updatedQuestions = Object.entries(SCOPED_TOPIC_DATA)
           .filter(([_, data]) => data.section === targetSection)

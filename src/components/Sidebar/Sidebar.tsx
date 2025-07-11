@@ -187,7 +187,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
       path: '/transportation',
       subheadings: [
         { name: 'Travel Frequency for Work/School', path: '/transportation/commute', topics: ['Travel Frequency for Work/School'] },
-        { name: 'Distance to Work/School', path: '/transportation/distance', topics: ['Distance to Work or School'] },
+        { name: 'Distance to Work or School', path: '/transportation/distance', topics: ['Distance to Work or School'] },
         { name: 'Transportation Choices', path: '/transportation/choices', topics: ['Transportation Choices']},
         { name: 'Delivery & Activity Frequency', path: '/transportation/delivery', topics: [
           'Delivery Frequency to Home',
