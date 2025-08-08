@@ -69,7 +69,7 @@ const Q51Visualization: React.FC = () => {
       valueMap={valueMap}
       alternateFields={['q51', 'household_income']}
       tooltipCountLabel="Responses"
-      labelWidth={200}
+      
     />
   );
 };

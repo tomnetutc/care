@@ -13,8 +13,8 @@ const App: React.FC = () => {
     <FilterProvider>
       <Router>
         <Routes>
-          {/* Redirect root to Home */}
-          <Route path="/" element={<Navigate to="/home" replace />} />
+          {/* Redirect root to Dashboard */}
+          <Route path="/" element={<Navigate to="/lifestyle/preferences" replace />} />
           {/* Home route - shows only Navbar and Home content */}
           <Route path="/home" element={
             <div className="app">
@@ -85,44 +85,20 @@ const App: React.FC = () => {
               </div>
             </div>
           } />
-          <Route path="/transit/:subHeadingName?" element={
+          <Route path="/sample-characteristics/:subHeadingName?" element={
             <div className="app">
               <Navbar />
               <div className="content-wrapper">
                 <main className="main-area">
                   <div className="main-content">
-                    <MainContent subHeadings={subHeadingsData.transit} />
-                  </div>
-                </main>
-              </div>
-            </div>
-          } />
-          <Route path="/demographics/:subHeadingName?" element={
-            <div className="app">
-              <Navbar />
-              <div className="content-wrapper">
-                <main className="main-area">
-                  <div className="main-content">
-                    <MainContent subHeadings={subHeadingsData.demographics} />
-                  </div>
-                </main>
-              </div>
-            </div>
-          } />
-          <Route path="/driving/:subHeadingName?" element={
-            <div className="app">
-              <Navbar />
-              <div className="content-wrapper">
-                <main className="main-area">
-                  <div className="main-content">
-                    <MainContent subHeadings={subHeadingsData.driving} />
+                    <MainContent subHeadings={subHeadingsData.sampleCharacteristics} />
                   </div>
                 </main>
               </div>
             </div>
           } />
           {/* Fallback route for unmatched paths */}
-          <Route path="*" element={<Navigate to="/home" replace />} />
+          <Route path="*" element={<Navigate to="/lifestyle/preferences" replace />} />
         </Routes>
       </Router>
     </FilterProvider>

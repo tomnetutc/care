@@ -90,109 +90,45 @@
       }
 
       .barGroupContainer {
+        flex-grow: 1;
         display: flex;
         flex-direction: row;
         gap: 10px;
         align-items: center;
         height: 30px;
-        width: 100%;
       }
-      .barWithValue {
+      .barContainer {
+        flex-grow: 1;
         display: flex;
         align-items: center;
-        gap: 4px;
         height: 30px;
-        min-width: 0;
-        flex: 1 1 0;
       }
       .bar {
         height: 100%;
-        border-radius: 6px;
         transition: width 0.3s ease;
         opacity: 1 !important;
-        min-width: 2px;
+        min-width: 0px;
         max-width: 100%;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         cursor: pointer;
         display: flex;
         align-items: center;
         position: relative;
-        padding-left: 8px;
+        padding-left: 5px;
+        &:hover {
+          filter: brightness(1.1);
+          cursor: pointer;
+        }
       }
-      .valueLabel {
-        font-size: 13px;
-        color: #222;
-        font-weight: 500;
-        white-space: nowrap;
-        position: absolute;
-        left: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        pointer-events: none;
+      .value {
+        font-size: 14px;
+        min-width: 50px;
+        margin-left: 12px;
+        line-height: 30px;
+        text-align: left;
       }
     }
-
-    .barRowStacked {
-      display: flex;
-      align-items: flex-start;
-      margin-bottom: 22px;
-      position: relative;
-      min-height: 60px;
-    }
-    .labelStacked {
-      font-size: 14px;
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      height: 100%;
-      text-align: left;
-      top: 0;
-    }
-    .barStackedGroup {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      align-items: flex-start;
-      width: 100%;
-      margin-left: 0;
-    }
-    .barWithValueStacked {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      min-width: 0;
-      height: 30px;
-    }
-    .barStacked {
-      height: 30px;
-      //border-radius: 6px;
-      transition: width 0.3s ease;
-      opacity: 1 !important;
-      min-width: 2px;
-      max-width: 100%;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      position: relative;
-      padding-left: 0;
-    }
-    .valueLabelStacked {
-      font-size: 14px;
-      color: #333;
-      min-width: 50px;
-      margin-left: 12px;
-      line-height: 30px;
-      text-align: left;
-      position: static;
-      left: auto;
-      top: auto;
-      transform: none;
-      pointer-events: none;
-      font-weight: 400;
-      white-space: nowrap;
-    }
+    // Remove or comment out old stacked styles if not needed
+    //.barRowStacked, .labelStacked, .barStackedGroup, .barWithValueStacked, .barStacked, .valueLabelStacked { display: none; }
   }
 
   .tooltip {
@@ -293,6 +229,39 @@
   z-index: 2;
   pointer-events: none;
 }
+
+.barGroupWithGrid {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  margin-right: 24px;
+  margin-left: 0;
+}
+.barGroupWithGrid:last-child {
+  margin-right: 0;
+}
+.barGroupWithGrid + .barGroupWithGrid::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 10%;
+  height: 80%;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #d0d0d0 0px,
+    #d0d0d0 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  z-index: 2;
+}
+// Remove gridlines for now
+.groupGridLines, .groupGridLine { display: none !important; }
 
 @media (max-width: 768px) {
   .horizontalGroupedBarChart {

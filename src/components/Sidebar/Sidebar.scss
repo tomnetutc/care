@@ -86,7 +86,7 @@
         background-color: #fafafa; // Lighter background for subsection area
 
         &.expanded {
-          max-height: 500px; // Enough height to accommodate all items
+          max-height: none; // Enough height to accommodate all items
           margin-top: 8px;
           margin-bottom: 8px;
           opacity: 1;

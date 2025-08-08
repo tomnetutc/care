@@ -35,6 +35,8 @@ export interface Q22TransportationRow {
 
 export const useQ22TransportationData = () => {
   const [data, setData] = useState<Q22TransportationRow[]>([]);
+  const [rawData, setRawData] = useState<any[]>([]);
+  const [filteredRawData, setFilteredRawData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { filters, isDataLoading, dataError } = useFilters();
@@ -44,6 +46,7 @@ export const useQ22TransportationData = () => {
       try {
         setIsLoading(true);
         const parsedData = await DataService.getInstance().getData();
+        setRawData(parsedData);
         processData(parsedData);
       } catch (err) {
         setError((err as Error).message);
@@ -62,7 +65,10 @@ export const useQ22TransportationData = () => {
 
   useEffect(() => {
     if (!isLoading && !error) {
-      DataService.getInstance().getData().then(processData);
+      DataService.getInstance().getData().then(parsedData => {
+        setRawData(parsedData);
+        processData(parsedData);
+      });
     }
   }, [filters]);
 
@@ -70,10 +76,41 @@ export const useQ22TransportationData = () => {
     try {
       let filteredData = parsedData;
       if (filters.length > 0) {
-        filteredData = parsedData.filter(row =>
-          filters.every(filter => String(row[filter.field]) === String(filter.value))
-        );
+        filteredData = parsedData.filter(row => {
+          // Group filters by field to handle multiple values for same field
+          const filtersByField: Record<string, string[]> = {};
+          filters.forEach(filter => {
+            if (!filtersByField[filter.field]) {
+              filtersByField[filter.field] = [];
+            }
+            
+            // Special handling for disability filter
+            if (filter.field === 'travel_disability') {
+              if (filter.value === 'yes') {
+                // Map "Yes (Disabled)" to values 2, 3, 4 (any disability)
+                filtersByField[filter.field].push('2', '3', '4');
+              } else if (filter.value === 'no') {
+                // Map "No (Disabled)" to value 1 (no disability)
+                filtersByField[filter.field].push('1');
+              } else {
+                filtersByField[filter.field].push(String(filter.value));
+              }
+            } else {
+              filtersByField[filter.field].push(String(filter.value));
+            }
+          });
+          
+          // Check if row matches any of the filter combinations
+          return Object.entries(filtersByField).every(([field, values]) => {
+            const rowValue = String(row[field]);
+            return values.includes(rowValue);
+          });
+        });
       }
+      
+      // Set the filtered raw data for summary calculations
+      setFilteredRawData(filteredData);
+      
       const modeRows: Q22TransportationRow[] = Object.entries(modeMapping).map(([modeCode, modeLabel]) => {
         const row: Q22TransportationRow = { mode: modeLabel };
         SEGMENTS.forEach(segment => {
@@ -105,5 +142,5 @@ export const useQ22TransportationData = () => {
     }
   };
 
-  return { data, isLoading, error };
-}; 
+  return { data, rawData: filteredRawData, isLoading, error };
+};

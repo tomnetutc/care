@@ -61,7 +61,7 @@ const Q37aVisualization: React.FC = () => {
       categoryLabels={categoryLabels}
       valueMap={valueMap}
       alternateFields={["transit_trip_purpose_other"]}
-      labelWidth={300}
+      
       dataProcessor={dataProcessor}
       customTotalResponses={customTotal}
     />

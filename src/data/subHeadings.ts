@@ -110,40 +110,56 @@ export const subHeadingsData = {
     ],
     transportation: [
       {
-        name: 'Travel Frequency for Work/School',
-        questions: [{ id: 18, text: 'Travel Frequency for Work/School' }],
-      },
-      {
-        name: 'Distance to Work or School',
+        name: 'Work/School Commute Patterns',
         questions: [
-          { id: 19, text: 'Distance to Work or School' },
+          { id: 18, text: 'Frequency of Commuting' },
+          { id: 19, text: 'Distance to Work/School' },
         ],
       },
       {
-        name: 'Transportation Choices',
-        questions: [{ id: 21, text: 'Transportation Choices' }],
+        name: 'Modes of Transportation',
+        questions: [{ id: 21, text: 'Modes of Transportation' }],
       },
       {
-        name: 'Delivery & Activity Frequency',
+        name: 'Deliveries and Services',
         questions: [
-          { id: 22, text: 'Delivery Frequency to Home' },
-          { id: 23, text: 'Frequency of Other Activities' },
+          { id: 22, text: 'Deliveries and Services' },
         ],
       },
       {
-        name: 'Decision Making & Concerns',
+        name: 'Leisure and Outdoor Activities',
         questions: [
-          { id: 24, text: 'Factors influencing out-of-home activity' },
+          { id: 23, text: 'Leisure and Outdoor Activities' },
+        ],
+      },
+      {
+        name: 'Motivations and Concerns for Activity Participation',
+        questions: [
+          { id: 24, text: 'Importance of Factors for Participation' },
           { id: 26, text: 'Motivations for Leaving Home' },
-          { id: 27, text: 'Concerns About Going Out' },
+          { id: 27, text: 'Concerns About Out-of-Home Activities' },
         ],
       },
       {
-        name: 'Dining Habits',
+        name: 'Dining Preferences and COVID-19 Impact',
         questions: [
           { id: 28, text: 'Dining Preferences' },
-          { id: 29, text: 'Dining Changes During COVID-19' },
-          { id: 30, text: 'Restaurant Adaptations During COVID-19' },
+          { id: 29, text: 'Changes in Dining Behavior' },
+          { id: 30, text: 'Restaurant Adaptations' },
+        ],
+      },
+      {
+        name: 'Transit Use and COVID-19 Impact',
+        questions: [
+          { id: 31, text: 'Transit Availability' },
+          { id: 32, text: 'Current Frequency of Use' },
+          { id: 33, text: 'Mode-Specific Transit Use' },
+          { id: 34, text: 'Pre-Pandemic Transit Use' },
+          { id: 35, text: 'Transit Use During Pandemic' },
+          { id: 36, text: 'Reasons for Reduced Use Post-Pandemic' },
+          { id: 37, text: 'Reasons for Increased Use Post-Pandemic' },
+          { id: 38, text: 'Purpose of Last Transit Trip' },
+          { id: 39, text: 'Alternative Mode If Transit Unavailable' },
         ],
       },
       {
@@ -168,76 +184,35 @@ export const subHeadingsData = {
         ],
       },
     ],
-    transit: [
+    sampleCharacteristics: [
       {
-        name: 'Access & Usage',
+        name: 'Individual Attributes',
         questions: [
-          { id: 30, text: 'Available Public Transit' },
-          { id: 31, text: 'Current Public Transit Use' },
-          { id: 32, text: 'Regular Transit Modes' },
-        ],
-      },
-      {
-        name: 'Changes Over Time',
-        questions: [
-          { id: 33, text: 'Transit Use Before COVID-19' },
-          { id: 34, text: 'Transit Use During COVID-19' },
-        ],
-      },
-      {
-        name: 'Reasons for Change',
-        questions: [
-          { id: 35, text: 'Reasons for Using Transit Less' },
-          { id: 36, text: 'Reasons for Using Transit More' },
-        ],
-      },
-      {
-        name: 'Recent Transit Trip',
-        questions: [
-          { id: 37, text: 'Trip Purpose' },
-          { id: 38, text: 'Alternate Travel Method if No Transit' },
-        ],
-      },
-    ],
-    driving: [
-      {
-        name: 'Licensing & Work',
-        questions: [
-          { id: 38, text: "Driver’s license status" },
-          { id: 39, text: "Work environment" },
-          { id: 40, text: 'Q39 – Work Environment' },
-        ],
-      },
-      {
-        name: 'Housing & Ownership',
-        questions: [
-          { id: 41, text: "Housing type" },
-          { id: 42, text: "Home ownership" },
-        ],
-      },
-      {
-        name: 'Household Resources',
-        questions: [
-          { id: 43, text: "Q43 – Driver's Licenses in Household" },
-          { id: 44, text: 'Q44 – Vehicles in Household' },
-        ],
-      },
-    ],
-    demographics: [
-      {
-        name: 'Household Composition',
-        questions: [{ id: 45, text: 'Q42 – Household Age Groups' }],
-      },
-      {
-        name: 'Personal Info',
-        questions: [
-          { id: 17, text: 'Employment & Student Status' },
           { id: 46, text: 'Gender' },
-          { id: 47, text: 'Hispanic/Latino origin' },
+          { id: 45, text: 'Age' },
           { id: 48, text: 'Race' },
-          { id: 49, text: 'Education level' },
-          { id: 50, text: 'Disability affecting travel' },
-          { id: 51, text: 'Household income' },
+          { id: 47, text: 'Ethnicity' },
+          { id: 49, text: 'Education Level' },
+          { id: 50, text: 'Disability Status' },
+          { id: 19, text: 'Employment/Student Status' },
+          { id: 39, text: 'Work Environment' },
+          { id: 38, text: 'Driver\'s License' },
+        ],
+      },
+      {
+        name: 'Household Attributes',
+        questions: [
+          { id: 42, text: 'Household Size' },
+          { id: 42.1, text: 'Number of Children' },
+          { id: 42.2, text: 'Number of Adults' },
+          { id: 42.3, text: 'Number of Older Persons (65+)' },
+          { id: 51, text: 'Household Income' },
+          { id: 40, text: 'Housing Type' },
+          { id: 41, text: 'Home Ownership' },
+          { id: 44, text: 'Number of Vehicles' },
+          { id: 43, text: 'Number of Drivers' },
+          { id: 52, text: 'Division' },
+          { id: 53, text: 'Census Region + County' },
         ],
       },
     ],

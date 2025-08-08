@@ -18,7 +18,7 @@ const Q9Visualization: React.FC = () => {
       dataField="provide_care"
       categoryOrder={categoryOrder}
       categoryLabels={categoryLabels}
-      labelWidth={320} // Wider for longer labels
+
     />
   );
 };

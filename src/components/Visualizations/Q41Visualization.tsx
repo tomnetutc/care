@@ -43,7 +43,7 @@ const Q41Visualization: React.FC = () => {
       categoryLabels={categoryLabels}
       alternateFields={["41"]}
       dataProcessor={dataProcessor}
-      labelWidth={260}
+      
     />
   );
 };

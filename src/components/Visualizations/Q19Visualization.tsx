@@ -17,7 +17,7 @@ const Q19Visualization: React.FC = () => {
       dataField="employment_status"
       categoryOrder={categoryOrder}
       categoryLabels={categoryLabels}
-      labelWidth={260}
+      
     />
   );
 };

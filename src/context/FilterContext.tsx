@@ -4,12 +4,13 @@ import DataService from '../services/DataService'; // Add import
 export interface FilterOption {
   field: string;
   value: string | number;
+  id?: string; // Add unique identifier for multiple filters on same field
 }
 
 interface FilterContextType {
   filters: FilterOption[];
   addFilter: (filter: FilterOption) => void;
-  removeFilter: (field: string) => void;
+  removeFilter: (field: string, value?: string | number) => void;
   clearFilters: () => void;
   isDataLoading: boolean; // Add this
   dataError: string | null; // Add this
@@ -42,15 +43,21 @@ export const FilterProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   const addFilter = (filter: FilterOption) => {
     setFilters(prevFilters => {
-      // Remove any existing filter with the same field
-      const filtered = prevFilters.filter(f => f.field !== filter.field);
-      // Add the new filter
-      return [...filtered, filter];
+      // Add the new filter (allow multiple filters for same field)
+      return [...prevFilters, { ...filter, id: `${filter.field}-${filter.value}-${Date.now()}` }];
     });
   };
 
-  const removeFilter = (field: string) => {
-    setFilters(prevFilters => prevFilters.filter(f => f.field !== field));
+  const removeFilter = (field: string, value?: string | number) => {
+    setFilters(prevFilters => {
+      if (value !== undefined) {
+        // Remove specific filter with matching field and value
+        return prevFilters.filter(f => !(f.field === field && f.value === value));
+      } else {
+        // Remove all filters with the field
+        return prevFilters.filter(f => f.field !== field);
+      }
+    });
   };
 
   const clearFilters = () => {

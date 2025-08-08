@@ -54,7 +54,7 @@ const Q37bVisualization: React.FC = () => {
       categoryOrder={categoryOrder}
       categoryLabels={categoryLabels}
       valueMap={valueMap}
-      labelWidth={300}
+      
       dataProcessor={dataProcessor}
       customTotalResponses={customTotal}
     />

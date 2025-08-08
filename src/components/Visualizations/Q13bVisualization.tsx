@@ -31,7 +31,7 @@ const Q13bVisualization: React.FC = () => {
       categoryOrder={categoryOrder}
       categoryLabels={categoryLabels}
       categoryColors={categoryColors}
-      labelWidth={220}
+      
     />
   );
 };

@@ -26,7 +26,7 @@ const Q39Visualization: React.FC = () => {
       categoryLabels={categoryLabels}
       valueMap={valueMap}
       alternateFields={["39"]}
-      labelWidth={260}
+      
     />
   );
 };

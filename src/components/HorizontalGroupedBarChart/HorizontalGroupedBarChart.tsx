@@ -46,11 +46,22 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
   const showTooltip = (e: React.MouseEvent, label: string, group: string, value: number) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
+    // Find the count for this group/category from the data array
+    const row = data.find(d => d.label === label);
+    let count = 0;
+    if (row && typeof row[`${group}_count`] === 'number') {
+      count = row[`${group}_count`] as number;
+    } else if (row && typeof row[`${group}Count`] === 'number') {
+      count = row[`${group}Count`] as number;
+    } else if (row && typeof row[group] === 'number') {
+      // fallback: if only percentage is present, can't show count
+      count = NaN;
+    }
     setTooltip({
       visible: true,
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
-      data: { label, group, value }
+      data: { label, group, value: count }
     });
   };
 
@@ -84,7 +95,7 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     return (
       <div className={styles.tooltip} style={tooltipStyle}>
         <div className={styles.tooltipTitle}>{categoryLabels[tooltip.data.label] || tooltip.data.label}</div>
-        <div><b>{tooltip.data.group}:</b> {tooltip.data.value.toFixed(1)}%</div>
+        <div>n = {isNaN(tooltip.data.value) ? 'N/A' : tooltip.data.value.toLocaleString()}</div>
       </div>
     );
   };
@@ -101,38 +112,49 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     </div>
   );
 
-  // Render split-row grouped bar chart, matching HorizontalBarChart style
+  // Add a reusable component for per-group gridlines
+  const GroupGridLines: React.FC = () => (
+    <div className={styles.groupGridLines} aria-hidden="true">
+      {[0, 20, 40, 60, 80, 100].map((val) => (
+        <div
+          key={val}
+          className={styles.groupGridLine}
+          style={{ left: `${val}%` }}
+        />
+      ))}
+    </div>
+  );
+
+  // Render side-by-side grouped bar chart, matching HorizontalBarChart style
   const renderBarChart = () => {
     const formatPercent = (value: number) => value.toFixed(1) + '%';
     return (
       <div className={styles.chartContainer} style={{ paddingLeft: `${labelWidth}px` }}>
-        <div className={styles.gridLines} style={{ inset: `0 0 0 ${labelWidth}px` }}>
-          {[0, 20, 40, 60, 80, 100].map(value => (
-            <div key={value} className={styles.gridLine} style={{ left: `${value}%` }}></div>
-          ))}
-        </div>
         <div className={styles.barChart}>
           {categoryOrder.map((cat, rowIdx) => (
-            <div className={styles.barRowStacked} key={cat}>
-              <div className={styles.labelStacked} style={{ width: `${labelWidth}px`, left: `-${labelWidth}px` }}>
+            <div className={styles.barRow} key={cat}>
+              <div className={styles.label} style={{ width: `${labelWidth}px`, left: `-${labelWidth}px` }}>
                 {categoryLabels[cat] || cat}
               </div>
-              <div className={styles.barStackedGroup}>
+              <div className={styles.barGroupContainer}>
                 {groupLabels.map((group, groupIdx) => {
                   const value = typeof data[rowIdx]?.[group] === 'number' ? (data[rowIdx][group] as number) : 0;
                   return (
-                    <div key={group} className={styles.barWithValueStacked}>
-                      <div
-                        className={styles.barStacked}
-                        style={{
-                          width: `${value}%`,
-                          backgroundColor: groupColors[groupIdx],
-                        }}
-                        onMouseEnter={e => showTooltip(e, cat, group, value)}
-                        onMouseLeave={hideTooltip}
-                        onMouseMove={moveTooltip}
-                      ></div>
-                      <div className={styles.valueLabelStacked}>{formatPercent(value)}</div>
+                    <div key={group} className={styles.barGroupWithGrid}>
+                      <GroupGridLines />
+                      <div className={styles.barContainer}>
+                        <div
+                          className={styles.bar}
+                          style={{
+                            width: `${value}%`,
+                            backgroundColor: groupColors[groupIdx],
+                          }}
+                          onMouseEnter={e => showTooltip(e, cat, group, value)}
+                          onMouseLeave={hideTooltip}
+                          onMouseMove={moveTooltip}
+                        ></div>
+                        <div className={styles.value}>{formatPercent(value)}</div>
+                      </div>
                     </div>
                   );
                 })}

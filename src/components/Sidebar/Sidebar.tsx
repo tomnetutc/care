@@ -183,77 +183,64 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
       icon: <FontAwesomeIcon icon={faExclamationCircle} />,
     },
     {
-      title: 'Activity Travel Patterns',
+      title: 'Activity and Travel Behaviors and Choices',
       path: '/transportation',
       subheadings: [
-        { name: 'Travel Frequency for Work/School', path: '/transportation/commute', topics: ['Travel Frequency for Work/School'] },
-        { name: 'Distance to Work or School', path: '/transportation/distance', topics: ['Distance to Work or School'] },
-        { name: 'Transportation Choices', path: '/transportation/choices', topics: ['Transportation Choices']},
-        { name: 'Delivery & Activity Frequency', path: '/transportation/delivery', topics: [
-          'Delivery Frequency to Home',
-          'Frequency of Other Activities',
-          
-        ] },
-        { name: 'Decision Making & Concerns', path: '/transportation/decisions', topics: [
-          'Factors influencing out-of-home activity',
+        { name: 'Work/School Commute Patterns', path: '/transportation/commute', topics: ['Frequency of Commuting', 'Distance to Work/School'] },
+        { name: 'Modes of Transportation', path: '/transportation/choices', topics: ['Modes of Transportation'] },
+        { name: 'Deliveries and Services', path: '/transportation/deliveries', topics: ['Deliveries and Services'] },
+        { name: 'Leisure and Outdoor Activities', path: '/transportation/leisure', topics: ['Leisure and Outdoor Activities'] },
+        { name: 'Motivations and Concerns for Activity Participation', path: '/transportation/decisions', topics: [
+          'Importance of Factors for Participation',
           'Motivations for Leaving Home',
-          'Concerns About Going Out',
+          'Concerns About Out-of-Home Activities',
         ] },
-        { name: 'Dining Habits', path: '/transportation/dining' , topics: [
+        { name: 'Dining Preferences and COVID-19 Impact', path: '/transportation/dining' , topics: [
           'Dining Preferences',
-          'Dining Changes During COVID-19',
-          'Restaurant Adaptations During COVID-19',
+          'Changes in Dining Behavior',
+          'Restaurant Adaptations',
+        ] },
+        { name: 'Transit Use and COVID-19 Impact', path: '/transportation/transit', topics: [
+          'Transit Availability',
+          'Current Frequency of Use',
+          'Mode-Specific Transit Use',
+          'Pre-Pandemic Transit Use',
+          'Transit Use During Pandemic',
+          'Reasons for Reduced Use Post-Pandemic',
+          'Reasons for Increased Use Post-Pandemic',
+          'Purpose of Last Transit Trip',
+          'Alternative Mode If Transit Unavailable',
         ] },
       ],
       icon: <FontAwesomeIcon icon={faTruck} />,
     },
     {
-      title: 'Public Transit Access & Usage',
-      path: '/transit',
+      title: 'Sample Characteristics',
+      path: '/sample-characteristics',
       subheadings: [
-        { name: 'Access & Usage', path: '/transit/access', topics: [
-          'Available Public Transit',
-          'Current Public Transit Use',
-          'Regular Transit Modes',
-        ] },
-        { name: 'Changes Over Time', path: '/transit/changes', topics: [
-          'Transit Use Before COVID-19',
-          'Transit Use During COVID-19'
-        ] },
-        { name: 'Reasons for Change', path: '/transit/reasons', topics: [
-          'Reasons for using transit less',
-          'Reasons for using transit more'
-        ] },
-        { name: 'Recent Transit Trip', path: '/transit/recent-trip', topics: [
-          'Trip purpose',
-          'Alternate travel method if no transit'
-        ] },
-      ],
-      icon: <FontAwesomeIcon icon={faBus} />,
-    },
-    {
-      title: 'Driving & Household Vehicle Access',
-      path: '/driving',
-      subheadings: [
-        { name: 'Licensing & Work', path: '/driving/licensing', topics: ["Driver’s license status", "Work environment"] },
-        { name: 'Housing & Ownership', path: '/driving/housing', topics: ["Housing type", "Home ownership"] },
-        { name: 'Household Resources', path: '/driving/resources' },
-      ],
-      icon: <FontAwesomeIcon icon={faCar} />,
-    },
-    {
-      title: 'Demographics',
-      path: '/demographics',
-      subheadings: [
-        { name: 'Household Composition', path: '/demographics/household' },
-        { name: 'Personal Info', path: '/demographics/personal', topics: [
-          'Employment & Student Status',
+        { name: 'Individual Attributes', path: '/sample-characteristics/individual', topics: [
           'Gender',
-          'Hispanic/Latino origin',
+          'Age',
           'Race',
-          'Education level',
-          'Disability affecting travel',
-          'Household income',
+          'Ethnicity',
+          'Education Level',
+          'Disability Status',
+          'Employment/Student Status',
+          'Work Environment',
+          'Driver\'s License',
+        ] },
+        { name: 'Household Attributes', path: '/sample-characteristics/household', topics: [
+          'Household Size',
+          'Number of Children',
+          'Number of Adults',
+          'Number of Older Persons (65+)',
+          'Household Income',
+          'Housing Type',
+          'Home Ownership',
+          'Number of Vehicles',
+          'Number of Drivers',
+          'Division',
+          'Census Region + County',
         ] },
       ],
       icon: <FontAwesomeIcon icon={faUser} />,
@@ -354,27 +341,29 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
     return pathParts[1] || 'lifestyle';
   };
 
-  // Update isSubheadingActive to work with main section context
+  // In isSubheadingActive, handle subheadings with no topics (like Household Composition)
   const isSubheadingActive = (subheading: SubHeading): boolean => {
-    // Check if any topic in this subheading is active
-    if (selectedQuestion && subheading.topics) {
+    if (selectedQuestion) {
       const currentSection = getCurrentSection();
       const subheadingSlug = subheading.path.split('/').pop() || '';
-      
-      // Only check if we're in the same section
       const subheadingSection = subheading.path.split('/')[1];
       if (subheadingSection !== currentSection) {
         return false;
       }
-      
-      return subheading.topics.some(topic => {
-        const scopedKey = generateScopedKey(currentSection, subheadingSlug, topic);
+      if (subheading.topics) {
+        return subheading.topics.some(topic => {
+          const scopedKey = generateScopedKey(currentSection, subheadingSlug, topic);
+          return scopedKey === selectedQuestion;
+        });
+      } else {
+        // Single-topic subheading: use subheading name as topic label
+        const scopedKey = generateScopedKey(currentSection, subheadingSlug, subheading.name);
         return scopedKey === selectedQuestion;
-      });
+      }
     }
     return false;
   };
-  
+
   // Updated isTopicActive function to work with main section context
   const isTopicActive = (topic: string, subheadingSlug: string): boolean => {
     if (!selectedQuestion) return false;
@@ -452,7 +441,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedQuestion, activeSubheading, o
                           className={`subheading-container ${subheadingActive ? 'active' : ''}`}
                           onClick={() => {
                             // Navigate directly to the topic visualization
-                            onTopicClick && onTopicClick(subheading.topics![0], subheadingSlug);
+                            onTopicClick && onTopicClick(subheading.name, subheadingSlug);
                             setExpandedSubheading(subheadingSlug);
                           }}
                           style={{ cursor: 'pointer' }}

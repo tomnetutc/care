@@ -70,9 +70,33 @@ export const usePieChartData = (options: UsePieChartDataOptions) => {
       
       if (filters.length > 0) {
         filteredData = parsedData.filter(row => {
-          return filters.every(filter => {
-            const rowValue = String(row[filter.field]);
-            return rowValue === String(filter.value);
+          // Group filters by field to handle multiple values for same field
+          const filtersByField: Record<string, string[]> = {};
+          filters.forEach(filter => {
+            if (!filtersByField[filter.field]) {
+              filtersByField[filter.field] = [];
+            }
+            
+            // Special handling for disability filter
+            if (filter.field === 'travel_disability') {
+              if (filter.value === 'yes') {
+                // Map "Yes (Disabled)" to values 2, 3, 4 (any disability)
+                filtersByField[filter.field].push('2', '3', '4');
+              } else if (filter.value === 'no') {
+                // Map "No (Disabled)" to value 1 (no disability)
+                filtersByField[filter.field].push('1');
+              } else {
+                filtersByField[filter.field].push(String(filter.value));
+              }
+            } else {
+              filtersByField[filter.field].push(String(filter.value));
+            }
+          });
+          
+          // Check if row matches any of the filter combinations
+          return Object.entries(filtersByField).every(([field, values]) => {
+            const rowValue = String(row[field]);
+            return values.includes(rowValue);
           });
         });
       }

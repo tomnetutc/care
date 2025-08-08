@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { useHorizontalBarData, BarDataItem, UseHorizontalBarDataOptions } from '../../hooks/useHorizontalBarData';
 import styles from './HorizontalBarChart.module.scss';
 
@@ -25,6 +25,7 @@ export interface HorizontalBarChartProps {
   multiSelectFields?: Record<string, string>;
   percentageDenominator?: 'uniqueRespondents' | 'totalSelections';
   customTotalResponses?: number;
+  categoryNotes?: Record<string, string>;
 }
 
 const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
@@ -36,13 +37,14 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   categoryColors,
   valueMap = {},
   alternateFields = [],
-  labelWidth = 180,
+  labelWidth,
   tooltipTitle = "Category",
   tooltipCountLabel = "Count",
   dataProcessor,
   multiSelectFields,
   percentageDenominator,
-  customTotalResponses
+  customTotalResponses,
+  categoryNotes
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -64,6 +66,34 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     percentageDenominator
   });
 
+  // Calculate optimal label width based on longest label
+  const calculatedLabelWidth = useMemo(() => {
+    if (labelWidth !== undefined) {
+      return labelWidth; // Use provided width if specified
+    }
+
+    // Calculate width based on longest label
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    if (!context) return 180; // Fallback
+
+    // Set font to match the CSS (you may need to adjust this to match your actual font)
+    context.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    
+    let maxWidth = 0;
+    
+    // Check all category labels
+    Object.values(categoryLabels).forEach(label => {
+      const textWidth = context.measureText(label).width;
+      maxWidth = Math.max(maxWidth, textWidth);
+    });
+
+    // Add padding for comfortable spacing (20px on each side)
+    const optimalWidth = Math.max(maxWidth + 40, 120); // Minimum 120px, maximum reasonable width
+    
+    return Math.ceil(optimalWidth);
+  }, [labelWidth, categoryLabels]);
+
   // Determine color for a bar
   const getBarColor = (item: BarDataItem, index: number): string => {
     if (Array.isArray(categoryColors)) {
@@ -80,10 +110,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     const formatPercent = (value: number) => value.toFixed(1) + '%';
     
     return (
-      <div className={styles.chartContainer} style={{ paddingLeft: `${labelWidth}px` }}>
+      <div className={styles.chartContainer} style={{ paddingLeft: `${calculatedLabelWidth}px` }}>
         <div 
           className={styles.gridLines} 
-          style={{ inset: `0 0 0 ${labelWidth}px` }}
+          style={{ inset: `0 0 0 ${calculatedLabelWidth}px` }}
         >
           {[0, 20, 40, 60, 80, 100].map(value => (
             <div 
@@ -98,7 +128,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             <div className={styles.barRow} key={index}>
               <div 
                 className={styles.label} 
-                style={{ width: `${labelWidth}px`, left: `-${labelWidth}px` }}
+                style={{ width: `${calculatedLabelWidth}px`, left: `-${calculatedLabelWidth}px` }}
               >
                 {item.label}
               </div>
@@ -199,6 +229,11 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       {renderTooltip()}
       <div className={styles.totalResponses}>
         Number of respondents: {(customTotalResponses ?? totalResponses).toLocaleString()}
+        {categoryNotes && categoryNotes['6'] && (
+          <div className={styles.categoryNote}>
+            {categoryNotes['6']}
+          </div>
+        )}
       </div>
     </div>
   );

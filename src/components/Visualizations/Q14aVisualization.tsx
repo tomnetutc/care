@@ -30,7 +30,7 @@ const Q14aVisualization: React.FC = () => {
       categoryOrder={categoryOrder}
       categoryLabels={categoryLabels}
       categoryColors={categoryColors}
-      labelWidth={120}
+      
     />
   );
 };

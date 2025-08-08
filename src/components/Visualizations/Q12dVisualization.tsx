@@ -29,7 +29,6 @@ const Q12dVisualization: React.FC = () => {
       categoryOrder={categoryOrder}
       categoryLabels={categoryLabels}
       categoryColors={categoryColors}
-      labelWidth={420} // Increased to accommodate longer labels
     />
   );
 };

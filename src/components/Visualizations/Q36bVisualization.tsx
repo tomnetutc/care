@@ -53,7 +53,7 @@ const Q36bVisualization: React.FC = () => {
       categoryLabels={categoryLabels}
       multiSelectFields={multiSelectFields}
       percentageDenominator="uniqueRespondents"
-      labelWidth={300}
+      
     />
   );
 };

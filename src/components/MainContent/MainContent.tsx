@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Q1Visualization, Q2Visualization, Q3Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q8Visualization, Q9Visualization, Q10Visualization, Q11aVisualization, Q12aVisualization, Q13aVisualization, Q14aVisualization, Q15aVisualization, Q16aVisualization, Q17aVisualization, Q18aVisualization, Q11bVisualization, Q12bVisualization, Q13bVisualization, Q14bVisualization, Q15bVisualization, Q16bVisualization, Q17bVisualization, Q11cVisualization, Q12cVisualization, Q52Visualization, Q13cVisualization, Q14cVisualization, Q15cVisualization, Q16cVisualization, Q17cVisualization, Q11dVisualization, Q12dVisualization, Q13dVisualization, Q14dVisualization, Q15dVisualization, Q16dVisualization, Q17dVisualization, Q11eVisualization, Q12eVisualization, Q13eVisualization, Q14eVisualization, Q15eVisualization, Q17eVisualization, Q16eVisualization, Q19Visualization, Q20Visualization, Q21CombinedVisualization, Q22Visualization, Q23Visualization, Q24Visualization, Q25Visualization, Q26Visualization, Q27Visualization, Q28Visualization, Q29Visualization, Q30Visualization, Q31Visualization, Q32Visualization, Q33Visualization, Q34Visualization, Q35Visualization, Q36aVisualization, Q36bVisualization, Q37aVisualization, Q37bVisualization, Q38Visualization, Q39Visualization, Q40Visualization, Q41Visualization, Q46Visualization, Q47Visualization, Q48Visualization, Q49Visualization, Q50Visualization, Q51Visualization } from '../Visualizations';
+import { Q1Visualization, Q2Visualization, Q3Visualization, Q4Visualization, Q5Visualization, Q6Visualization, Q7Visualization, Q8Visualization, Q9Visualization, Q10Visualization, Q11aVisualization, Q12aVisualization, Q13aVisualization, Q14aVisualization, Q15aVisualization, Q16aVisualization, Q17aVisualization, Q18aVisualization, Q11bVisualization, Q12bVisualization, Q13bVisualization, Q14bVisualization, Q15bVisualization, Q16bVisualization, Q17bVisualization, Q11cVisualization, Q12cVisualization, Q52Visualization, Q13cVisualization, Q14cVisualization, Q15cVisualization, Q16cVisualization, Q17cVisualization, Q11dVisualization, Q12dVisualization, Q13dVisualization, Q14dVisualization, Q15dVisualization, Q16dVisualization, Q17dVisualization, Q11eVisualization, Q12eVisualization, Q13eVisualization, Q14eVisualization, Q15eVisualization, Q17eVisualization, Q16eVisualization, Q19Visualization, Q20Visualization, Q21CombinedVisualization, Q22Visualization, Q23Visualization, Q24Visualization, Q25Visualization, Q26Visualization, Q27Visualization, Q28Visualization, Q29Visualization, Q30Visualization, Q31Visualization, Q32Visualization, Q33Visualization, Q34Visualization, Q35Visualization, Q36aVisualization, Q36bVisualization, Q37aVisualization, Q37bVisualization, Q38Visualization, Q39Visualization, Q40Visualization, Q41Visualization, Q46Visualization, Q47Visualization, Q48Visualization, Q49Visualization, Q50Visualization, Q51Visualization, Q42Visualization, Q42aVisualization, Q42bVisualization, Q42cVisualization, DivisionVisualization, CensusRegionCountyVisualization, Q43Visualization, Q44Visualization, Q45Visualization } from '../Visualizations';
 import './MainContent.scss';
 import Sidebar from '../Sidebar/Sidebar';
 import TopMenu from '../TopMenu/TopMenu';
+import { subHeadingsData } from '../../data/subHeadings';
 
 // Generate unique scoped key for topic identification
 const generateScopedKey = (section: string, subSection: string, topicLabel: string): string => {
@@ -310,39 +311,39 @@ const SCOPED_TOPIC_DATA: Record<string, { text: string; component: React.Compone
     subSection: 'power-outage' 
   },
   
-  // Work section
-  [generateScopedKey('transportation', 'commute', 'Travel Frequency for Work/School')]: { 
-    text: 'Travel Frequency for Work/School', 
-    component: Q20Visualization, 
-    section: 'transportation', 
-    subSection: 'commute' 
+  // Activity and Travel Behaviors and Choices
+  [generateScopedKey('transportation', 'commute', 'Frequency of Commuting')]: {
+    text: 'Frequency of Commuting',
+    component: Q20Visualization,
+    section: 'transportation',
+    subSection: 'commute'
   },
-  [generateScopedKey('transportation', 'distance', 'Distance to Work or School')]: {
-    text: 'Distance to Work or School',
+  [generateScopedKey('transportation', 'commute', 'Distance to Work/School')]: {
+    text: 'Distance to Work/School',
     component: Q21CombinedVisualization,
     section: 'transportation',
-    subSection: 'distance'
+    subSection: 'commute'
   },
-  [generateScopedKey('transportation', 'choices', 'Transportation Choices')]: {
-    text: 'Transportation Choices',
+  [generateScopedKey('transportation', 'choices', 'Modes of Transportation')]: {
+    text: 'Modes of Transportation',
     component: Q22Visualization,
     section: 'transportation',
     subSection: 'choices'
   },
-  [generateScopedKey('transportation', 'delivery', 'Delivery Frequency to Home')]: {
-    text: 'Delivery Frequency to Home',
+  [generateScopedKey('transportation', 'deliveries', 'Deliveries and Services')]: {
+    text: 'Deliveries and Services',
     component: Q23Visualization,
     section: 'transportation',
-    subSection: 'delivery'
+    subSection: 'deliveries'
   },
-  [generateScopedKey('transportation', 'delivery', 'Frequency of Other Activities')]: {
-    text: 'Frequency of Other Activities',
+  [generateScopedKey('transportation', 'leisure', 'Leisure and Outdoor Activities')]: {
+    text: 'Leisure and Outdoor Activities',
     component: Q24Visualization,
     section: 'transportation',
-    subSection: 'delivery'
+    subSection: 'leisure'
   },
-  [generateScopedKey('transportation', 'decisions', 'Factors influencing out-of-home activity')]: {
-    text: 'Factors influencing out-of-home activity',
+  [generateScopedKey('transportation', 'decisions', 'Importance of Factors for Participation')]: {
+    text: 'Importance of Factors for Participation',
     component: Q25Visualization,
     section: 'transportation',
     subSection: 'decisions'
@@ -353,8 +354,8 @@ const SCOPED_TOPIC_DATA: Record<string, { text: string; component: React.Compone
     section: 'transportation',
     subSection: 'decisions'
   },
-  [generateScopedKey('transportation', 'decisions', 'Concerns About Going Out')]: {
-    text: 'Concerns About Going Out',
+  [generateScopedKey('transportation', 'decisions', 'Concerns About Out-of-Home Activities')]: {
+    text: 'Concerns About Out-of-Home Activities',
     component: Q27Visualization,
     section: 'transportation',
     subSection: 'decisions'
@@ -365,143 +366,191 @@ const SCOPED_TOPIC_DATA: Record<string, { text: string; component: React.Compone
     section: 'transportation',
     subSection: 'dining'
   },
-  [generateScopedKey('transportation', 'dining', 'Dining Changes During COVID-19')]: {
-    text: 'Dining Changes During COVID-19',
+  [generateScopedKey('transportation', 'dining', 'Changes in Dining Behavior')]: {
+    text: 'Changes in Dining Behavior',
     component: Q29Visualization,
     section: 'transportation',
     subSection: 'dining'
   },
-  [generateScopedKey('transportation', 'dining', 'Restaurant Adaptations During COVID-19')]: {
-    text: 'Restaurant Adaptations During COVID-19',
+  [generateScopedKey('transportation', 'dining', 'Restaurant Adaptations')]: {
+    text: 'Restaurant Adaptations',
     component: Q30Visualization,
     section: 'transportation',
     subSection: 'dining'
   },
-  [generateScopedKey('transit', 'access', 'Available Public Transit')]: {
-    text: 'Available Public Transit',
+  [generateScopedKey('transportation', 'transit', 'Transit Availability')]: {
+    text: 'Transit Availability',
     component: Q31Visualization,
-    section: 'transit',
-    subSection: 'access'
+    section: 'transportation',
+    subSection: 'transit'
   },
-  [generateScopedKey('transit', 'access', 'Current Public Transit Use')]: {
-    text: 'Current Public Transit Use',
+  [generateScopedKey('transportation', 'transit', 'Current Frequency of Use')]: {
+    text: 'Current Frequency of Use',
     component: Q32Visualization,
-    section: 'transit',
-    subSection: 'access'
+    section: 'transportation',
+    subSection: 'transit'
   },
-  [generateScopedKey('transit', 'access', 'Regular Transit Modes')]: {
-    text: 'Regular Transit Modes',
+  [generateScopedKey('transportation', 'transit', 'Mode-Specific Transit Use')]: {
+    text: 'Mode-Specific Transit Use',
     component: Q33Visualization,
-    section: 'transit',
-    subSection: 'access'
+    section: 'transportation',
+    subSection: 'transit'
   },
-  [generateScopedKey('transit', 'changes', 'Transit Use Before COVID-19')]: {
-    text: 'Transit Use Before COVID-19',
+  [generateScopedKey('transportation', 'transit', 'Pre-Pandemic Transit Use')]: {
+    text: 'Pre-Pandemic Transit Use',
     component: Q34Visualization,
-    section: 'transit',
-    subSection: 'changes'
+    section: 'transportation',
+    subSection: 'transit'
   },
-  [generateScopedKey('transit', 'changes', 'Transit Use During COVID-19')]: {
-    text: 'Transit Use During COVID-19',
+  [generateScopedKey('transportation', 'transit', 'Transit Use During Pandemic')]: {
+    text: 'Transit Use During Pandemic',
     component: Q35Visualization,
-    section: 'transit',
-    subSection: 'changes'
+    section: 'transportation',
+    subSection: 'transit'
   },
-  [generateScopedKey('transit', 'reasons', 'Reasons for using transit less')]: {
-    text: 'Reasons for using transit less',
+  [generateScopedKey('transportation', 'transit', 'Reasons for Reduced Use Post-Pandemic')]: {
+    text: 'Reasons for Reduced Use Post-Pandemic',
     component: Q36aVisualization,
-    section: 'transit',
-    subSection: 'reasons'
+    section: 'transportation',
+    subSection: 'transit'
   },
-  [generateScopedKey('transit', 'reasons', 'Reasons for using transit more')]: {
-    text: 'Reasons for using transit more',
+  [generateScopedKey('transportation', 'transit', 'Reasons for Increased Use Post-Pandemic')]: {
+    text: 'Reasons for Increased Use Post-Pandemic',
     component: Q36bVisualization,
-    section: 'transit',
-    subSection: 'reasons'
+    section: 'transportation',
+    subSection: 'transit'
   },
-  [generateScopedKey('transit', 'recent-trip', 'Trip purpose')]: {
-    text: 'Trip purpose',
+  [generateScopedKey('transportation', 'transit', 'Purpose of Last Transit Trip')]: {
+    text: 'Purpose of Last Transit Trip',
     component: Q37aVisualization,
-    section: 'transit',
-    subSection: 'recent-trip'
+    section: 'transportation',
+    subSection: 'transit'
   },
-  [generateScopedKey('transit', 'recent-trip', 'Alternate travel method if no transit')]: {
-    text: 'Alternate travel method if no transit',
+  [generateScopedKey('transportation', 'transit', 'Alternative Mode If Transit Unavailable')]: {
+    text: 'Alternative Mode If Transit Unavailable',
     component: Q37bVisualization,
-    section: 'transit',
-    subSection: 'recent-trip'
+    section: 'transportation',
+    subSection: 'transit'
   },
-  // Demographics section (add Employment & Student Status to Personal Info)
-  [generateScopedKey('demographics', 'personal', 'Employment & Student Status')]: {
-    text: 'Employment & Student Status',
-    component: Q19Visualization,
-    section: 'demographics',
-    subSection: 'personal'
-  },
-  [generateScopedKey('demographics', 'personal', 'Gender')]: {
+  // Sample Characteristics section
+  [generateScopedKey('sample-characteristics', 'individual', 'Gender')]: {
     text: 'Gender',
     component: Q46Visualization,
-    section: 'demographics',
-    subSection: 'personal'
+    section: 'sample-characteristics',
+    subSection: 'individual'
   },
-  [generateScopedKey('demographics', 'personal', 'Hispanic/Latino origin')]: {
-    text: 'Hispanic/Latino origin',
-    component: Q47Visualization,
-    section: 'demographics',
-    subSection: 'personal'
+  [generateScopedKey('sample-characteristics', 'individual', 'Age')]: {
+    text: 'Age',
+    component: Q45Visualization,
+    section: 'sample-characteristics',
+    subSection: 'individual'
   },
-  [generateScopedKey('demographics', 'personal', 'Race')]: {
+  [generateScopedKey('sample-characteristics', 'individual', 'Race')]: {
     text: 'Race',
     component: Q48Visualization,
-    section: 'demographics',
-    subSection: 'personal'
+    section: 'sample-characteristics',
+    subSection: 'individual'
   },
-  [generateScopedKey('demographics', 'personal', 'Education level')]: {
-    text: 'Education level',
+  [generateScopedKey('sample-characteristics', 'individual', 'Ethnicity')]: {
+    text: 'Ethnicity',
+    component: Q47Visualization,
+    section: 'sample-characteristics',
+    subSection: 'individual'
+  },
+  [generateScopedKey('sample-characteristics', 'individual', 'Education Level')]: {
+    text: 'Education Level',
     component: Q49Visualization,
-    section: 'demographics',
-    subSection: 'personal'
+    section: 'sample-characteristics',
+    subSection: 'individual'
   },
-  [generateScopedKey('demographics', 'personal', 'Disability affecting travel')]: {
-    text: 'Disability affecting travel',
+  [generateScopedKey('sample-characteristics', 'individual', 'Disability Status')]: {
+    text: 'Disability Status',
     component: Q50Visualization,
-    section: 'demographics',
-    subSection: 'personal'
+    section: 'sample-characteristics',
+    subSection: 'individual'
   },
-  [generateScopedKey('demographics', 'personal', 'Household income')]: {
-    text: 'Household income',
-    component: Q51Visualization,
-    section: 'demographics',
-    subSection: 'personal'
-  },
-  [generateScopedKey('driving', 'licensing', "Driver’s license status")]: {
-    text: "Driver’s license status",
-    component: Q38Visualization,
-    section: 'driving',
-    subSection: 'licensing'
-  },
-  [generateScopedKey('driving', 'licensing', "Work environment")]: {
-    text: "Work environment",
-    component: Q39Visualization,
-    section: 'driving',
-    subSection: 'licensing'
-  },
-  [generateScopedKey('driving', 'housing', "Housing type")]: {
-    text: "Housing type",
-    component: Q40Visualization,
-    section: 'driving',
-    subSection: 'housing'
-  },
-  [generateScopedKey('driving', 'housing', "Home ownership")]: {
-    text: "Home ownership",
-    component: Q41Visualization,
-    section: 'driving',
-    subSection: 'housing'
-  },
-  [generateScopedKey('demographics', 'household', 'Employment & Student Status')]: {
-    text: 'Employment & Student Status',
+  [generateScopedKey('sample-characteristics', 'individual', 'Employment/Student Status')]: {
+    text: 'Employment/Student Status',
     component: Q19Visualization,
-    section: 'demographics',
+    section: 'sample-characteristics',
+    subSection: 'individual'
+  },
+  [generateScopedKey('sample-characteristics', 'individual', 'Work Environment')]: {
+    text: 'Work Environment',
+    component: Q39Visualization,
+    section: 'sample-characteristics',
+    subSection: 'individual'
+  },
+  [generateScopedKey('sample-characteristics', 'individual', 'Driver\'s License')]: {
+    text: 'Driver\'s License',
+    component: Q38Visualization,
+    section: 'sample-characteristics',
+    subSection: 'individual'
+  },
+  [generateScopedKey('sample-characteristics', 'household', 'Household Size')]: {
+    text: 'Household Size',
+    component: Q42Visualization,
+    section: 'sample-characteristics',
+    subSection: 'household'
+  },
+  [generateScopedKey('sample-characteristics', 'household', 'Number of Children')]: {
+    text: 'Number of Children',
+    component: Q42aVisualization,
+    section: 'sample-characteristics',
+    subSection: 'household'
+  },
+  [generateScopedKey('sample-characteristics', 'household', 'Number of Adults')]: {
+    text: 'Number of Adults',
+    component: Q42bVisualization,
+    section: 'sample-characteristics',
+    subSection: 'household'
+  },
+  [generateScopedKey('sample-characteristics', 'household', 'Number of Older Persons (65+)')]: {
+    text: 'Number of Older Persons (65+)',
+    component: Q42cVisualization,
+    section: 'sample-characteristics',
+    subSection: 'household'
+  },
+  [generateScopedKey('sample-characteristics', 'household', 'Household Income')]: {
+    text: 'Household Income',
+    component: Q51Visualization,
+    section: 'sample-characteristics',
+    subSection: 'household'
+  },
+  [generateScopedKey('sample-characteristics', 'household', 'Housing Type')]: {
+    text: 'Housing Type',
+    component: Q40Visualization,
+    section: 'sample-characteristics',
+    subSection: 'household'
+  },
+  [generateScopedKey('sample-characteristics', 'household', 'Home Ownership')]: {
+    text: 'Home Ownership',
+    component: Q41Visualization,
+    section: 'sample-characteristics',
+    subSection: 'household'
+  },
+  [generateScopedKey('sample-characteristics', 'household', 'Number of Vehicles')]: {
+    text: 'Number of Vehicles',
+    component: Q44Visualization,
+    section: 'sample-characteristics',
+    subSection: 'household'
+  },
+  [generateScopedKey('sample-characteristics', 'household', 'Number of Drivers')]: {
+    text: 'Number of Drivers',
+    component: Q43Visualization,
+    section: 'sample-characteristics',
+    subSection: 'household'
+  },
+  [generateScopedKey('sample-characteristics', 'household', 'Division')]: {
+    text: 'Division',
+    component: DivisionVisualization,
+    section: 'sample-characteristics',
+    subSection: 'household'
+  },
+  [generateScopedKey('sample-characteristics', 'household', 'Census Region + County')]: {
+    text: 'Census Region + County',
+    component: CensusRegionCountyVisualization,
+    section: 'sample-characteristics',
     subSection: 'household'
   },
 };
@@ -520,22 +569,27 @@ const DEFAULT_SCOPED_KEYS: Record<string, string> = {
   'flooding': generateScopedKey('disruptions', 'flooding', 'Impact on Daily Life'),
   'earthquake': generateScopedKey('disruptions', 'earthquake', 'Impact on Daily Life'),
   'power-outage': generateScopedKey('disruptions', 'power-outage', 'Impact on Daily Life'),
-  'employment': generateScopedKey('transportation', 'employment', 'Employment & Student Status'),
-  'commute': generateScopedKey('transportation', 'commute', 'Travel Frequency for Work/School'),
-  'distance': generateScopedKey('transportation', 'distance', 'Distance to Work or School'),
-  'choices': generateScopedKey('transportation', 'choices', 'Transportation Choices'),
-  'delivery': generateScopedKey('transportation', 'delivery', 'Delivery Frequency to Home'),
-  'decisions': generateScopedKey('transportation', 'decisions', 'Factors influencing out-of-home activity'),
+  'employment': generateScopedKey('transportation', 'commute', 'Frequency of Commuting'),
+  'commute': generateScopedKey('transportation', 'commute', 'Frequency of Commuting'),
+  'distance': generateScopedKey('transportation', 'commute', 'Distance to Work/School'),
+  'choices': generateScopedKey('transportation', 'choices', 'Modes of Transportation'),
+  'delivery': generateScopedKey('transportation', 'deliveries', 'Deliveries and Services'),
+  'decisions': generateScopedKey('transportation', 'decisions', 'Importance of Factors for Participation'),
   'dining': generateScopedKey('transportation', 'dining', 'Dining Preferences'),
-  'access': generateScopedKey('transit', 'access', 'Available Public Transit'),
-  'changes': generateScopedKey('transit', 'changes', 'Transit Use Before COVID-19'),
-  'reasons': generateScopedKey('transit', 'reasons', 'Reasons for using transit less'),
-  'recent-trip': generateScopedKey('transit', 'recent-trip', 'Trip purpose'),
-  'licensing': generateScopedKey('driving', 'licensing', "Driver's license status"),
-  'housing': generateScopedKey('driving', 'housing', "Housing type"),
-
-  'household': generateScopedKey('demographics', 'household', 'Employment & Student Status'),
-  'personal': generateScopedKey('demographics', 'personal', 'Employment & Student Status'),
+  'transit': generateScopedKey('transportation', 'transit', 'Transit Availability'),
+  'transit-frequency': generateScopedKey('transportation', 'transit', 'Current Frequency of Use'),
+  'transit-modes': generateScopedKey('transportation', 'transit', 'Mode-Specific Transit Use'),
+  'transit-pre-pandemic': generateScopedKey('transportation', 'transit', 'Pre-Pandemic Transit Use'),
+  'transit-pandemic': generateScopedKey('transportation', 'transit', 'Transit Use During Pandemic'),
+  'transit-reasons-reduced': generateScopedKey('transportation', 'transit', 'Reasons for Reduced Use Post-Pandemic'),
+  'transit-reasons-increased': generateScopedKey('transportation', 'transit', 'Reasons for Increased Use Post-Pandemic'),
+  'transit-last-trip': generateScopedKey('transportation', 'transit', 'Purpose of Last Transit Trip'),
+  'transit-alternative': generateScopedKey('transportation', 'transit', 'Alternative Mode If Transit Unavailable'),
+  'licensing': generateScopedKey('sample-characteristics', 'individual', 'Driver\'s License'),
+  'housing': generateScopedKey('sample-characteristics', 'household', 'Housing Type'),
+  'household': generateScopedKey('sample-characteristics', 'household', 'Household Size'),
+  'personal': generateScopedKey('sample-characteristics', 'individual', 'Employment/Student Status'),
+  'individual': generateScopedKey('sample-characteristics', 'individual', 'Gender'),
 };
 
 // Type definitions
@@ -574,17 +628,23 @@ const SLUG_TO_NAME_MAP: Record<string, string> = {
   'distance': 'Distance to Work or School',
   'choices': 'Transportation Choices',
   'delivery': 'Delivery & Activity Frequency',
-  'decisions': 'Decision Making & Concerns',
-  'dining': 'Dining Habits',
-  'access': 'Available Public Transit',
-  'changes': 'Q62 – Changes in transit usage',
-  'reasons': 'Q65 – Reasons for transit usage patterns',
-  'recent-trip': 'Q68 – Recent transit experience',
+  'decisions': 'Motivations and Concerns for Activity Participation',
+  'dining': 'Dining Preferences and COVID-19 Impact',
+  'transit': 'Transit Use and COVID-19 Impact',
+  'transit-frequency': 'Current Frequency of Use',
+  'transit-modes': 'Mode-Specific Transit Use',
+  'transit-pre-pandemic': 'Pre-Pandemic Transit Use',
+  'transit-pandemic': 'Transit Use During Pandemic',
+  'transit-reasons-reduced': 'Reasons for Reduced Use Post-Pandemic',
+  'transit-reasons-increased': 'Reasons for Increased Use Post-Pandemic',
+  'transit-last-trip': 'Purpose of Last Transit Trip',
+  'transit-alternative': 'Alternative Mode If Transit Unavailable',
   'licensing': 'Q70 – Driver licensing status',
   'housing': 'Q80 – Housing situation',
   'resources-household': 'Q83 – Household resources',
   'household': 'Q85 – Household composition',
-  'personal': 'Q90 – Demographic information'
+  'personal': 'Q90 – Demographic information',
+  'individual': 'Individual Attributes'
 };
 
 // Mapping of subheading slugs to section keys
@@ -608,15 +668,20 @@ const SUBHEADING_TO_SECTION: Record<string, string> = {
   'delivery': 'transportation',
   'decisions': 'transportation',
   'dining': 'transportation',
-  'access': 'transit',
-  'changes': 'transit',
-  'reasons': 'transit',
-  'recent-trip': 'transit',
-  'licensing': 'driving',
-  'housing': 'driving',
-
-  'household': 'demographics',
-  'personal': 'demographics',
+  'transit': 'transportation',
+  'transit-frequency': 'transportation',
+  'transit-modes': 'transportation',
+  'transit-pre-pandemic': 'transportation',
+  'transit-pandemic': 'transportation',
+  'transit-reasons-reduced': 'transportation',
+  'transit-reasons-increased': 'transportation',
+  'transit-last-trip': 'transportation',
+  'transit-alternative': 'transportation',
+  'licensing': 'sample-characteristics',
+  'housing': 'sample-characteristics',
+  'household': 'sample-characteristics',
+  'personal': 'sample-characteristics',
+  'individual': 'sample-characteristics',
 };
 
 const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
@@ -638,10 +703,31 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
   // Filter questions based on current MAIN SECTION only (not subsection)
   const getCurrentQuestions = () => {
     const section = getCurrentSection();
-    
+    if (section === 'sample-characteristics') {
+      // Use subHeadingsData.sampleCharacteristics order
+      const questions: { id: number; text: string; scopedKey: string; section: string; subSection: string }[] = [];
+      subHeadingsData.sampleCharacteristics.forEach((sub: any) => {
+        const subSectionSlug = sub.name === 'Individual Attributes' ? 'individual' : 'household';
+        sub.questions.forEach((q: any) => {
+          const scopedKey = generateScopedKey('sample-characteristics', subSectionSlug, q.text);
+          const topicData = SCOPED_TOPIC_DATA[scopedKey];
+          if (topicData) {
+            questions.push({
+              id: q.id,
+              text: q.text,
+              scopedKey,
+              section: 'sample-characteristics',
+              subSection: subSectionSlug
+            });
+          }
+        });
+      });
+      return questions;
+    }
+    // Default for other sections
     return Object.entries(SCOPED_TOPIC_DATA)
       .filter(([scopedKey, data]) => {
-        return data.section === section; // Only filter by main section
+        return data.section === section;
       })
       .map(([scopedKey, data], index) => ({
         id: index + 1,

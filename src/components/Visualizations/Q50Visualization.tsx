@@ -41,7 +41,7 @@ const Q50Visualization: React.FC = () => {
       valueMap={valueMap}
       alternateFields={['q50', 'disability_travel']}
       tooltipCountLabel="Responses"
-      labelWidth={260}
+      
     />
   );
 };

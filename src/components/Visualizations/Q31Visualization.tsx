@@ -45,6 +45,7 @@ const Q31Visualization: React.FC = () => {
         ta_none: "None",
         transit_avail_other: "Other"
       }}
+      percentageDenominator="uniqueRespondents"
       tooltipCountLabel="Responses"
     />
   );

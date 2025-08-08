@@ -47,7 +47,7 @@ const Q40Visualization: React.FC = () => {
       categoryLabels={categoryLabels}
       alternateFields={["40"]}
       dataProcessor={dataProcessor}
-      labelWidth={260}
+      
     />
   );
 };
