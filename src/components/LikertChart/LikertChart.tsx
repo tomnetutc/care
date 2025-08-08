@@ -50,9 +50,49 @@ const LikertChart: React.FC<LikertChartProps> = ({
 
   const topicLabel = useCurrentTopicLabel(title);
 
-  // Transform data for CSV export
+  // Sort data based on response distribution
+  const sortedData = useMemo(() => {
+    if (!data || data.length === 0) return data;
+
+    // Determine sorting logic based on response categories
+    const getSortValue = (item: ProcessedDataItem) => {
+      // For standard Likert scale (Strongly disagree to Strongly agree)
+      if (responseCategories.includes("Strongly agree") && responseCategories.includes("Somewhat agree")) {
+        const stronglyAgree = item.values.find(v => v.category === "Strongly agree")?.value || 0;
+        const somewhatAgree = item.values.find(v => v.category === "Somewhat agree")?.value || 0;
+        return stronglyAgree + somewhatAgree;
+      }
+      
+      // For "Have used" type questions
+      if (responseCategories.includes("Have used")) {
+        return item.values.find(v => v.category === "Have used")?.value || 0;
+      }
+      
+      // For "Very likely" + "Somewhat likely" type questions
+      if (responseCategories.includes("Very likely") && responseCategories.includes("Somewhat likely")) {
+        const veryLikely = item.values.find(v => v.category === "Very likely")?.value || 0;
+        const somewhatLikely = item.values.find(v => v.category === "Somewhat likely")?.value || 0;
+        return veryLikely + somewhatLikely;
+      }
+      
+      // For "Much more" + "Somewhat more" type questions
+      if (responseCategories.includes("Much more") && responseCategories.includes("Somewhat more")) {
+        const muchMore = item.values.find(v => v.category === "Much more")?.value || 0;
+        const somewhatMore = item.values.find(v => v.category === "Somewhat more")?.value || 0;
+        return muchMore + somewhatMore;
+      }
+      
+      // Default: return 0 (no sorting)
+      return 0;
+    };
+
+    // Sort data by the calculated sort value (descending - highest first)
+    return [...data].sort((a, b) => getSortValue(b) - getSortValue(a));
+  }, [data, responseCategories]);
+
+  // Transform data for CSV export (using sorted data)
   const transformedData = useMemo(() => {
-    return data.map((item) => {
+    return sortedData.map((item) => {
       const obj: { [key: string]: string | number } = {
         name: item.question,
         ...responseCategories.reduce((acc, category, index) => {
@@ -63,7 +103,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
       };
       return obj;
     });
-  }, [data, responseCategories]);
+  }, [sortedData, responseCategories]);
 
   // Download CSV handler
   const handleDownload = () => {
@@ -102,7 +142,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
   
   // Create and update visualization
   useEffect(() => {
-    if (data.length === 0 || !svgRef.current || dimensions.width === 0) return;
+    if (sortedData.length === 0 || !svgRef.current || dimensions.width === 0) return;
 
     // Create tooltip div if it doesn't exist
     if (!tooltipRef.current) {
@@ -130,7 +170,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
     // Calculate width to maintain the ratio
     const width = chartWidth - margin.right; // Subtract right margin
     const barHeightMultiplier = dimensions.width > 768 ? 40 : 30;
-    const height = Math.max(500, data.length * barHeightMultiplier) - margin.top - margin.bottom;
+    const height = Math.max(500, sortedData.length * barHeightMultiplier) - margin.top - margin.bottom;
 
     // Create responsive SVG with better viewBox settings
     const svg = d3.select(svgRef.current)
@@ -156,7 +196,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
 
     // Create scales
     const y = d3.scaleBand()
-      .domain(data.map(d => d.question))
+      .domain(sortedData.map(d => d.question))
       .range([0, height])
       .padding(0.1);
       
@@ -175,7 +215,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
     }
 
     // Stack the data
-    const stackedData = prepareStackedData(data);
+    const stackedData = prepareStackedData(sortedData);
 
     // Add axes
     addAxes(svg, y, x, height, margin);
@@ -190,7 +230,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
         tooltipRef.current = null;
       }
     };
-  }, [data, highlightedCategory, totalResponses, dimensions, responseCategories, categoryColors, legendWrap]);
+  }, [sortedData, highlightedCategory, totalResponses, dimensions, responseCategories, categoryColors, legendWrap]);
 
   // Helper functions for D3 visualization components
   function createBackgroundGradient(svg: d3.Selection<SVGGElement, unknown, null, undefined>) {
@@ -478,6 +518,13 @@ const LikertChart: React.FC<LikertChartProps> = ({
   function renderSummaryTable() {
     if (!showSummaryTable) return null;
     
+    // Sort summary stats to match the sorted data order
+    const sortedSummaryStats = summaryStats.sort((a, b) => {
+      const aIndex = sortedData.findIndex(item => item.question === a.question);
+      const bIndex = sortedData.findIndex(item => item.question === b.question);
+      return aIndex - bIndex;
+    });
+    
     return (
       <div className={styles.summaryTableContainer}>
         <h3>Summary Table</h3>
@@ -495,7 +542,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
             </tr>
           </thead>
           <tbody>
-            {summaryStats.map((stat, index) => (
+            {sortedSummaryStats.map((stat, index) => (
               <tr key={index}>
                 <td>{stat.question}</td>
                 <td>{Number.isInteger(stat.min) ? stat.min : stat.min.toFixed(2)}</td>
