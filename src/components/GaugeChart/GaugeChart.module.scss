@@ -12,6 +12,22 @@
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
   }
   
+  .titleContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .titleContainer h2 {
+    font-size: 16px;
+    margin: 0;
+    font-weight: normal;
+    color: #333;
+    font-family: Arial, sans-serif;
+    flex: 1;
+  }
+
   h2 {
     font-size: 16px;
     margin-top: 0;

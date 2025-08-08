@@ -1,4 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
+import { chartDataToCSV, downloadCSV } from '../../utils/csvUtils';
+import DownloadButton from '../DownloadButton/DownloadButton';
+import { useCurrentTopicLabel } from '../../hooks/useCurrentTopicLabel';
 import styles from './HorizontalGroupedBarChart.module.scss';
 
 export interface GroupedBarDataItem {
@@ -42,6 +45,8 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     data: null
   });
 
+  const topicLabel = useCurrentTopicLabel(title);
+
   // Tooltip handlers
   const showTooltip = (e: React.MouseEvent, label: string, group: string, value: number) => {
     if (!containerRef.current) return;
@@ -80,6 +85,31 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
       ...prev,
       visible: false
     }));
+  };
+
+  // Transform data for CSV export
+  const transformedData = useMemo(() => {
+    return data.map((item) => {
+      const obj: { [key: string]: string | number } = {
+        name: item.label,
+        ...groupLabels.reduce((acc, group) => {
+          const value = item[group];
+          acc[group] = typeof value === 'number' ? value : 0;
+          return acc;
+        }, {} as { [key: string]: number })
+      };
+      return obj;
+    });
+  }, [data, groupLabels]);
+
+  // Download CSV handler
+  const handleDownload = () => {
+    const csv = chartDataToCSV(
+      transformedData,
+      groupLabels.map(group => ({ label: group }))
+    );
+    const filename = `${topicLabel}.csv`;
+    downloadCSV(csv, filename);
   };
 
   // Render tooltip
@@ -168,7 +198,12 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
 
   return (
     <div className={styles.horizontalGroupedBarChart} ref={containerRef}>
-      {title && <h2><strong>{title}</strong></h2>}
+      {title && (
+        <div className={styles.titleContainer}>
+          <h2><strong>{title}</strong></h2>
+          <DownloadButton onClick={handleDownload} />
+        </div>
+      )}
       {renderLegend()}
       {renderBarChart()}
       {renderTooltip()}

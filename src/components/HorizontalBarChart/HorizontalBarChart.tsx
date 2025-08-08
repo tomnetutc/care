@@ -1,5 +1,8 @@
 import React, { useRef, useState, useMemo } from 'react';
 import { useHorizontalBarData, BarDataItem, UseHorizontalBarDataOptions } from '../../hooks/useHorizontalBarData';
+import { chartDataToCSV, downloadCSV } from '../../utils/csvUtils';
+import DownloadButton from '../DownloadButton/DownloadButton';
+import { useCurrentTopicLabel } from '../../hooks/useCurrentTopicLabel';
 import styles from './HorizontalBarChart.module.scss';
 
 interface TooltipState {
@@ -66,6 +69,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     percentageDenominator
   });
 
+  const topicLabel = useCurrentTopicLabel(title);
+
   // Calculate optimal label width based on longest label
   const calculatedLabelWidth = useMemo(() => {
     if (labelWidth !== undefined) {
@@ -102,6 +107,28 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       return categoryColors[item.category] || '#507dbc';
     }
     return '#507dbc';
+  };
+
+  // Transform data for CSV export
+  const transformedData = useMemo(() => {
+    return data.map((item) => {
+      const obj: { [key: string]: string | number } = {
+        name: item.label,
+        Count: item.count,
+        Percentage: item.percentage
+      };
+      return obj;
+    });
+  }, [data]);
+
+  // Download CSV handler
+  const handleDownload = () => {
+    const csv = chartDataToCSV(
+      transformedData,
+      [{ label: 'Count' }, { label: 'Percentage' }]
+    );
+    const filename = `${topicLabel}.csv`;
+    downloadCSV(csv, filename);
   };
 
   // Function to render the bar chart visualization
@@ -224,7 +251,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
   return (
     <div className={styles.horizontalBarChart} ref={containerRef}>
-      {title && <h2><strong>{title}</strong></h2>}
+      {title && (
+        <div className={styles.titleContainer}>
+          <h2><strong>{title}</strong></h2>
+          <DownloadButton onClick={handleDownload} />
+        </div>
+      )}
       {renderBarChart()}
       {renderTooltip()}
       <div className={styles.totalResponses}>

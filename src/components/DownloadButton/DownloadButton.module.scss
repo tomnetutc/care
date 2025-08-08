@@ -1,0 +1,27 @@
+.downloadBtn {
+  background: none;
+  border: none;
+  padding: 4px;
+  margin-left: 8px;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+  }
+
+  &:hover {
+    color: #000;
+  }
+
+  &:focus {
+    outline: 2px solid #507dbc;
+    outline-offset: 2px;
+  }
+} 

@@ -1,7 +1,10 @@
-import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useRef, useState, useLayoutEffect, useMemo } from 'react';
 import * as d3 from 'd3';
 import { useLikertData, sanitizeForCssSelector } from '../../hooks/useLikertData';
 import { LikertChartProps, StackedData, ProcessedDataItem, ChartSegment } from '../../types/Helpers';
+import { chartDataToCSV, downloadCSV } from '../../utils/csvUtils';
+import DownloadButton from '../DownloadButton/DownloadButton';
+import { useCurrentTopicLabel } from '../../hooks/useCurrentTopicLabel';
 import styles from './LikertChart.module.css';
 
 const LikertChart: React.FC<LikertChartProps> = ({
@@ -44,6 +47,33 @@ const LikertChart: React.FC<LikertChartProps> = ({
     sourceCategories,
     dataProcessor
   });
+
+  const topicLabel = useCurrentTopicLabel(title);
+
+  // Transform data for CSV export
+  const transformedData = useMemo(() => {
+    return data.map((item) => {
+      const obj: { [key: string]: string | number } = {
+        name: item.question,
+        ...responseCategories.reduce((acc, category, index) => {
+          const categoryData = item.values.find(v => v.category === category);
+          acc[category] = categoryData ? categoryData.count : 0;
+          return acc;
+        }, {} as { [key: string]: number })
+      };
+      return obj;
+    });
+  }, [data, responseCategories]);
+
+  // Download CSV handler
+  const handleDownload = () => {
+    const csv = chartDataToCSV(
+      transformedData,
+      responseCategories.map(category => ({ label: category }))
+    );
+    const filename = `${topicLabel}.csv`;
+    downloadCSV(csv, filename);
+  };
 
   // Update dimensions on resize
   useLayoutEffect(() => {
@@ -541,7 +571,10 @@ const LikertChart: React.FC<LikertChartProps> = ({
 
   return (
     <div className={styles.chartContainer + (legendWrap ? ' ' + styles.q22CardBackground : '')} ref={containerRef}>
-      <h2><strong>{title}</strong></h2>
+      <div className={styles.titleContainer}>
+        <h2><strong>{title}</strong></h2>
+        <DownloadButton onClick={handleDownload} />
+      </div>
       {subtitle && <p>{subtitle}</p>}
       {legendWrap ? <HTMLLegend /> : null}
       <svg ref={svgRef}></svg>

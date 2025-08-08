@@ -1,6 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { PieChart as ReChartsPie, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { usePieChartData, PieDataItem } from '../../hooks/usePieChartData';
+import { chartDataToCSV, downloadCSV } from '../../utils/csvUtils';
+import DownloadButton from '../DownloadButton/DownloadButton';
+import { useCurrentTopicLabel } from '../../hooks/useCurrentTopicLabel';
 import styles from './PieChart.module.scss';
 
 export interface PieChartProps {
@@ -47,6 +50,8 @@ const PieChart: React.FC<PieChartProps> = ({
     valueMap,
     alternateFields
   });
+
+  const topicLabel = useCurrentTopicLabel(title);
   
   // Determine color for a pie slice
   const getSliceColor = (item: PieDataItem, index: number): string => {
@@ -115,6 +120,30 @@ const PieChart: React.FC<PieChartProps> = ({
     );
   };
 
+  // Transform data for CSV export
+  const transformedData = useMemo(() => {
+    const total = data.reduce((sum, item) => sum + item.value, 0);
+    return data.map((item) => {
+      const percentage = total > 0 ? (item.value / total) * 100 : 0;
+      const obj: { [key: string]: string | number } = {
+        name: item.label,
+        Count: item.value,
+        Percentage: percentage
+      };
+      return obj;
+    });
+  }, [data]);
+
+  // Download CSV handler
+  const handleDownload = () => {
+    const csv = chartDataToCSV(
+      transformedData,
+      [{ label: 'Count' }, { label: 'Percentage' }]
+    );
+    const filename = `${topicLabel}.csv`;
+    downloadCSV(csv, filename);
+  };
+
   if (isLoading) {
     return (
       <div className={styles.pieChartContainer}>
@@ -140,7 +169,10 @@ const PieChart: React.FC<PieChartProps> = ({
 
   return (
     <div className={styles.pieChartContainer} ref={containerRef}>
-      <h2><strong>{title}</strong></h2>
+      <div className={styles.titleContainer}>
+        <h2><strong>{title}</strong></h2>
+        <DownloadButton onClick={handleDownload} />
+      </div>
       <div className={styles.chartContent}>
         <div className={styles.chartWrapper}>
           <ResponsiveContainer width="100%" height={400}>

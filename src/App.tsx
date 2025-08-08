@@ -6,12 +6,14 @@ import Home from './components/Home/Home';
 import About from './components/About/About';
 import { subHeadingsData } from './data/subHeadings';
 import { FilterProvider } from './context/FilterContext';
+import { CurrentTopicProvider } from './context/CurrentTopicContext';
 import './App.css';
 
 const App: React.FC = () => {
   return (
     <FilterProvider>
-      <Router>
+      <CurrentTopicProvider>
+        <Router>
         <Routes>
           {/* Redirect root to Dashboard */}
           <Route path="/" element={<Navigate to="/lifestyle/preferences" replace />} />
@@ -100,7 +102,8 @@ const App: React.FC = () => {
           {/* Fallback route for unmatched paths */}
           <Route path="*" element={<Navigate to="/lifestyle/preferences" replace />} />
         </Routes>
-      </Router>
+        </Router>
+      </CurrentTopicProvider>
     </FilterProvider>
   );
 };

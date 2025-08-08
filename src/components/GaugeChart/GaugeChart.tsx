@@ -1,7 +1,10 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import * as d3 from 'd3';
 import styles from './GaugeChart.module.scss';
 import { useGaugeData, SummaryStatistic } from '../../hooks/useGaugeData';
+import { chartDataToCSV, downloadCSV } from '../../utils/csvUtils';
+import DownloadButton from '../DownloadButton/DownloadButton';
+import { useCurrentTopicLabel } from '../../hooks/useCurrentTopicLabel';
 
 export interface GaugeChartProps {
   title: string;
@@ -34,6 +37,42 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
     dataField, 
     title 
   });
+
+  const topicLabel = useCurrentTopicLabel(title);
+
+  // Transform data for CSV export
+  const transformedData = useMemo(() => {
+    if (!summary) return [];
+    
+    return [{
+      name: summary.field,
+      Value: value,
+      Mean: summary.mean,
+      Min: summary.min,
+      Max: summary.max,
+      'Standard Deviation': summary.stdDev,
+      'Sample Size': summary.responses
+    }];
+  }, [value, summary]);
+
+  // Download CSV handler
+  const handleDownload = () => {
+    if (!summary) return;
+    
+    const csv = chartDataToCSV(
+      transformedData,
+      [
+        { label: 'Value' },
+        { label: 'Mean' },
+        { label: 'Min' },
+        { label: 'Max' },
+        { label: 'Standard Deviation' },
+        { label: 'Sample Size' }
+      ]
+    );
+    const filename = `${topicLabel}.csv`;
+    downloadCSV(csv, filename);
+  };
   
   useEffect(() => {
     if (!isLoading && !error && svgRef.current) {
@@ -266,7 +305,10 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
 
   return (
     <div className={styles.gaugeChartContainer}>
-      <h2><strong>{title}</strong></h2>
+      <div className={styles.titleContainer}>
+        <h2><strong>{title}</strong></h2>
+        <DownloadButton onClick={handleDownload} />
+      </div>
       <div className={styles.gaugeContainer}>
         <svg ref={svgRef}></svg>
       </div>

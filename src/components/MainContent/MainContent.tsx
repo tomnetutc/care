@@ -5,6 +5,7 @@ import './MainContent.scss';
 import Sidebar from '../Sidebar/Sidebar';
 import TopMenu from '../TopMenu/TopMenu';
 import { subHeadingsData } from '../../data/subHeadings';
+import { useCurrentTopic } from '../../context/CurrentTopicContext';
 
 // Generate unique scoped key for topic identification
 const generateScopedKey = (section: string, subSection: string, topicLabel: string): string => {
@@ -589,7 +590,7 @@ const DEFAULT_SCOPED_KEYS: Record<string, string> = {
   'housing': generateScopedKey('sample-characteristics', 'household', 'Housing Type'),
   'household': generateScopedKey('sample-characteristics', 'household', 'Household Size'),
   'personal': generateScopedKey('sample-characteristics', 'individual', 'Employment/Student Status'),
-  'individual': generateScopedKey('sample-characteristics', 'individual', 'Gender'),
+  'individual': generateScopedKey('sample-characteristics', 'individual', 'Age'),
 };
 
 // Type definitions
@@ -693,6 +694,7 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
   const [isProgrammaticScrolling, setIsProgrammaticScrolling] = useState(false);
   const [manuallySelectedQuestion, setManuallySelectedQuestion] = useState<string | null>(null);
   const visualizationRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const { setCurrentTopicLabel, setCurrentTopicLabelSync } = useCurrentTopic();
   
   // Get current section from URL
   const getCurrentSection = () => {
@@ -755,11 +757,28 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
       setActiveSubheading(currentSlug);
       
       if (DEFAULT_SCOPED_KEYS[currentSlug] && !manuallySelectedQuestion) {
-        setSelectedQuestion(DEFAULT_SCOPED_KEYS[currentSlug]);
+        const scopedKey = DEFAULT_SCOPED_KEYS[currentSlug];
+        setSelectedQuestion(scopedKey);
+        
+        // Set current topic label for the default question
+        const topicData = SCOPED_TOPIC_DATA[scopedKey];
+        if (topicData) {
+          setCurrentTopicLabelSync(topicData.text);
+        }
       }
     }
-  }, [location.pathname, manuallySelectedQuestion]);
+    }, [location.pathname, manuallySelectedQuestion, setCurrentTopicLabel]);
 
+  // Update current topic label when selectedQuestion changes
+  useEffect(() => {
+    if (selectedQuestion) {
+      const topicData = SCOPED_TOPIC_DATA[selectedQuestion];
+      if (topicData) {
+        setCurrentTopicLabelSync(topicData.text);
+      }
+    }
+  }, [selectedQuestion, setCurrentTopicLabelSync]);
+  
   // Handle scroll position changes to update active question
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
     if (isProgrammaticScrolling) return;
@@ -776,8 +795,14 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
     
     if (mostVisibleScopedKey && mostVisibleScopedKey !== selectedQuestion) {
       setSelectedQuestion(mostVisibleScopedKey);
+      
+      // Update current topic label
+      const topicData = SCOPED_TOPIC_DATA[mostVisibleScopedKey];
+      if (topicData) {
+        setCurrentTopicLabelSync(topicData.text);
+      }
     }
-  }, [selectedQuestion, isProgrammaticScrolling]);
+  }, [selectedQuestion, isProgrammaticScrolling, setCurrentTopicLabelSync]);
   
   // Setup intersection observer
   useEffect(() => {
@@ -813,6 +838,7 @@ const MainContent: React.FC<MainContentProps> = ({ subHeadings }) => {
     setSelectedQuestion(scopedKey);
     setManuallySelectedQuestion(scopedKey);
     setActiveSubheading(subheadingSlug || '');
+    setCurrentTopicLabelSync(topicLabel);
     setIsProgrammaticScrolling(true);
 
     // Check if we need to navigate to a different section/subheading

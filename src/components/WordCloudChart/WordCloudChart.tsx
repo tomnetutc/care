@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import WordCloud from 'react-wordcloud';
 import { useWordCloudData, UseWordCloudDataOptions } from '../../hooks/useWordCloudData';
+import { chartDataToCSV, downloadCSV } from '../../utils/csvUtils';
+import DownloadButton from '../DownloadButton/DownloadButton';
+import { useCurrentTopicLabel } from '../../hooks/useCurrentTopicLabel';
 import styles from './WordCloudChart.module.scss';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
@@ -39,6 +42,26 @@ const WordCloudChart: React.FC<WordCloudChartProps> = ({
     useBigrams
   });
 
+  const topicLabel = useCurrentTopicLabel(typeof title === 'string' ? title : 'WordCloud');
+
+  // Transform data for CSV export
+  const transformedData = useMemo(() => {
+    return words.map((word) => ({
+      name: word.text,
+      Count: word.value
+    }));
+  }, [words]);
+
+  // Download CSV handler
+  const handleDownload = () => {
+    const csv = chartDataToCSV(
+      transformedData,
+      [{ label: 'Count' }]
+    );
+    const filename = `${topicLabel}.csv`;
+    downloadCSV(csv, filename);
+  };
+
   if (isLoading) {
     return (
       <div className={styles.wordCloudContainer}>
@@ -64,7 +87,10 @@ const WordCloudChart: React.FC<WordCloudChartProps> = ({
   if (words.length === 0) {
     return (
       <div className={styles.wordCloudContainer}>
-        <h2>{title}</h2>
+        <div className={styles.titleContainer}>
+          <h2>{title}</h2>
+          <DownloadButton onClick={handleDownload} />
+        </div>
         <div className={styles.noData}>
           <p>No data available for this visualization.</p>
         </div>
@@ -74,7 +100,10 @@ const WordCloudChart: React.FC<WordCloudChartProps> = ({
 
   return (
     <div className={styles.wordCloudContainer}>
-      <h2>{title}</h2>
+      <div className={styles.titleContainer}>
+        <h2>{title}</h2>
+        <DownloadButton onClick={handleDownload} />
+      </div>
       <div style={{ width: '100%', height: `${height}px` }} className={styles.cloudWrapper}>
         <WordCloud
           words={words}
