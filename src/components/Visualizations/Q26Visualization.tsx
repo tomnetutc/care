@@ -37,7 +37,7 @@ const categoryColors: { [key: string]: string } = {
 // Custom processor for Q26
 const processQ26Data = (filteredData: any[]) => {
   const total = filteredData.length;
-  return categoryOrder.map((field) => {
+  const processedData = categoryOrder.map((field) => {
     let count = 0;
     if (field === 'travel_motivation_other') {
       count = filteredData.filter(row => row[field] && String(row[field]).trim() !== '').length;
@@ -51,6 +51,9 @@ const processQ26Data = (filteredData: any[]) => {
       percentage: total > 0 ? (count / total) * 100 : 0
     };
   });
+  
+  // Sort by count in descending order (highest to lowest)
+  return processedData.sort((a, b) => b.count - a.count);
 };
 
 const Q26Visualization: React.FC = () => (

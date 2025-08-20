@@ -40,12 +40,12 @@ const TopMenu: React.FC = () => {
       label: "Race",
       options: [
         { value: 'white', label: 'White' }, { value: 'black', label: 'Black' },
-        { value: 'asian', label: 'Asian' }, { value: 'multiple', label: 'Multiple' }
+        { value: 'asian', label: 'Asian' }, { value: 'multiple', label: 'Multiple races' }
       ]
     },
     {
       label: "Hispanic",
-      options: [{ value: '1', label: 'Yes (Hispanic)' }, { value: '2', label: 'No (Hispanic)' }]
+      options: [{ value: '1', label: 'Hispanic' }, { value: '2', label: 'Non-Hispanic' }]
     },
     {
       label: "Education Level",
@@ -59,7 +59,7 @@ const TopMenu: React.FC = () => {
     },
     {
       label: "Disability Status",
-      options: [{ value: 'no', label: 'No (Disabled)' }, { value: 'yes', label: 'Yes (Disabled)' }]
+      options: [{ value: 'no', label: 'No (Disability)' }, { value: 'yes', label: 'Yes (Disability)' }]
     },
     {
       label: "Employment",
@@ -76,9 +76,9 @@ const TopMenu: React.FC = () => {
     {
       label: "Household Size",
       options: [
-        { value: 'one', label: 'One' },
-        { value: 'two', label: 'Two' },
-        { value: 'three-or-more', label: 'Three or more' }
+        { value: 'one', label: '1' },
+        { value: 'two', label: '2' },
+        { value: 'three-or-more', label: '3 or more' }
       ]
     },
     {
@@ -125,7 +125,7 @@ const TopMenu: React.FC = () => {
       ]
     },
     {
-      label: "Division",
+      label: "Census Division",
       options: [
         { value: 'new-england', label: 'New England' },
         { value: 'middle-atlantic', label: 'Middle Atlantic' },
@@ -139,7 +139,7 @@ const TopMenu: React.FC = () => {
       ]
     },
     {
-      label: "Census Region",
+      label: "Census Region/County",
       options: [
         { value: 'maricopa-county', label: 'Maricopa County' },
         { value: 'puget-sound-county', label: 'Puget Sound County' },
@@ -250,9 +250,9 @@ const TopMenu: React.FC = () => {
             return 'vehicles_category';
           case "Number of Drivers":
             return 'drivers_category';
-          case "Division":
+          case "Census Division":
             return 'division_category';
-          case "Census Region":
+          case "Census Region/County":
             return 'census_region_category';
           default:
             return 'age_category'; // fallback

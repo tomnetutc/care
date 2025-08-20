@@ -27,11 +27,11 @@ const Q32Visualization: React.FC = () => {
   };
   
   const categoryColors = [
-    "#507dbc",  // Every day
-    "#507dbc",  // A few times a week
-    "#507dbc",  // A few times a month
-    "#507dbc",  // Less than once a month
-    "#507dbc"   // Never
+    "#A3923D",  // Darkest Yellow
+    "#D1B856",  // Darker Yellow
+    "#EAD97C",  // Anchor Yellow
+    "#F4E9AA",  // Lightest Yellow
+    "#b6bebc"   // Light Gray
   ];
   
   return (

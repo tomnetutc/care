@@ -13,11 +13,11 @@ const Q11aVisualization: React.FC = () => {
   };
   
   const categoryColors = [
-    "#e25b61",   // Extreme impact (warm)
-    "#f0b3ba",   // Significant impact
-    "#ead97c",   // Moderate impact
-    "#93c4b9",   // Minimal impact
-    "#2ba88c"    // No impact (cool)
+    "#A3923D",  // Darkest Yellow
+    "#D1B856",  // Darker Yellow
+    "#EAD97C",  // Anchor Yellow
+    "#F4E9AA",  // Lightest Yellow
+    "#b6bebc"   // Light Gray
   ];
   
   return (

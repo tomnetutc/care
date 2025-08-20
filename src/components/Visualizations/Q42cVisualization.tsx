@@ -5,9 +5,9 @@ const Q42cVisualization: React.FC = () => {
   const categoryOrder = ['0', '1', '2'];
   
   const categoryLabels: Record<string, string> = {
-    '0': '0 older persons',
-    '1': '1 older person',
-    '2': '2+ older persons'
+    '0': '0',
+    '1': '1',
+    '2': '2 or more'
   };
 
   return (

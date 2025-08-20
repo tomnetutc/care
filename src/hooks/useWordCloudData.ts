@@ -95,6 +95,11 @@ export const useWordCloudData = (options: UseWordCloudDataOptions): WordCloudDat
               } else {
                 filtersByField[filter.field].push(String(filter.value));
               }
+            }
+            // Special handling for gender filter - combine Other and Prefer not to answer
+            else if (filter.field === 'gender' && filter.value === '4') {
+              // When "Other" is selected, include both "Other" (4) and "Prefer not to answer" (3)
+              filtersByField[filter.field].push('3', '4');
             } else {
               filtersByField[filter.field].push(String(filter.value));
             }

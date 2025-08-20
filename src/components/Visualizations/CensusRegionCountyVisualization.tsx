@@ -6,7 +6,7 @@ const CensusRegionCountyVisualization: React.FC = () => {
   
   const categoryLabels: {[key: string]: string} = {
     '1': 'Maricopa County',
-    '2': 'Puget Sound County',
+    '2': 'Puget Sound Region',
     '3': 'Northeast',
     '4': 'Midwest',
     '5': 'South',
@@ -78,7 +78,7 @@ const CensusRegionCountyVisualization: React.FC = () => {
   return (
     <HorizontalBarChart
       questionId="CensusRegionCounty"
-      title="Census Region + County"
+      title="Census Region/County"
       dataField="county_region"
       categoryOrder={categoryOrder}
       categoryLabels={categoryLabels}

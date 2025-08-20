@@ -69,8 +69,8 @@ const DivisionVisualization: React.FC = () => {
 
   return (
     <HorizontalBarChart
-      questionId="Division"
-      title="Geographic Division"
+      questionId="CensusDivision"
+      title="Census Division"
       dataField="division"
       categoryOrder={categoryOrder}
       categoryLabels={categoryLabels}

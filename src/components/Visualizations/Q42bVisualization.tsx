@@ -5,10 +5,10 @@ const Q42bVisualization: React.FC = () => {
   const categoryOrder = ['1', '2', '3', '4'];
   
   const categoryLabels: Record<string, string> = {
-    '1': '1 adult',
-    '2': '2 adults',
-    '3': '3 adults',
-    '4': '4+ adults'
+    '1': '1',
+    '2': '2',
+    '3': '3',
+    '4': '4 or more'
   };
 
   return (

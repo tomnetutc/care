@@ -2,15 +2,15 @@ import React, { useState, useCallback } from 'react';
 import HorizontalBarChart from '../HorizontalBarChart/HorizontalBarChart';
 
 const categoryOrder = [
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  'Other',
+  '1',      // Work/school - 28.9% - highest
+  '2',      // Shopping/errands - 25.5%
+  '4',      // Social/recreational - 13.5%
+  '6',      // Medical/dental - 9.8%
+  '7',      // Going/returning home from another location - 7.8%
+  '3',      // Eating/drinking - 7.2%
+  '5',      // Access airport - 3.5%
+  '8',      // Just to enjoy the ride/try the service - 3.0%
+  'Other',  // Other - 0.9% - lowest
 ];
 
 const categoryLabels: Record<string, string> = {

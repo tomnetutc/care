@@ -31,7 +31,8 @@ const LikertChart: React.FC<LikertChartProps> = ({
   showSummaryTable = true,
   dataProcessor,
   sourceCategories,
-  legendWrap
+  legendWrap,
+  summaryString
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -80,6 +81,32 @@ const LikertChart: React.FC<LikertChartProps> = ({
         const muchMore = item.values.find(v => v.category === "Much more")?.value || 0;
         const somewhatMore = item.values.find(v => v.category === "Somewhat more")?.value || 0;
         return muchMore + somewhatMore;
+      }
+      
+      // For frequency-based responses (Never to Everyday) - specifically for Q24
+      if (responseCategories.includes("Never") && responseCategories.includes("Everyday")) {
+        const never = item.values.find(v => v.category === "Never")?.value || 0;
+        return never; // Sort by "Never" responses (highest to lowest)
+      }
+      
+      // For charts with "Never" responses but no "Everyday" (like Q10)
+      if (responseCategories.includes("Never") && !responseCategories.includes("Everyday")) {
+        const never = item.values.find(v => v.category === "Never")?.value || 0;
+        return never; // Sort by "Never" responses (highest to lowest)
+      }
+      
+      // For importance-based responses (Very important + Extremely important)
+      if (responseCategories.includes("Very important") && responseCategories.includes("Extremely important")) {
+        const veryImportant = item.values.find(v => v.category === "Very important")?.value || 0;
+        const extremelyImportant = item.values.find(v => v.category === "Extremely important")?.value || 0;
+        return veryImportant + extremelyImportant; // Sort by combined high importance
+      }
+      
+      // For concern-based responses (Very concerned + Extremely concerned)
+      if (responseCategories.includes("Very concerned") && responseCategories.includes("Extremely concerned")) {
+        const veryConcerned = item.values.find(v => v.category === "Very concerned")?.value || 0;
+        const extremelyConcerned = item.values.find(v => v.category === "Extremely concerned")?.value || 0;
+        return veryConcerned + extremelyConcerned; // Sort by combined high concern
       }
       
       // Default: return 0 (no sorting)
@@ -626,6 +653,9 @@ const LikertChart: React.FC<LikertChartProps> = ({
       {legendWrap ? <HTMLLegend /> : null}
       <svg ref={svgRef}></svg>
       {renderSummaryTable()}
+      <div className={styles.totalResponses}>
+        {summaryString ? summaryString : `Number of respondents: ${totalResponses.toLocaleString()}`}
+      </div>
     </div>
   );
 };

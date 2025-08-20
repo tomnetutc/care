@@ -5,11 +5,11 @@ const Q42Visualization: React.FC = () => {
   const categoryOrder = ['1', '2', '3', '4', '5'];
   
   const categoryLabels: Record<string, string> = {
-    '1': '1 person',
-    '2': '2 people',
-    '3': '3 people',
-    '4': '4 people',
-    '5': '5+ people'
+    '1': '1',
+    '2': '2',
+    '3': '3',
+    '4': '4',
+    '5': '5 or more'
   };
 
   return (

@@ -8,7 +8,7 @@ const categoryOrder = [
   'Native Hawaiian or Pacific Islander',
   'White',
   'Other',
-  'Multiple',
+  'Multiple races',
   'Prefer not to answer',
 ];
 
@@ -19,7 +19,7 @@ const categoryLabels: { [key: string]: string } = {
   'Native Hawaiian or Pacific Islander': 'Native Hawaiian or Pacific Islander',
   'White': 'White',
   'Other': 'Other',
-  'Multiple': 'Multiple',
+  'Multiple races': 'Multiple races',
   'Prefer not to answer': 'Prefer not to answer',
 };
 
@@ -62,7 +62,7 @@ const dataProcessor = (filteredData: any[], options: any) => {
     if (selectedRaces.length === 1) {
       counts[selectedRaces[0]]++;
     } else if (selectedRaces.length > 1) {
-      counts['Multiple']++;
+      counts['Multiple races']++;
     } else if (preferNot && selectedRaces.length === 0) {
       counts['Prefer not to answer']++;
     }

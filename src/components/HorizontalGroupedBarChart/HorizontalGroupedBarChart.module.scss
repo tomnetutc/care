@@ -108,9 +108,9 @@
         flex-grow: 1;
         display: flex;
         flex-direction: row;
-        gap: 10px;
         align-items: center;
         height: 30px;
+        gap: 0;
       }
       .barContainer {
         flex-grow: 1;
@@ -253,28 +253,8 @@
   display: flex;
   align-items: center;
   background: transparent;
-  margin-right: 24px;
-  margin-left: 0;
 }
-.barGroupWithGrid:last-child {
-  margin-right: 0;
-}
-.barGroupWithGrid + .barGroupWithGrid::before {
-  content: '';
-  position: absolute;
-  left: -16px;
-  top: 10%;
-  height: 80%;
-  width: 2px;
-  background: repeating-linear-gradient(
-    to bottom,
-    #d0d0d0 0px,
-    #d0d0d0 4px,
-    transparent 4px,
-    transparent 8px
-  );
-  z-index: 2;
-}
+/* Divider lines are now handled by inline styles in the React component */
 // Remove gridlines for now
 .groupGridLines, .groupGridLine { display: none !important; }
 

@@ -70,7 +70,7 @@ const responseCategories = [
 ];
 
 const categoryColors = [
-  "#808080", // Gray for "I'm not sure/I don't know"
+  "#b6bebc", // Gray for "I'm not sure/I don't know"
   "#e25b61", // Red for "Not available"
   "#ead97c", // Yellow for "Available, but have not used"
   "#2ba88c"  // Green for "Have used"

@@ -542,14 +542,14 @@ const SCOPED_TOPIC_DATA: Record<string, { text: string; component: React.Compone
     section: 'sample-characteristics',
     subSection: 'household'
   },
-  [generateScopedKey('sample-characteristics', 'household', 'Division')]: {
-    text: 'Division',
+  [generateScopedKey('sample-characteristics', 'household', 'Census Division')]: {
+    text: 'Census Division',
     component: DivisionVisualization,
     section: 'sample-characteristics',
     subSection: 'household'
   },
-  [generateScopedKey('sample-characteristics', 'household', 'Census Region + County')]: {
-    text: 'Census Region + County',
+  [generateScopedKey('sample-characteristics', 'household', 'Census Region/County')]: {
+    text: 'Census Region/County',
     component: CensusRegionCountyVisualization,
     section: 'sample-characteristics',
     subSection: 'household'

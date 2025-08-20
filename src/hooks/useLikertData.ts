@@ -72,6 +72,11 @@ export const useLikertData = (options: LikertDataOptions) => {
               } else {
                 filtersByField[filter.field].push(String(filter.value));
               }
+            }
+            // Special handling for gender filter - combine Other and Prefer not to answer
+            else if (filter.field === 'gender' && filter.value === '4') {
+              // When "Other" is selected, include both "Other" (4) and "Prefer not to answer" (3)
+              filtersByField[filter.field].push('3', '4');
             } else {
               filtersByField[filter.field].push(String(filter.value));
             }
@@ -102,6 +107,14 @@ export const useLikertData = (options: LikertDataOptions) => {
         responseCategories[4] === '7–10' &&
         responseCategories[5] === '>10';
 
+      // Special mapping for Q20-style frequency questions (0, 1-2 days, 3-4 days, 5+ days)
+      const isQ20Style = Array.isArray(responseCategories) && responseCategories.length === 4 &&
+        responseCategories[0] === '0' &&
+        responseCategories[1] === '1-2 days' &&
+        responseCategories[2] === '3-4 days' &&
+        responseCategories[3] === '5 or more days' &&
+        questionOrder.includes('freq_work') && questionOrder.includes('freq_school') && questionOrder.includes('freq_wfh');
+
       const responseCounts = new Array(responseCategories.length).fill(0);
       let validResponses = 0;
 
@@ -112,6 +125,21 @@ export const useLikertData = (options: LikertDataOptions) => {
           const intVal = parseInt(value as string);
           if (!isNaN(intVal) && intVal >= 1 && intVal <= 6) {
             responseCounts[intVal - 1]++;
+            validResponses++;
+          }
+        } else if (isQ20Style) {
+          // Map CSV values to Q20 categories: 0->0, 1,2->1-2 days, 3,4->3-4 days, 5,6,7->5+ days
+          const intVal = parseInt(value as string);
+          if (!isNaN(intVal) && intVal >= 0 && intVal <= 7) {
+            if (intVal === 0) {
+              responseCounts[0]++; // 0
+            } else if (intVal === 1 || intVal === 2) {
+              responseCounts[1]++; // 1-2 days
+            } else if (intVal === 3 || intVal === 4) {
+              responseCounts[2]++; // 3-4 days
+            } else if (intVal === 5 || intVal === 6 || intVal === 7) {
+              responseCounts[3]++; // 5 or more days
+            }
             validResponses++;
           }
         } else {

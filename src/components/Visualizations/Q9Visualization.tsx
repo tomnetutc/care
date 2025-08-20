@@ -5,10 +5,10 @@ const Q9Visualization: React.FC = () => {
   const categoryOrder = ["1", "2", "3", "4"];
   
   const categoryLabels: {[key: string]: string} = {
-    "1": "No, I am not currently responsible for providing care to anyone.",
-    "2": "Yes, I provide care for someone within my household.",
-    "3": "Yes, I provide care for someone outside of my household.", 
-    "4": "Yes, I provide care for someone both within and outside of my household."
+    "1": "No, I am not currently responsible for providing care to anyone",
+    "2": "Yes, I provide care for someone within my household",
+    "3": "Yes, I provide care for someone outside of my household", 
+    "4": "Yes, I provide care for someone both within and outside of my household"
   };
   
   return (

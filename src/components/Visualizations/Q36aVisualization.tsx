@@ -2,16 +2,16 @@ import React from 'react';
 import HorizontalBarChart from '../HorizontalBarChart/HorizontalBarChart';
 
 const categoryOrder = [
-  'Decrease in transit frequency or reliability',
-  'Increased concerns over health and safety',
-  'Changed job or work location',
-  'Shifted to work from home',
-  'Moved to a new home that is less transit accessible',
-  'Increase in the cost of public transit',
-  'Changes in my financial situation',
-  'Acquired a personal vehicle',
-  'Lifestyle or personal preference changes',
-  'Other',
+  'Increased concerns over health and safety',        // 36.7% - highest
+  'Acquired a personal vehicle',                      // 25.5%
+  'Lifestyle or personal preference changes',         // 25.0%
+  'Changed job or work location',                     // 20.8%
+  'Changes in my financial situation',                // 19.2%
+  'Decrease in transit frequency or reliability',     // 16.2%
+  'Shifted to work from home',                        // 15.2%
+  'Moved to a new home that is less transit accessible', // 14.9%
+  'Increase in the cost of public transit',           // 11.5%
+  'Other',                                            // 0.0% - lowest
 ];
 
 const categoryLabels: Record<string, string> = {

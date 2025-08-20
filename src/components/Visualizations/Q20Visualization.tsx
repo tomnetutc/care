@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import LikertChart from '../LikertChart/LikertChart';
 import { ProcessedDataItem } from '../../types/Helpers';
+import { useLikertData } from '../../hooks/useLikertData';
 
 // Order of questions for travel frequency
 const questionOrder = [
@@ -24,7 +25,7 @@ const dynamicCategoryMappings = [
   { id: "0", label: "0", color: "#E2E2DC", originalValues: ["0"] },
   { id: "1-2 days", label: "1–2 days", color: "#F4E9AA", originalValues: ["1", "2"] },
   { id: "3-4 days", label: "3–4 days", color: "#E4C75B", originalValues: ["3", "4"] },
-  { id: "5 or more days ", label: "5 or more days", color: "#B19D45", originalValues: ["5", "6", "7"] }
+  { id: "5 or more days", label: "5 or more days", color: "#B19D45", originalValues: ["5", "6", "7"] }
 ];
 
 // Function to map original value to corresponding dynamic category
@@ -71,6 +72,29 @@ const processData = (rawData: ProcessedDataItem[]): ProcessedDataItem[] => {
 };
 
 const Q20Visualization: React.FC = () => {
+  // Memoize the values to prevent infinite re-renders
+  const memoizedQuestionOrder = useMemo(() => questionOrder, []);
+  const memoizedQuestionLabels = useMemo(() => questionLabels, []);
+  const memoizedResponseCategories = useMemo(() => dynamicCategoryMappings.map(m => m.id), []);
+  const memoizedSourceCategories = useMemo(() => sourceCategories, []);
+
+  // Get the data from useLikertData hook
+  const { data } = useLikertData({
+    questionOrder: memoizedQuestionOrder,
+    questionLabels: memoizedQuestionLabels,
+    responseCategories: memoizedResponseCategories,
+    sourceCategories: memoizedSourceCategories
+    // Note: dataProcessor is removed from here, will be applied in LikertChart
+  });
+
+  // Calculate actual N values from the real data
+  const getNValue = (questionKey: keyof typeof questionLabels) => {
+    if (!data || data.length === 0) return 0;
+    const questionData = data.find((q: ProcessedDataItem) => q.question === questionLabels[questionKey]);
+    if (!questionData) return 0;
+    return questionData.values.reduce((sum: number, v: any) => sum + v.count, 0);
+  };
+
   // Extract response categories and colors from our dynamic mapping
   const categories = useMemo(() => dynamicCategoryMappings.map(m => m.id), []);
   const colors = useMemo(() => dynamicCategoryMappings.map(m => m.color), []);
@@ -88,6 +112,7 @@ const Q20Visualization: React.FC = () => {
       showSummaryTable={false}
       dataProcessor={processData}
       sourceCategories={sourceCategories}
+      summaryString={`Number of workers: ${getNValue('freq_work').toLocaleString()}, Number of students: ${getNValue('freq_school').toLocaleString()}`}
     />
   );
 };

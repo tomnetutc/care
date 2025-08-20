@@ -2,7 +2,17 @@ import React, { useState, useCallback } from 'react';
 import HorizontalBarChart from '../HorizontalBarChart/HorizontalBarChart';
 
 const categoryOrder = [
-  '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Other'
+  '1',      // Private vehicle, driving alone - 31.9% - highest
+  '5',      // Uber/Lyft/other ridehailing services - 20.6%
+  '9',      // Walk - 13.1%
+  '3',      // Private vehicle, riding as a passenger - 9.4%
+  '10',     // I would not have made this trip - 7.5%
+  '2',      // Private vehicle, driving with passengers - 6.4%
+  '6',      // Taxi - 4.2%
+  '4',      // Carsharing services (e.g., Zipcar) - 2.8%
+  '7',      // Bicycle/E-bike (including bike-sharing services) - 2.7%
+  '8',      // Scooter/E-scooter (including sharing services, e.g., Bird, Lime) - 1.0%
+  'Other',  // Other - 0.4% - lowest
 ];
 
 const categoryLabels: Record<string, string> = {

@@ -48,6 +48,7 @@ export interface LikertChartProps {
   dataProcessor?: (data: ProcessedDataItem[]) => ProcessedDataItem[];
   sourceCategories?: string[];
   legendWrap?: boolean;
+  summaryString?: string;
 }
 
 export interface LikertDataOptions {

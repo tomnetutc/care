@@ -45,7 +45,7 @@ const Q23Visualization: React.FC = () => {
       questionLabels={questionLabels}
       responseCategories={responseCategories}
       categoryColors={categoryColors}
-      showSummaryTable={true}
+      showSummaryTable={false}
     />
   );
 };

@@ -161,6 +161,23 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
     return (
       <div className={styles.chartContainer} style={{ paddingLeft: `${labelWidth}px` }}>
         <div className={styles.barChart}>
+          {/* Add full-height divider lines */}
+          {groupLabels.slice(0, -1).map((_, groupIdx) => (
+            <div 
+              key={`divider-${groupIdx}`}
+              className={styles.fullHeightDivider}
+              style={{
+                position: 'absolute',
+                left: `${(groupIdx + 1) * (100 / groupLabels.length)}%`,
+                top: '0',
+                bottom: '0',
+                width: '2px',
+                background: 'repeating-linear-gradient(to bottom, #d0d0d0 0px, #d0d0d0 4px, transparent 4px, transparent 8px)',
+                zIndex: 2,
+                transform: 'translateX(-50%)'
+              }}
+            />
+          ))}
           {categoryOrder.map((cat, rowIdx) => (
             <div className={styles.barRow} key={cat}>
               <div className={styles.label} style={{ width: `${labelWidth}px`, left: `-${labelWidth}px` }}>
@@ -170,7 +187,16 @@ const HorizontalGroupedBarChart: React.FC<HorizontalGroupedBarChartProps> = ({
                 {groupLabels.map((group, groupIdx) => {
                   const value = typeof data[rowIdx]?.[group] === 'number' ? (data[rowIdx][group] as number) : 0;
                   return (
-                    <div key={group} className={styles.barGroupWithGrid}>
+                    <div 
+                      key={group} 
+                      className={styles.barGroupWithGrid}
+                      style={{
+                        width: `${100 / groupLabels.length}%`,
+                        paddingLeft: '15px',
+                        paddingRight: '15px',
+                        boxSizing: 'border-box'
+                      }}
+                    >
                       <GroupGridLines />
                       <div className={styles.barContainer}>
                         <div

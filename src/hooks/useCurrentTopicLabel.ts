@@ -44,9 +44,9 @@ const extractTopicFromTitle = (title: string): string | null => {
     'work environment': 'Work Environment',
     'driver license': 'Driver\'s License',
     'license': 'Driver\'s License',
-    'division': 'Division',
-    'census region': 'Census Region + County',
-    'region': 'Census Region + County'
+    'division': 'Census Division',
+    'census region': 'Census Region/County',
+    'region': 'Census Region/County'
   };
   
   for (const [keyword, topic] of Object.entries(topicKeywords)) {
@@ -285,14 +285,14 @@ const SCOPED_TOPIC_DATA: Record<string, { text: string; component: any; section:
     section: 'sample-characteristics',
     subSection: 'household'
   },
-  [generateScopedKey('sample-characteristics', 'household', 'Division')]: {
-    text: 'Division',
+  [generateScopedKey('sample-characteristics', 'household', 'Census Division')]: {
+    text: 'Census Division',
     component: null,
     section: 'sample-characteristics',
     subSection: 'household'
   },
-  [generateScopedKey('sample-characteristics', 'household', 'Census Region + County')]: {
-    text: 'Census Region + County',
+  [generateScopedKey('sample-characteristics', 'household', 'Census Region/County')]: {
+    text: 'Census Region/County',
     component: null,
     section: 'sample-characteristics',
     subSection: 'household'
@@ -374,9 +374,9 @@ export const useCurrentTopicLabel = (fallbackTitle?: string) => {
                 'vehicles': 'Number of Vehicles',
                 'number-of-drivers': 'Number of Drivers',
                 'drivers': 'Number of Drivers',
-                'division': 'Division',
-                'census-region': 'Census Region + County',
-                'region': 'Census Region + County'
+                'division': 'Census Division',
+                'census-region': 'Census Region/County',
+                'region': 'Census Region/County'
               };
               
               return topicMapping[topic] || 'Household Size'; // Default fallback

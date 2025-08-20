@@ -5,9 +5,7 @@ const Q49Visualization: React.FC = () => {
   const categoryOrder = [
     'Less than high school',
     'High school graduate',
-    'Some college',
-    'Vocational/technical training',
-    'Associate degree',
+    'Some college Degree',
     "Bachelor's degree",
     'Graduate/post-graduate degree',
   ];
@@ -15,9 +13,7 @@ const Q49Visualization: React.FC = () => {
   const categoryLabels: { [key: string]: string } = {
     'Less than high school': 'Less than high school',
     'High school graduate': 'High school graduate',
-    'Some college': 'Some college',
-    'Vocational/technical training': 'Vocational/technical training',
-    'Associate degree': 'Associate degree',
+    'Some college Degree': 'Some college Degree',
     "Bachelor's degree": "Bachelor's degree",
     'Graduate/post-graduate degree': 'Graduate/post-graduate degree',
   };
@@ -35,11 +31,40 @@ const Q49Visualization: React.FC = () => {
   const categoryColors: { [key: string]: string } = {
     'Less than high school': '#507dbc',
     'High school graduate': '#507dbc',
-    'Some college': '#507dbc',
-    'Vocational/technical training': '#507dbc',
-    'Associate degree': '#507dbc',
+    'Some college Degree': '#507dbc',
     "Bachelor's degree": '#507dbc',
     'Graduate/post-graduate degree': '#507dbc',
+  };
+
+  // Custom processor to combine Some college, Vocational/technical training, and Associate degree
+  const dataProcessor = (filteredData: any[], options: any) => {
+    const counts: Record<string, number> = {};
+    categoryOrder.forEach(cat => { counts[cat] = 0; });
+    
+    filteredData.forEach(row => {
+      const educValue = row.educ || row.q49 || row.education_level;
+      if (!educValue || educValue === '-8') return;
+      
+      if (educValue === '3' || educValue === '4' || educValue === '5') {
+        // Combine Some college (3), Vocational/technical training (4), and Associate degree (5)
+        counts['Some college Degree']++;
+      } else if (educValue === '1') {
+        counts['Less than high school']++;
+      } else if (educValue === '2') {
+        counts['High school graduate']++;
+      } else if (educValue === '6') {
+        counts["Bachelor's degree"]++;
+      } else if (educValue === '7') {
+        counts['Graduate/post-graduate degree']++;
+      }
+    });
+
+    return categoryOrder.map(category => ({
+      category,
+      label: categoryLabels[category] || category,
+      count: counts[category],
+      percentage: filteredData.length > 0 ? (counts[category] / filteredData.length) * 100 : 0
+    }));
   };
 
   return (
@@ -53,6 +78,7 @@ const Q49Visualization: React.FC = () => {
       valueMap={valueMap}
       alternateFields={['q49', 'education_level']}
       tooltipCountLabel="Responses"
+      dataProcessor={dataProcessor}
     />
   );
 };

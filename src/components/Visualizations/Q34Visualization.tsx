@@ -12,6 +12,14 @@ const Q34Visualization: React.FC = () => {
     '5': 'Never'
   };
 
+  const categoryColors = [
+    "#A3923D",  // Darkest Yellow
+    "#D1B856",  // Darker Yellow
+    "#EAD97C",  // Anchor Yellow
+    "#F4E9AA",  // Lightest Yellow
+    "#b6bebc"   // Light Gray
+  ];
+
   return (
     <HorizontalBarChart
       questionId="34"
@@ -19,6 +27,7 @@ const Q34Visualization: React.FC = () => {
       dataField="pre_covid_transit_use"
       categoryOrder={categoryOrder}
       categoryLabels={categoryLabels}
+      categoryColors={categoryColors}
     />
   );
 };
