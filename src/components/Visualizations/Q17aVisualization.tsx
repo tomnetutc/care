@@ -38,16 +38,14 @@ const responseCategories = [
   "Much less", 
   "Somewhat less", 
   "About the same",
-  "Somewhat more", 
-  "Much more"
+  "Somewhat more"
 ];
 
 const categoryColors = [
   "#e25b61", // Red for much less
   "#f0b3ba", // Light red for somewhat less
   "#ead97c", // Yellow for about the same
-  "#93c4b9", // Light green for somewhat more
-  "#2ba88c"  // Strong green for much more
+  "#93c4b9"  // Light green for somewhat more
 ];
 
 const Q17aVisualization: React.FC = () => {

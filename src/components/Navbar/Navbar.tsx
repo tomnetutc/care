@@ -7,17 +7,25 @@ import timeTravelIcon from "../images/SVGLogo.svg";
 export const Navbar: React.FC = () => {
   const location = useLocation();
   
+  // Check if we're on Home, About, or Scenario Analysis pages
+  const isHomepage = location.pathname === '/home' || location.pathname === '/about' || location.pathname === '/scenario';
+  
   return (
-    <NavbarBs fixed="top" className="dashboard-navbar shadow-sm">
+    <NavbarBs fixed="top" className={`dashboard-navbar ${isHomepage ? 'homepage-navbar' : ''} shadow-sm`}>
       <div className="navbar-content">
         <div className="navbar-brand-section">
           <Link to="/" className="brand-link">
             <img
               src={timeTravelIcon}
               alt="Dashboard Logo"
-              style={{ width: "80px", marginRight: "-8px" }}
+              className={isHomepage ? "navbar-logo" : ""}
+              style={isHomepage ? {} : { width: "80px", marginRight: "-8px" }}
             />
-            <h1 className="fw-bold mb-0 text-dark" style={{ marginLeft: "-4px" }}>Community Adaptation and Resilience to Extremes (CARE) Dashboard</h1>
+            {isHomepage ? (
+              <span className="brand-title">Community Adaptation and Resilience to Extremes (CARE) Dashboard</span>
+            ) : (
+              <h1 className="fw-bold mb-0 text-dark" style={{ marginLeft: "-4px" }}>Community Adaptation and Resilience to Extremes (CARE) Dashboard</h1>
+            )}
           </Link>
         </div>
 
@@ -35,7 +43,8 @@ export const Navbar: React.FC = () => {
   location.pathname.includes('/driving') ||
   location.pathname.includes('/demographics')
   ? 'active' : ''
-}`}>Dashboard</Link>
+}`}>Survey Explorer</Link>
+          <Link to="/scenario" className={`nav-link ${location.pathname === '/scenario' ? 'active' : ''}`}>Scenario Analysis</Link>
         </div>
       </div>
     </NavbarBs>

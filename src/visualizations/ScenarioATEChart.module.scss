@@ -1,0 +1,366 @@
+/**
+ * Scenario ATE Chart Styles - Clean and Organized Design
+ */
+
+.chartContainer {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+  padding: 12px;
+  margin: 8px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.chartHeader {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.chartTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.025em;
+}
+
+.chartSubtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 400;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 10px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.legendTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.legendItems {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.legendColor {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.legendNote {
+  font-size: 13px;
+  color: #6b7280;
+  text-align: center;
+  font-style: italic;
+}
+
+.chart {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chartContent {
+  padding: 8px 0;
+}
+
+.activityRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #f9fafb;
+  }
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.activityLabel {
+  width: 220px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  text-align: right;
+  padding-right: 24px;
+  flex-shrink: 0;
+}
+
+.barContainer {
+  flex: 1;
+  position: relative;
+  height: 50px;
+}
+
+.barBackground {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, 
+    rgba(239, 68, 68, 0.1) 0%, 
+    rgba(239, 68, 68, 0.1) 50%, 
+    rgba(16, 185, 129, 0.1) 50%, 
+    rgba(16, 185, 129, 0.1) 100%);
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.centerLine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #374151;
+  transform: translateX(-50%);
+  opacity: 0.6;
+}
+
+.netBar {
+  position: absolute;
+  top: 50%;
+  height: 40px;
+  border-radius: 4px;
+  transform: translateY(-50%);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  &:hover {
+    opacity: 1 !important;
+    transform: translateY(-50%) scaleY(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.netValue {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+  pointer-events: none;
+  
+  .netBar[style*="left: 50%"] & {
+    left: 12px;
+  }
+  
+  .netBar:not([style*="left: 50%"]) & {
+    right: 12px;
+  }
+}
+
+.tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.tooltipTitle {
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.tooltipContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tooltipLabel {
+  color: #d1d5db;
+  font-weight: 500;
+}
+
+.tooltipValue {
+  font-weight: 600;
+  color: #fff;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.noDataContainer {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+}
+
+.noDataIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.noDataContainer h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.noDataContainer p {
+  font-size: 16px;
+  margin: 0;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.debugInfo {
+  margin-top: 32px;
+  padding: 20px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.debugInfo h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 16px 0;
+}
+
+.debugStats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.debugStats > div {
+  font-size: 14px;
+  color: #6b7280;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.debugResults {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.debugResult {
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  font-size: 13px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.debugResult strong {
+  color: #374151;
+  font-weight: 600;
+}
+
+.debugResult > div {
+  margin-top: 4px;
+  color: #6b7280;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chartContainer {
+    padding: 16px;
+    margin: 16px 0;
+  }
+  
+  .chartTitle {
+    font-size: 20px;
+  }
+  
+  .chartSubtitle {
+    font-size: 14px;
+  }
+  
+  .activityLabel {
+    width: 150px;
+    font-size: 13px;
+    padding-right: 12px;
+  }
+  
+  .legendItems {
+    gap: 16px;
+  }
+  
+  .legendItem {
+    font-size: 13px;
+  }
+  
+  .debugStats {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .activityRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .activityLabel {
+    width: 100%;
+    text-align: left;
+    padding-right: 0;
+  }
+  
+  .barContainer {
+    width: 100%;
+  }
+  
+  .legendItems {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

@@ -90,9 +90,6 @@ export const useLikertData = (options: LikertDataOptions) => {
       });
     }
     
-    // Set total responses after filtering
-    setTotalResponses(filteredData.length);
-    
     // Use sourceCategories if provided, otherwise use responseCategories
     const categoriesToUse = sourceCategories || responseCategories;
     
@@ -123,14 +120,16 @@ export const useLikertData = (options: LikertDataOptions) => {
         if (isQ23Style) {
           // Map CSV values 1-6 to indices 0-5
           const intVal = parseInt(value as string);
-          if (!isNaN(intVal) && intVal >= 1 && intVal <= 6) {
+          // Exclude -8 (refused) and -9 (not applicable/didn't experience)
+          if (!isNaN(intVal) && intVal >= 1 && intVal <= 6 && intVal !== -8 && intVal !== -9) {
             responseCounts[intVal - 1]++;
             validResponses++;
           }
         } else if (isQ20Style) {
           // Map CSV values to Q20 categories: 0->0, 1,2->1-2 days, 3,4->3-4 days, 5,6,7->5+ days
           const intVal = parseInt(value as string);
-          if (!isNaN(intVal) && intVal >= 0 && intVal <= 7) {
+          // Exclude -8 (refused) and -9 (not applicable/didn't experience)
+          if (!isNaN(intVal) && intVal >= 0 && intVal <= 7 && intVal !== -8 && intVal !== -9) {
             if (intVal === 0) {
               responseCounts[0]++; // 0
             } else if (intVal === 1 || intVal === 2) {
@@ -145,14 +144,18 @@ export const useLikertData = (options: LikertDataOptions) => {
         } else {
           // Default Likert logic
           const parsed = parseInt(value as string);
+          // Exclude -8 (refused) and -9 (not applicable/didn't experience)
+          if (isNaN(parsed) || parsed === -8 || parsed === -9) {
+            return; // Skip invalid values
+          }
           const isZeroBased = responseCategories.includes("0");
           if (isZeroBased) {
-            if (!isNaN(parsed) && parsed >= 0 && parsed < responseCategories.length) {
+            if (parsed >= 0 && parsed < responseCategories.length) {
               responseCounts[parsed]++;
               validResponses++;
             }
           } else {
-            if (!isNaN(parsed) && parsed >= 1 && parsed <= responseCategories.length) {
+            if (parsed >= 1 && parsed <= responseCategories.length) {
               responseCounts[parsed - 1]++;
               validResponses++;
             }
@@ -187,7 +190,8 @@ export const useLikertData = (options: LikertDataOptions) => {
       
       filteredData.forEach(d => {
         const value = parseInt(d[column] as string);
-        if (!isNaN(value) && value >= 0) {
+        // Exclude -8 (refused) and -9 (not applicable/didn't experience)
+        if (!isNaN(value) && value >= 0 && value !== -8 && value !== -9) {
           values.push(value);
           validResponses++;
         }
@@ -212,6 +216,28 @@ export const useLikertData = (options: LikertDataOptions) => {
     });
 
     setSummaryStats(calculatedStats);
+    
+    // Calculate totalResponses: count rows that have at least one valid response across all questions
+    // This excludes rows where all questions have -9 (not applicable) or -8 (refused)
+    let totalValidRespondents = 0;
+    filteredData.forEach(d => {
+      // Check if this row has at least one valid response across all questions
+      const hasValidResponse = questionOrder.some((column: string) => {
+        const value = parseInt(d[column] as string);
+        // Valid if it's a number >= 0 and not -8 or -9
+        return !isNaN(value) && value >= 0 && value !== -8 && value !== -9;
+      });
+      if (hasValidResponse) {
+        totalValidRespondents++;
+      }
+    });
+    
+    // Set totalResponses to the count of respondents with at least one valid response
+    // If all questions have the same sample size, use that; otherwise use the calculated count
+    const sampleSizes = calculatedStats.map(stat => stat.responses);
+    const allSameSize = sampleSizes.length > 0 && sampleSizes.every(size => size === sampleSizes[0]);
+    setTotalResponses(allSameSize && sampleSizes[0] > 0 ? sampleSizes[0] : totalValidRespondents);
+    
     setIsLoading(false);
   };
 

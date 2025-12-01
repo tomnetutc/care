@@ -1,0 +1,197 @@
+{
+  "use_transit": {
+    "metadata": {
+      "levels": 3,
+      "link": "probit"
+    },
+    "coefficients": {
+      "impa345": -0.051,
+      "hcity": -0.113,
+      "hhveh0": 0.385,
+      "in150250": -0.251,
+      "age_3140": -0.158,
+      "work_out": 0.398,
+      "a6170ve0": -0.359,
+      "hrnt_i50": -0.136,
+      "PR_i250p": -0.537,
+      "urban": 0.079
+    },
+    "thresholds": {
+      "1|2": -0.819,
+      "2|3": 1.299
+    },
+    "variables": ["impa345", "hcity", "hhveh0", "in150250", "age_3140", "work_out", "a6170ve0", "hrnt_i50", "PR_i250p", "urban"]
+  },
+  "use_car": {
+    "metadata": {
+      "levels": 3,
+      "link": "probit"
+    },
+    "coefficients": {
+      "impa345": 0.118,
+      "CR": -0.028,
+      "PR": 0.066,
+      "SE": 0.054,
+      "age_1830": 0.162,
+      "worker": 0.103,
+      "in150250": 0.226,
+      "hhveh2": 0.103,
+      "charging_stations": 0.086,
+      "a40_ve2p": 0.161,
+      "wr_mob": 0.331,
+      "s1_hcity": 0.170,
+      "rural": -0.252,
+      "suburban": -0.106
+    },
+    "thresholds": {
+      "1|2": -0.741,
+      "2|3": 1.141
+    },
+    "variables": ["impa345", "CR", "PR", "SE", "age_1830", "worker", "in150250", "hhveh2", "charging_stations", "a40_ve2p", "wr_mob", "s1_hcity", "rural", "suburban"]
+  },
+  "stay_home": {
+    "metadata": {
+      "levels": 3,
+      "link": "probit"
+    },
+    "coefficients": {
+      "impa345": 0.171,
+      "CR": 0.082,
+      "emergency_medical": 0.155,
+      "work_in": 0.132,
+      "ac": 0.137,
+      "hcity": 0.159,
+      "urban": 0.104,
+      "hhveh0": 0.148,
+      "non_wrkr": 0.202,
+      "in2550": 0.094,
+      "hhsize3p": 0.124,
+      "dis_yes": 0.157
+    },
+    "thresholds": {
+      "1|2": -0.892,
+      "2|3": 0.833
+    },
+    "variables": ["impa345", "CR", "emergency_medical", "work_in", "ac", "hcity", "urban", "hhveh0", "non_wrkr", "in2550", "hhsize3p", "dis_yes"]
+  },
+  "dine_in_pickup": {
+    "metadata": {
+      "levels": 3,
+      "link": "probit"
+    },
+    "coefficients": {
+      "impa345": 0.096,
+      "SE": 0.070,
+      "age_1840": 0.176,
+      "non_wrkr": -0.217,
+      "work_out": 0.199,
+      "hhveh2p": 0.174,
+      "ac": -0.157,
+      "SE_i100p": 0.164,
+      "urbanch": 0.250,
+      "hcity_v0": -0.172
+    },
+    "thresholds": {
+      "1|2": -1.239,
+      "2|3": 0.613
+    },
+    "variables": ["impa345", "SE", "age_1840", "non_wrkr", "work_out", "hhveh2p", "ac", "SE_i100p", "urbanch", "hcity_v0"]
+  },
+  "get_meal_delivered": {
+    "metadata": {
+      "levels": 3,
+      "link": "probit"
+    },
+    "coefficients": {
+      "impa345": 0.117,
+      "PR": 0.076,
+      "age_1840": 0.159,
+      "age_65p": -0.161,
+      "non_wht": 0.196,
+      "work_in": 0.135,
+      "wrkr_std": 0.310,
+      "hhveh0": 0.129,
+      "hcity": 0.124,
+      "rural": -0.164,
+      "urbanch": 0.253
+    },
+    "thresholds": {
+      "1|2": -0.91,
+      "2|3": 0.992
+    },
+    "variables": ["impa345", "PR", "age_1840", "age_65p", "non_wht", "work_in", "wrkr_std", "hhveh0", "hcity", "rural", "urbanch"]
+  },
+  "work_from_home": {
+    "metadata": {
+      "levels": 3,
+      "link": "probit"
+    },
+    "coefficients": {
+      "impa345": 0.095,
+      "PR": 0.071,
+      "CR_bs": 0.216,
+      "tcom": 0.455,
+      "less_hs": -0.641,
+      "in100p": 0.174,
+      "ac": 0.211,
+      "hhsize3p": 0.144,
+      "hispanic": -0.261,
+      "black": 0.210
+    },
+    "thresholds": {
+      "1|2": -1.394,
+      "2|3": 0.807
+    },
+    "variables": ["impa345", "PR", "CR_bs", "tcom", "less_hs", "in100p", "ac", "hhsize3p", "hispanic", "black"]
+  },
+  "work_from_office": {
+    "metadata": {
+      "levels": 3,
+      "link": "probit"
+    },
+    "coefficients": {
+      "impa345": 0.028,
+      "hs_less": 0.248,
+      "ac": -0.161,
+      "in100p": 0.165,
+      "hhsize1": 0.183,
+      "tcom": -0.196,
+      "work_in": -0.188,
+      "CR_bs": -0.206
+    },
+    "thresholds": {
+      "1|2": -1.082,
+      "2|3": 0.88
+    },
+    "variables": ["impa345", "hs_less", "ac", "in100p", "hhsize1", "tcom", "work_in", "CR_bs"]
+  },
+  "go_business_as_usual": {
+    "metadata": {
+      "levels": 5,
+      "link": "probit"
+    },
+    "coefficients": {
+      "impa345": -0.484,
+      "PR": 0.193,
+      "CR": 0.078,
+      "female": -0.136,
+      "age_3150": 0.168,
+      "age_5165": 0.119,
+      "asian": 0.251,
+      "nh_whit": 0.102,
+      "non_wrkr": -0.219,
+      "dis_yes": -0.153,
+      "hhveh0": -0.113,
+      "ac": 0.183,
+      "hcity": 0.144,
+      "urban": -0.090
+    },
+    "thresholds": {
+      "1|2": -1.661,
+      "2|3": -0.968,
+      "3|4": -0.373,
+      "4|5": 0.629
+    },
+    "variables": ["impa345", "PR", "CR", "female", "age_3150", "age_5165", "asian", "nh_whit", "non_wrkr", "dis_yes", "hhveh0", "ac", "hcity", "urban"]
+  }
+}

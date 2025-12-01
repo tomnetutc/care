@@ -1,6 +1,11 @@
 body, #root {
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body.is-dashboard {
+  overflow-y: hidden;
 }
 
 .app {
@@ -8,6 +13,7 @@ body, #root {
   flex-direction: column;
   height: 100vh;
   background-color: #f5f5f5;
+  overflow-y: hidden;
 }
 
 .sidebar {
@@ -40,6 +46,7 @@ body, #root {
   background-color: #eee;
   overflow-y: auto;
   position: relative;
+  height: calc(100vh - 100px);
 }
 
 .menu-container {
@@ -64,11 +71,12 @@ body, #root {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 24px;
   margin-top: 85px;
+  margin-bottom: 0;
 }
 
 .simple-page-content {
-  padding-top: 60px; /* Adjust based on your navbar height */
-  min-height: calc(100vh - 60px);
+  padding-top: 57px; /* Adjust based on your navbar height for Home/About pages */
+  min-height: calc(100vh - 57px);
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -88,4 +96,56 @@ body, #root {
     min-height: 65px;
     padding: 12px 16px;
   }
+}
+
+/* Additional styles for Home page */
+.hr-spec {
+  border: none;
+  border-top: 1px solid;
+  margin: 1rem 0;
+  opacity: 0.25;
+}
+
+/* About page styles */
+.sidediv {
+  height: 100vh;
+  background-color: #f5f9ff;
+  position: fixed;
+}
+
+.sidenavbarlist {
+  position: relative;
+  top: 200px;
+  padding: 0;
+  z-index: 1;
+}
+
+.sidenavbarlistitem {
+  list-style: none;
+  height: 50px;
+  padding: 8px 16px 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.contenthead::before {
+  display: block;
+  content: " ";
+  margin-top: -80px;
+  height: 80px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.fw-bold {
+  font-weight: bold;
+}
+
+.custom-container {
+  padding: 0px !important;
+}
+
+.no-underline {
+  text-decoration: none;
 }

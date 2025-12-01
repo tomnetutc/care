@@ -119,7 +119,8 @@ export const usePieChartData = (options: UsePieChartDataOptions) => {
         const rawValue = d[dataField];
         
         // Skip empty or invalid values
-        if (rawValue === null || rawValue === undefined || rawValue === '-8' || (rawValue.trim && rawValue.trim() === '')) {
+        // Exclude -8 (refused) and -9 (not applicable/didn't experience)
+        if (rawValue === null || rawValue === undefined || rawValue === '-8' || rawValue === '-9' || String(rawValue).trim() === '-9' || (rawValue.trim && rawValue.trim() === '')) {
           return;
         }
         

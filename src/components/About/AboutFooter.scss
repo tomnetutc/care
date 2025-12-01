@@ -1,0 +1,55 @@
+.about-footer {
+  background: #f8faf9;
+  padding: 3rem 2rem 2rem;
+  margin-top: 4rem;
+}
+
+.about-footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.about-sponsors {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.about-sponsors-title {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 1.5rem;
+}
+
+.about-sponsors-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.about-sponsor-logo {
+  height: 60px;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.about-sponsor-logo:hover {
+  opacity: 1;
+}
+
+.about-copyright {
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+  padding-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .about-sponsors-grid {
+    gap: 1.5rem;
+  }
+}
+

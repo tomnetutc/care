@@ -109,22 +109,20 @@ export const useHorizontalBarData = (options: UseHorizontalBarDataOptions) => {
         });
       }
 
-      // Exclude -8, blank, or null values globally
+      // Exclude -8, -9, blank, or null values globally
       if (multiSelectFields) {
         filteredData = filteredData.filter(row =>
           Object.keys(multiSelectFields).some(field => {
             const val = String(row[field]);
-            return val !== "-8" && val !== "" && val != null;
+            return val !== "-8" && val !== "-9" && val !== "" && val != null;
           })
         );
       } else {
         filteredData = filteredData.filter(row => {
           const val = String(row[dataField]);
-          return val !== "-8" && val !== "" && val != null;
+          return val !== "-8" && val !== "-9" && val !== "" && val != null;
         });
       }
-
-      setTotalResponses(filteredData.length);
 
       // If a custom dataProcessor is provided, use it
       if (dataProcessor) {
@@ -202,7 +200,8 @@ export const useHorizontalBarData = (options: UseHorizontalBarDataOptions) => {
         const rawValue = d[dataField];
         
         // Skip empty or invalid values (but NOT "0")
-        if (!rawValue || rawValue === '-8' || (rawValue.trim && rawValue.trim() === '')) {
+        // Exclude -8 (refused) and -9 (not applicable/didn't experience)
+        if (!rawValue || rawValue === '-8' || rawValue === '-9' || String(rawValue).trim() === '-9' || (rawValue.trim && rawValue.trim() === '')) {
           return;
         }
         
@@ -267,6 +266,8 @@ export const useHorizontalBarData = (options: UseHorizontalBarDataOptions) => {
       
       setData(processedData);
       setIsLoading(false);
+      // Set totalResponses to the actual count of valid responses (excluding -9 values)
+      setTotalResponses(validResponses);
       
     } catch (err) {
       console.error('Error processing data:', err);

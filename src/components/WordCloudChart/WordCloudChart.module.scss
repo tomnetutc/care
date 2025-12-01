@@ -1,11 +1,12 @@
 .wordCloudContainer {
-  width: 98.5%;
+  width: 103%;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  padding: 20px;
+  padding: 15px;
   margin-bottom: 20px;
   transition: all 0.3s ease;
+  box-sizing: border-box;
   
   &:hover {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);

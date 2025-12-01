@@ -1,0 +1,200 @@
+.about-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.about-page-title {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.about-content-section {
+  margin-bottom: 3rem;
+}
+
+.about-content-section h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #6dafa0;
+}
+
+.about-content-section p {
+  margin-bottom: 1rem;
+  color: #555;
+  line-height: 1.8;
+}
+
+.about-content-section ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.about-content-section li {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.about-content-section a {
+  color: #6dafa0;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.about-content-section a:hover {
+  text-decoration: underline;
+}
+
+.about-highlight-box {
+  background: linear-gradient(135deg, #f8fdfb 0%, #f0f9f6 100%);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #6dafa0;
+  margin-bottom: 1.5rem;
+}
+
+.about-highlight-box strong {
+  color: #6dafa0;
+}
+
+.about-highlight-box p {
+  margin-bottom: 0.5rem;
+}
+
+.about-highlight-box ul {
+  margin-top: 0.5rem;
+  margin-left: 1.5rem;
+}
+
+.about-highlight-box li {
+  margin-bottom: 0.5rem;
+}
+
+.about-data-dict-title {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #6dafa0;
+  font-size: 1.3rem;
+}
+
+.about-download-link {
+  margin-left: 1.5rem;
+  margin-top: 1rem;
+}
+
+.about-download-link:first-of-type {
+  margin-top: 1rem;
+}
+
+.about-download-link:not(:first-of-type) {
+  margin-top: 0.5rem;
+}
+
+.about-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.about-team-member {
+  text-align: center;
+}
+
+.about-team-photo {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  margin: 0 auto 1rem;
+  overflow: hidden;
+  border: 3px solid #6dafa0;
+}
+
+.about-team-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about-team-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.3rem;
+}
+
+.about-team-title {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.2rem;
+}
+
+.about-team-title::before {
+  content: "Role: ";
+  font-weight: 600;
+  color: #6dafa0;
+}
+
+.about-team-affiliation {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.about-ack-section {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.about-ack-section h3 {
+  color: #6dafa0;
+  margin-bottom: 0.8rem;
+  font-size: 1.2rem;
+}
+
+.about-ack-section p {
+  margin-bottom: 0.5rem;
+}
+
+.about-ack-team-list {
+  margin-top: 1rem;
+  color: #555;
+  line-height: 1.8;
+}
+
+.about-citation {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-left: 3px solid #6dafa0;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.about-citation a {
+  color: #6dafa0;
+  text-decoration: none;
+}
+
+.about-citation a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .about-team-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .about-container {
+    padding: 2rem 1rem;
+  }
+
+  .about-page-title {
+    font-size: 2rem;
+  }
+}
+

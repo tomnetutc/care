@@ -1,39 +1,60 @@
-import React from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import MainContent from './components/MainContent/MainContent';
 import Home from './components/Home/Home';
 import About from './components/About/About';
+import ScenarioATEPanel from './components/scenario/ScenarioATEPanel';
 import { subHeadingsData } from './data/subHeadings';
 import { FilterProvider } from './context/FilterContext';
 import { CurrentTopicProvider } from './context/CurrentTopicContext';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const isDashboard =
+      pathname.startsWith("/lifestyle") ||
+      pathname.startsWith("/community") ||
+      pathname.startsWith("/disruptions") ||
+      pathname.startsWith("/transportation") ||
+      pathname.startsWith("/sample-characteristics") ||
+      pathname.startsWith("/dashboard");
+
+    document.body.classList.toggle("is-dashboard", isDashboard);
+    
+    // Reset scroll position when switching to dashboard pages
+    if (isDashboard) {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname]);
+
   return (
-    <FilterProvider>
-      <CurrentTopicProvider>
-        <Router>
-        <Routes>
+    <Routes>
           {/* Redirect root to Dashboard */}
           <Route path="/" element={<Navigate to="/lifestyle/preferences" replace />} />
           {/* Home route - shows only Navbar and Home content */}
           <Route path="/home" element={
-            <div className="app">
+            <>
               <Navbar />
-              <div className="simple-page-content">
-                <Home />
-              </div>
-            </div>
+              <Home />
+            </>
           } />
           {/* About route - shows only Navbar and About content */}
           <Route path="/about" element={
-            <div className="app">
+            <>
               <Navbar />
-              <div className="simple-page-content">
-                <About />
-              </div>
-            </div>
+              <About />
+            </>
+          } />
+          {/* Scenario Analysis route */}
+          <Route path="/scenario" element={
+            <>
+              <Navbar />
+              <ScenarioATEPanel />
+            </>
           } />
           {/* Dashboard redirect route */}
           <Route path="/dashboard" element={<Navigate to="/lifestyle/preferences" replace />} />
@@ -101,7 +122,16 @@ const App: React.FC = () => {
           } />
           {/* Fallback route for unmatched paths */}
           <Route path="*" element={<Navigate to="/lifestyle/preferences" replace />} />
-        </Routes>
+    </Routes>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <FilterProvider>
+      <CurrentTopicProvider>
+        <Router>
+          <AppContent />
         </Router>
       </CurrentTopicProvider>
     </FilterProvider>

@@ -31,9 +31,9 @@ const TopMenu: React.FC = () => {
     {
       label: "Age Group",
       options: [
-        { value: '1', label: '18-24' }, { value: '2', label: '25-34' },
-        { value: '3', label: '35-44' }, { value: '4', label: '45-54' },
-        { value: '5', label: '55-64' }, { value: '6', label: '65+' }
+        { value: '1', label: '18 to 24 years' }, { value: '2', label: '25 to 34 years' },
+        { value: '3', label: '35 to 44 years' }, { value: '4', label: '45 to 54 years' },
+        { value: '5', label: '55 to 64 years' }, { value: '6', label: '65+ years' }
       ]
     },
     {
@@ -392,6 +392,7 @@ const TopMenu: React.FC = () => {
                   placeholder="Select attribute"
                   styles={customStyles}
                   isClearable
+                  isSearchable
                   components={{
                     DropdownIndicator: CustomDropdownIndicator,
                   }}
@@ -401,6 +402,31 @@ const TopMenu: React.FC = () => {
                   menuPortalTarget={document.body}
                   menuPosition={'fixed'}
                   maxMenuHeight={200}
+                  filterOption={(option, inputValue) => {
+                    if (!inputValue) return true;
+                    const searchValue = inputValue.toLowerCase();
+                    
+                    // Check if search matches the option label (like "male", "female")
+                    const optionLabel = option.label?.toLowerCase() || '';
+                    if (optionLabel.includes(searchValue)) {
+                      return true;
+                    }
+                    
+                    // Check if search matches any group label by searching through groupedOptions
+                    for (const group of groupedOptions) {
+                      if (group.label.toLowerCase().includes(searchValue)) {
+                        // Check if this option belongs to this group
+                        const belongsToGroup = group.options.some(groupOption => 
+                          groupOption.value === option.value && groupOption.label === option.label
+                        );
+                        if (belongsToGroup) {
+                          return true;
+                        }
+                      }
+                    }
+                    
+                    return false;
+                  }}
                 />
               </div>
             ))}

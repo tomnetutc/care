@@ -1,0 +1,616 @@
+.scenarioPanel {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 120px 8px 20px 8px;
+  background: white;
+  min-height: calc(100vh - 100px);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e9ecef;
+  
+  h1 {
+    color: #333;
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  
+  .subtitle {
+    color: #666;
+    font-size: 0.85rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.3;
+  }
+}
+
+.configurationSection {
+  background: #fafafa;
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.configSection {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e8e8e8;
+  
+  &:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+  }
+}
+
+.sectionLabel {
+  font-weight: 700;
+  color: #000;
+  font-size: 1rem;
+  min-width: 180px;
+  flex-shrink: 0;
+  padding-top: 4px;
+  
+  @media (max-width: 768px) {
+    min-width: auto;
+    padding-top: 0;
+  }
+}
+
+.sectionControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.configSelect {
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: white;
+  transition: border-color 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  }
+  
+  &:disabled {
+    background: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+  }
+  
+  option:disabled {
+    color: #6c757d;
+    font-style: italic;
+  }
+}
+
+.comingSoon {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.severityContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.severitySlider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #ddd;
+  outline: none;
+  -webkit-appearance: none;
+  
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  &::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.severityLabels {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 10px;
+}
+
+.severityLabel {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e9ecef;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  
+  &.active {
+    background: #007bff;
+    color: white;
+    transform: scale(1.2);
+  }
+}
+
+.severityDescription {
+  text-align: center;
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.severityMapping {
+  margin-top: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  
+  .highSeverity {
+    color: #dc3545;
+  }
+  
+  .lowSeverity {
+    color: #28a745;
+  }
+}
+
+// Event Buttons
+.eventButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 110px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  
+  &:hover:not(:disabled) {
+    border-color: #bbb;
+    background: #f9f9f9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  
+  &.eventButtonActive {
+    background: #fff8dc;
+    border-color: #ffd700;
+    box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
+    
+    &:hover:not(:disabled) {
+      background: #fff8dc;
+      transform: translateY(-1px);
+    }
+  }
+  
+  &.eventButtonDisabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.eventIcon {
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+}
+
+.eventText {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+// Impact Row
+.impactRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.impactGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.impactGroupLabel {
+  font-weight: 700;
+  color: #000;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+
+.impactSelect {
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  color: #333;
+  min-width: 180px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  }
+  
+  &:hover:not(:disabled) {
+    border-color: #999;
+  }
+  
+  &:disabled {
+    background: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.impactArrow {
+  font-size: 1.5rem;
+  color: #555;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin: 0 12px 6px 12px;
+  
+  @media (max-width: 768px) {
+    transform: rotate(90deg);
+    margin: 8px 0;
+  }
+}
+
+.mappingWarning {
+  background: #fff3cd;
+  color: #856404;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ffeaa7;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.anticipatedChangeButton {
+  padding: 10px 20px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  
+  &:hover:not(:disabled) {
+    border-color: #bbb;
+    background: #f9f9f9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  &.anticipatedChangeButtonActive {
+    background: #fff8dc;
+    border-color: #ffd700;
+    color: #333;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
+    
+    &:hover:not(:disabled) {
+      background: #fff8dc;
+      border-color: #ffd700;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.actionButtons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 16px;
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.computingIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #007bff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.computeButton {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 160px;
+  justify-content: center;
+  
+  &:hover:not(:disabled) {
+    background: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+  }
+  
+  &:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.clearButton {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    background: #545b62;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+  }
+  
+  &:disabled {
+    background: #adb5bd;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.warningMessage {
+  background: #fff3cd;
+  color: #856404;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ffeaa7;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.errorMessage {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #f5c6cb;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+.debugToggle {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #dee2e6;
+}
+
+.debugLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #666;
+  cursor: pointer;
+  
+  input[type="checkbox"] {
+    margin: 0;
+  }
+}
+
+.resultsSection {
+  margin-bottom: 16px;
+  
+  h2 {
+    color: #333;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+}
+
+.instructions {
+  background: #e7f3ff;
+  padding: 25px;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+  margin-bottom: 30px;
+  
+  h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+  }
+  
+  ol {
+    margin: 0 0 20px 0;
+    padding-left: 20px;
+    
+    li {
+      margin-bottom: 10px;
+      line-height: 1.6;
+      color: #333;
+      
+      strong {
+        color: #007bff;
+      }
+    }
+  }
+  
+  .note {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #b3d9ff;
+    font-size: 0.9rem;
+    color: #666;
+    
+    strong {
+      color: #333;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .scenarioPanel {
+    padding: 15px;
+  }
+  
+  .header h1 {
+    font-size: 2rem;
+  }
+  
+  .configurationSection {
+    padding: 20px;
+  }
+  
+  .configGrid {
+    gap: 20px;
+  }
+  
+  .actionButtons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .computeButton,
+  .clearButton {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .configurationSection {
+    padding: 15px;
+  }
+  
+  .configLabel {
+    font-size: 0.9rem;
+  }
+  
+  .configSelect {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .severityDescription {
+    font-size: 0.8rem;
+  }
+}
