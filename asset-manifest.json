@@ -1,16 +1,26 @@
 {
   "files": {
-    "main.css": "/care/static/css/main.43e67920.css",
-    "main.js": "/care/static/js/main.6c8280a2.js",
+    "main.css": "/care/static/css/main.e08587ea.css",
+    "main.js": "/care/static/js/main.83308a9b.js",
     "static/js/453.b3386f09.chunk.js": "/care/static/js/453.b3386f09.chunk.js",
     "static/media/SVGLogo.svg": "/care/static/media/SVGLogo.10877a8d6a8227f615b4eb80df2e7640.svg",
+    "static/media/utaustin.png": "/care/static/media/utaustin.4d9c4d8501c077e9dfcb.png",
+    "static/media/mohammed.jpg": "/care/static/media/mohammed.6ed7fc21a93ecbf013f4.jpg",
+    "static/media/spolzin.png": "/care/static/media/spolzin.489c628344b9c9a42231.png",
+    "static/media/us-dot.png": "/care/static/media/us-dot.b1e24565fc71f21c4ab1.png",
+    "static/media/rpendyala.png": "/care/static/media/rpendyala.ac1140527b497c3c02ed.png",
+    "static/media/asu.png": "/care/static/media/asu.dd3034a1c788d6228ec6.png",
+    "static/media/tomnet.png": "/care/static/media/tomnet.acf267644c12e604d5ef.png",
+    "static/media/tbd.png": "/care/static/media/tbd.87218437eb2c8eab3ecd.png",
+    "static/media/ibatur.jpg": "/care/static/media/ibatur.7609cb8082a7ecf6b27c.jpg",
+    "static/media/cchen.jpeg": "/care/static/media/cchen.4df3ef3eb7b58cf94a65.jpeg",
     "index.html": "/care/index.html",
-    "main.43e67920.css.map": "/care/static/css/main.43e67920.css.map",
-    "main.6c8280a2.js.map": "/care/static/js/main.6c8280a2.js.map",
+    "main.e08587ea.css.map": "/care/static/css/main.e08587ea.css.map",
+    "main.83308a9b.js.map": "/care/static/js/main.83308a9b.js.map",
     "453.b3386f09.chunk.js.map": "/care/static/js/453.b3386f09.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.43e67920.css",
-    "static/js/main.6c8280a2.js"
+    "static/css/main.e08587ea.css",
+    "static/js/main.83308a9b.js"
   ]
 }
