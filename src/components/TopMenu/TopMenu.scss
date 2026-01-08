@@ -2,8 +2,7 @@
 .menu-container {
   background-color: white;
   position: fixed;
-  left: 0;
-  right: 0;
+  /* left, right, top are set in App.css to account for sidebar and navbar */
   z-index: 15;
   border-top: 2px solid #ccc;
   border-bottom: 2px solid #ccc;

@@ -1,9 +1,9 @@
 .scenarioPanel {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 120px 8px 20px 8px;
+  padding: 77px 8px 20px 8px; /* Adjusted: 57px navbar + 20px spacing */
   background: white;
-  min-height: calc(100vh - 100px);
+  min-height: calc(100vh - 57px);
 }
 
 .header {

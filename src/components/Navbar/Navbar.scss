@@ -20,6 +20,8 @@
     align-items: center;
     justify-content: space-between;
     height: 100%;
+    padding-left: 30px;
+    padding-right: 30px;
   }
 
   .navbar-brand-section {
@@ -53,6 +55,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    margin-left: auto; /* Push links to the right */
 
     .nav-link {
       color: #666;
@@ -76,18 +79,22 @@
   }
 }
 
-// Dashboard navbar style (original - restored)
+// Dashboard navbar style - now also 57px to match homepage
 .dashboard-navbar {
-  height: 100px !important;
-  min-height: 100px !important;
+  height: 57px !important;
+  min-height: 57px !important;
   background: white;
-  padding: 0 20px;
+  padding: 0.5rem 1rem;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  margin: 0;
+  border-top: none;
 
   .navbar-content {
     display: flex;
@@ -95,6 +102,8 @@
     justify-content: space-between;
     height: 100%;
     width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .navbar-brand-section {
@@ -105,23 +114,34 @@
     .brand-link {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       text-decoration: none;
       color: inherit;
 
       .navbar-logo {
-        height: 45px;
-        width: 45px;
+        height: 40px;
+        width: 40px;
         object-fit: contain;
       }
 
       h1 {
-        font-size: 24px;
-        font-weight: 600;
+        font-size: 1.25rem;
+        font-weight: 700;
         color: #333;
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        letter-spacing: -0.5px;
+        line-height: 1;
+      }
+
+      .brand-title {
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        color: #333;
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        line-height: 1;
+        display: flex;
+        align-items: center;
       }
     }
   }
@@ -136,8 +156,8 @@
       color: #666;
       text-decoration: none;
       font-size: 14px;
-      font-weight: 500;
-      padding: 6px 12px;
+      font-weight: 400;
+      padding: 4px 8px;
       border-radius: 4px;
       transition: all 0.2s ease;
 
@@ -148,7 +168,7 @@
 
       &.active {
         color: black;
-        font-weight: 700;
+        font-weight: bold;
       }
     }
   }

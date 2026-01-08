@@ -2,30 +2,21 @@ import React from "react";
 import "./Navbar.scss";
 import { Navbar as NavbarBs } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
-import timeTravelIcon from "../images/SVGLogo.svg";
+import { CareLogo } from "./CareLogo";
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
   
-  // Check if we're on Home, About, or Scenario Analysis pages
+  // All pages now use the same compact navbar
   const isHomepage = location.pathname === '/home' || location.pathname === '/about' || location.pathname === '/scenario';
   
   return (
-    <NavbarBs fixed="top" className={`dashboard-navbar ${isHomepage ? 'homepage-navbar' : ''} shadow-sm`}>
+    <NavbarBs fixed="top" className="dashboard-navbar homepage-navbar shadow-sm">
       <div className="navbar-content">
         <div className="navbar-brand-section">
           <Link to="/" className="brand-link">
-            <img
-              src={timeTravelIcon}
-              alt="Dashboard Logo"
-              className={isHomepage ? "navbar-logo" : ""}
-              style={isHomepage ? {} : { width: "80px", marginRight: "-8px" }}
-            />
-            {isHomepage ? (
-              <span className="brand-title">Community Adaptation and Resilience to Extremes (CARE) Dashboard</span>
-            ) : (
-              <h1 className="fw-bold mb-0 text-dark" style={{ marginLeft: "-4px" }}>Community Adaptation and Resilience to Extremes (CARE) Dashboard</h1>
-            )}
+            <CareLogo size={40} />
+            <span className="brand-title">CARE Dashboard</span>
           </Link>
         </div>
 

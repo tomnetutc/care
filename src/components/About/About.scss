@@ -1,8 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap');
+
 .about-page-wrapper {
   padding-top: 57px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
   color: #333;
   line-height: 1.6;
   min-height: 100vh;
   background: white;
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 0;
+}
+
+/* Footer positioning - ensure it's in document flow after content */
+.about-page-wrapper {
+  padding-bottom: 0 !important;
+}
+
+.about-page-wrapper .about-footer {
+  position: relative !important;
+  z-index: 1000 !important;
+  background: #f8faf9 !important;
+  margin-left: 250px !important;
+  width: calc(100% - 250px) !important;
 }

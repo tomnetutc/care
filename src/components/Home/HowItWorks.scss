@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+
 .home-how-it-works {
   background: #f8faf9;
   padding: 3rem 2rem;
   margin: 3rem 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .home-steps-container {
@@ -15,8 +17,8 @@
   font-size: 2rem;
   margin-bottom: 3rem;
   color: #333;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 600;
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
 }
 
 .home-steps-list {
@@ -57,15 +59,15 @@
     display: block;
     margin-bottom: 0.25rem;
     font-size: 1.1rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 600;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
   }
 
   span {
     color: #666;
     display: block;
     line-height: 1.6;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
   }
 }
 

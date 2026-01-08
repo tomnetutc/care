@@ -1,7 +1,75 @@
-.about-footer {
-  background: #f8faf9;
-  padding: 3rem 2rem 2rem;
-  margin-top: 4rem;
+/* Footer styles - using inline styles in component to match TMD exactly */
+.about-footer-content-wrapper {
+  // Footer is full-width like TMD, no margin adjustments needed
+  width: 100% !important;
+  margin-left: 0 !important;
+}
+
+/* Sponsor logo styling for consistent alignment and white space handling */
+.sponsors-logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  padding: 10px 10px; /* Reduced top/bottom padding from 20px to 10px */
+}
+
+.sponsor-logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px; /* Fixed height for consistent alignment */
+  padding: 10px 15px;
+  transition: opacity 0.3s ease;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.sponsor-logo {
+  max-height: 80px; /* Consistent max height */
+  max-width: 220px; /* Increased to match all logos */
+  width: auto;
+  height: auto;
+  object-fit: contain; /* Maintain aspect ratio and handle white space */
+  display: block;
+  margin: 0 auto;
+}
+
+/* Specific styling for ASU logo to ensure visibility */
+.sponsor-logo-wrapper img[alt*="Arizona State University"] {
+  max-width: 220px; /* Slightly wider for ASU logo */
+  max-height: 80px;
+  min-height: 60px; /* Ensure minimum visibility */
+}
+
+/* Specific styling for UW logo to match other logos */
+.sponsor-logo-wrapper img[alt*="University of Washington"] {
+  max-width: 220px; /* Match ASU logo width */
+  max-height: 80px;
+  min-height: 60px; /* Ensure minimum visibility */
+  width: auto;
+  height: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sponsors-logo-container {
+    gap: 30px;
+    padding: 15px 5px;
+  }
+  
+  .sponsor-logo-wrapper {
+    height: 60px;
+    padding: 8px 10px;
+  }
+  
+  .sponsor-logo {
+    max-height: 60px;
+    max-width: 150px;
+  }
 }
 
 .about-footer-content {

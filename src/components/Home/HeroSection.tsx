@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import YouTubeModal from './YouTubeModal';
+import careLogo from '../../images/HomePage/care_logo_new.svg';
 import './HeroSection.scss';
 
 export const HeroSection: React.FC = () => {
@@ -10,9 +11,11 @@ export const HeroSection: React.FC = () => {
   return (
     <>
       <section className="home-hero">
-        <h1 className="home-hero-title">CARE</h1>
+        <div className="home-hero-logo-container">
+          <img src={careLogo} alt="CARE Logo" className="home-hero-logo" />
+        </div>
         <h2 className="home-hero-subtitle">Community Adaptation and Resilience to Extremes Dashboard</h2>
-        <p className="home-hero-description">by Arizona State University and University of Washington</p>
+        <p className="home-hero-description">-- by Arizona State University and University of Washington</p>
         <a href="#demo" className="home-cta-button" onClick={(e) => { e.preventDefault(); openModal(); }}>
           WATCH DEMO
         </a>

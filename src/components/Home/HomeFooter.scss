@@ -1,97 +1,66 @@
-// Footer styles ONLY for Home page - completely isolated with home- prefix
-.home-footer {
-  background: #f8faf9;
-  padding: 3rem 2rem 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  position: relative;
-  z-index: 1;
-}
-
-.home-footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.home-footer-section {
-  h4 {
-    color: #333;
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  }
-
-  p {
-    color: #666;
-    line-height: 1.6;
-    font-size: 0.95rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  }
-
-  a {
-    color: #6dafa0;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
-
-.home-visitor-stats {
-  display: flex;
-  gap: 2rem;
-  color: #666;
-  font-size: 0.9rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-
-  strong {
-    font-weight: 600;
-  }
-}
-
-.home-sponsors {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid #e0e0e0;
-}
-
-.home-sponsors-title {
-  text-align: center;
-  color: #333;
-  margin-bottom: 2rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-.home-sponsors-grid {
+/* Sponsor logo styling for consistent alignment and white space handling */
+.sponsors-logo-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 3rem;
   flex-wrap: wrap;
+  gap: 40px;
+  padding: 10px 10px; /* Reduced top/bottom padding from 20px to 10px */
 }
 
-.home-sponsor-logo {
-  height: 60px;
-  opacity: 0.7;
-  transition: opacity 0.3s;
-
+.sponsor-logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px; /* Fixed height for consistent alignment */
+  padding: 10px 15px;
+  transition: opacity 0.3s ease;
+  
   &:hover {
-    opacity: 1;
+    opacity: 0.8;
   }
 }
 
-.home-copyright {
-  text-align: center;
-  color: #888;
-  font-size: 0.9rem;
-  padding-top: 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+.sponsor-logo {
+  max-height: 80px; /* Consistent max height */
+  max-width: 200px; /* Prevent logos from being too wide */
+  width: auto;
+  height: auto;
+  object-fit: contain; /* Maintain aspect ratio and handle white space */
+  display: block;
+  margin: 0 auto;
 }
 
+/* Specific styling for ASU logo to ensure visibility */
+.sponsor-logo-wrapper img[alt*="Arizona State University"] {
+  max-width: 220px; /* Slightly wider for ASU logo */
+  max-height: 80px;
+  min-height: 60px; /* Ensure minimum visibility */
+}
+
+/* Specific styling for UW logo to match other logos */
+.sponsor-logo-wrapper img[alt*="University of Washington"] {
+  max-width: 220px; /* Match ASU logo width */
+  max-height: 80px;
+  min-height: 60px; /* Ensure minimum visibility */
+  width: auto;
+  height: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sponsors-logo-container {
+    gap: 30px;
+    padding: 15px 5px;
+  }
+  
+  .sponsor-logo-wrapper {
+    height: 60px;
+    padding: 8px 10px;
+  }
+  
+  .sponsor-logo {
+    max-height: 60px;
+    max-width: 150px;
+  }
+}

@@ -1,32 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+
 .home-hero {
   background: linear-gradient(135deg, #f5f9f8 0%, #e8f3f0 100%);
-  padding: 4rem 2rem;
+  padding: 3rem 2rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.home-hero-title {
-  font-size: 4rem;
-  font-weight: 700;
-  color: #5c9a8d;
-  margin-bottom: 0.5rem;
-  letter-spacing: -2px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+.home-hero-logo-container {
+  display: flex;
+  justify-content: center;
+  //margin-bottom: 0rem;
+}
+
+.home-hero-logo {
+  max-width: 238px !important;
+  height: 104px !important;
+  width: auto;
+  object-fit: contain;
+  margin-top: -10px;
 }
 
 .home-hero-subtitle {
-  font-size: 1.2rem;
+  font-size: 24px;
   font-weight: 400;
-  color: #666;
+  color: #595959;
   margin-bottom: 0.5rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .home-hero-description {
-  color: #888;
-  font-size: 0.95rem;
-  margin-bottom: 2rem;
+  color: #595959;
+  font-size: 16px;
+  margin-bottom: 1.8rem;
   font-style: italic;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .home-cta-button {
@@ -35,14 +45,14 @@
   padding: 0.75rem 2rem;
   border-radius: 25px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 600; // Match other buttons: font-weight: 600
   display: inline-block;
   transition: all 0.3s;
   box-shadow: 0 4px 10px rgba(109, 175, 160, 0.3);
   border: none;
   cursor: pointer;
-  font-size: 1rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
 
   &:hover {
     background: #5c9a8d;

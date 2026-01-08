@@ -5,6 +5,7 @@ import MainContent from './components/MainContent/MainContent';
 import Home from './components/Home/Home';
 import About from './components/About/About';
 import ScenarioATEPanel from './components/scenario/ScenarioATEPanel';
+import ScrollToTop from './components/ScrollToTop';
 import { subHeadingsData } from './data/subHeadings';
 import { FilterProvider } from './context/FilterContext';
 import { CurrentTopicProvider } from './context/CurrentTopicContext';
@@ -24,42 +25,30 @@ const AppContent: React.FC = () => {
       pathname.startsWith("/dashboard");
 
     document.body.classList.toggle("is-dashboard", isDashboard);
-    
-    // Reset scroll position when switching to dashboard pages
-    if (isDashboard) {
-      window.scrollTo(0, 0);
-    }
   }, [pathname]);
 
   return (
     <Routes>
-          {/* Redirect root to Dashboard */}
           <Route path="/" element={<Navigate to="/lifestyle/preferences" replace />} />
-          {/* Home route - shows only Navbar and Home content */}
           <Route path="/home" element={
             <>
               <Navbar />
               <Home />
             </>
           } />
-          {/* About route - shows only Navbar and About content */}
           <Route path="/about" element={
             <>
               <Navbar />
               <About />
             </>
           } />
-          {/* Scenario Analysis route */}
           <Route path="/scenario" element={
             <>
               <Navbar />
               <ScenarioATEPanel />
             </>
           } />
-          {/* Dashboard redirect route */}
           <Route path="/dashboard" element={<Navigate to="/lifestyle/preferences" replace />} />
-
-          {/* Dashboard section routes - use original layout with all components */}
           <Route path="/lifestyle/:subHeadingName?" element={
             <div className="app">
               <Navbar />
@@ -120,7 +109,6 @@ const AppContent: React.FC = () => {
               </div>
             </div>
           } />
-          {/* Fallback route for unmatched paths */}
           <Route path="*" element={<Navigate to="/lifestyle/preferences" replace />} />
     </Routes>
   );
@@ -131,6 +119,7 @@ const App: React.FC = () => {
     <FilterProvider>
       <CurrentTopicProvider>
         <Router>
+          <ScrollToTop />
           <AppContent />
         </Router>
       </CurrentTopicProvider>

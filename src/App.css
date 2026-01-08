@@ -1,7 +1,14 @@
+/* Ensure Roboto font is used globally for Bootstrap typography */
 body, #root {
   height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif !important;
+}
+
+/* Ensure Bootstrap typography uses Roboto */
+h1, h2, h3, h4, h5, h6, p, span, a, li {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 body.is-dashboard {
@@ -19,14 +26,14 @@ body.is-dashboard {
 .sidebar {
   width: 300px;
   min-width: 300px;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 57px);
   background-color: white;
   border-right: 1px solid #dee2e6;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
   overflow-y: auto;
   position: fixed;
   left: 0;
-  top: 100px;
+  top: 57px;
   z-index: 100;
   padding: 20px 0;
 }
@@ -35,8 +42,8 @@ body.is-dashboard {
   display: flex;
   flex: 1 1;
   overflow: hidden;
-  height: calc(100vh - 100px);
-  margin-top: 100px;
+  height: calc(100vh - 57px);
+  margin-top: 57px;
   background-color: white;
   box-sizing: border-box;
 }
@@ -46,12 +53,12 @@ body.is-dashboard {
   background-color: #eee;
   overflow-y: auto;
   position: relative;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 57px);
 }
 
 .menu-container {
   position: fixed;
-  top: 100px;
+  top: 57px;
   left: 300px;
   right: 0;
   height: 65px;
@@ -70,7 +77,7 @@ body.is-dashboard {
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 24px;
-  margin-top: 85px;
+  margin-top: 85px; /* Adjusted: 65px topmenu + 20px spacing (same spacing as before, just accounting for navbar change) */
   margin-bottom: 0;
 }
 
@@ -106,27 +113,26 @@ body.is-dashboard {
   opacity: 0.25;
 }
 
-/* About page styles */
+/* About page styles - Legacy support (keeping for backward compatibility) */
 .sidediv {
-  height: 100vh;
-  background-color: #f5f9ff;
-  position: fixed;
+  /* Styles moved to AboutSidebar.scss for modern implementation */
+  display: none; /* Hide old sidebar if still referenced */
 }
 
 .sidenavbarlist {
-  position: relative;
-  top: 200px;
-  padding: 0;
-  z-index: 1;
+  /* Styles moved to AboutSidebar.scss */
 }
 
 .sidenavbarlistitem {
-  list-style: none;
-  height: 50px;
-  padding: 8px 16px 8px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: start;
+  /* Styles moved to AboutSidebar.scss */
+}
+
+.sidenavbarlistitem a {
+  /* Styles moved to AboutSidebar.scss */
+}
+
+.sidenavbarlistitem a:hover {
+  /* Styles moved to AboutSidebar.scss */
 }
 
 .contenthead::before {

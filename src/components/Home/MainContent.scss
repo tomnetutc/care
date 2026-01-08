@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@400;700;900&display=swap');
+
 .home-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 3rem 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .home-description-box {
@@ -19,17 +22,17 @@
     line-height: 1.8;
     color: #555;
     margin-bottom: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
   }
 }
 
 .home-section-title {
   text-align: center;
-  font-size: 1.2rem;
-  color: #666;
+  font-size: 18.5px;
+  color: #657383;
   margin-bottom: 3rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 400;
+  font-family: 'Roboto Condensed', fallback-font, sans-serif;
+  font-weight: bold;
 }
 
 .home-features-badge-wrapper {
@@ -44,9 +47,10 @@
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  font-weight: 600;
+  font-weight: bold;
+  font-size: 23.5px;
   margin: 0 auto 3rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .home-features-badge-icon {
