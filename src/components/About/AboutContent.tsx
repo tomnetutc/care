@@ -4,6 +4,8 @@ import mohammed from '../../images/HeadShots/mohammed.jpg';
 import cchen from '../../images/HeadShots/cchen.jpeg';
 import rpendyala from '../../images/HeadShots/rpendyala.png';
 import spolzin from '../../images/HeadShots/spolzin.png';
+import xuesongzhou from '../../images/HeadShots/xuesongzhou.png';
+import norahennessy from '../../images/HeadShots/norahennessy.png';
 import './AboutContent.scss';
 
 export const AboutContent: React.FC = () => {
@@ -139,43 +141,81 @@ export const AboutContent: React.FC = () => {
           </h3>
           <div className="row text-center">
             <div className="col">
-              <figure className="figure">
-                <img src={ibatur} className="figure-img img-fluid rounded-circle" alt="Irfan Batur, PhD" style={{ width: '150px', height: '150px' }} />
-                <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Irfan Batur, PhD</figcaption>
-                <figcaption className="figure-caption">Role: Principal Investigator</figcaption>
-                <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
-              </figure>
+              <a href="https://search.asu.edu/profile/3243599" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                <figure className="figure">
+                  <img src={ibatur} className="figure-img img-fluid rounded-circle" alt="Irfan Batur, PhD" style={{ width: '150px', height: '150px' }} />
+                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Irfan Batur, PhD</figcaption>
+                  <figcaption className="figure-caption">Principal Investigator</figcaption>
+                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
+                </figure>
+              </a>
+            </div>
+            <div className="col">
+              <a href="https://www.linkedin.com/in/mohammedzaid1609/" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                <figure className="figure">
+                  <img src={mohammed} className="figure-img img-fluid rounded-circle" alt="Mohammed Zaid" style={{ width: '150px', height: '150px' }} />
+                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Mohammed Zaid</figcaption>
+                  <figcaption className="figure-caption">Developer</figcaption>
+                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
+                </figure>
+              </a>
+            </div>
+            <div className="col">
+              <a href="https://www.ce.washington.edu/facultyfinder/cynthia-chen" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                <figure className="figure">
+                  <img src={cchen} className="figure-img img-fluid rounded-circle" alt="Cynthia Chen, PhD" style={{ width: '150px', height: '150px' }} />
+                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Cynthia Chen, PhD</figcaption>
+                  <figcaption className="figure-caption">Chief Executive Officer</figcaption>
+                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >University of Washington</figcaption>
+                </figure>
+              </a>
+            </div>
+            <div className="col">
+              <a href="https://search.asu.edu/profile/980477" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                <figure className="figure">
+                  <img src={rpendyala} className="figure-img img-fluid rounded-circle" alt="Ram M. Pendyala, PhD" style={{ width: '150px', height: '150px' }} />
+                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Ram M. Pendyala, PhD</figcaption>
+                  <figcaption className="figure-caption">Chief Science Officer</figcaption>
+                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
+                </figure>
+              </a>
+            </div>
+            <div className="col">
+              <a href="https://search.asu.edu/profile/3993044" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                <figure className="figure">
+                  <img src={spolzin} className="figure-img img-fluid rounded-circle" alt="Steven E. Polzin, PhD" style={{ width: '150px', height: '150px' }} />
+                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Steven E. Polzin, PhD</figcaption>
+                  <figcaption className="figure-caption">Senior Adviser</figcaption>
+                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
+                </figure>
+              </a>
+            </div>
+            <div className="col">
+              <a href="https://search.asu.edu/profile/2182101" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                <figure className="figure">
+                  <img src={xuesongzhou} className="figure-img img-fluid rounded-circle" alt="Xuesong Zhou, PhD" style={{ width: '150px', height: '150px' }} />
+                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Xuesong Zhou, PhD</figcaption>
+                  <figcaption className="figure-caption">Co-Principal Investigator</figcaption>
+                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
+                </figure>
+              </a>
+            </div>
+            <div className="col">
+              <a href="https://search.asu.edu/profile/1683643" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                <figure className="figure">
+                  <img src={norahennessy} className="figure-img img-fluid rounded-circle" alt="Nora Hennessy" style={{ width: '150px', height: '150px' }} />
+                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Nora Hennessy</figcaption>
+                  <figcaption className="figure-caption">Research Scientist</figcaption>
+                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
+                </figure>
+              </a>
             </div>
             <div className="col">
               <figure className="figure">
-                <img src={mohammed} className="figure-img img-fluid rounded-circle" alt="Mohammed Zaid" style={{ width: '150px', height: '150px' }} />
-                <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Mohammed Zaid</figcaption>
-                <figcaption className="figure-caption">Role: Lead Developer</figcaption>
-                <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
-              </figure>
-            </div>
-            <div className="col">
-              <figure className="figure">
-                <img src={cchen} className="figure-img img-fluid rounded-circle" alt="Cynthia Chen, PhD" style={{ width: '150px', height: '150px' }} />
-                <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Cynthia Chen, PhD</figcaption>
-                <figcaption className="figure-caption">Role: Co-Principal Investigator</figcaption>
-                <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >University of Washington</figcaption>
-              </figure>
-            </div>
-            <div className="col">
-              <figure className="figure">
-                <img src={rpendyala} className="figure-img img-fluid rounded-circle" alt="Ram M. Pendyala, PhD" style={{ width: '150px', height: '150px' }} />
-                <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Ram M. Pendyala, PhD</figcaption>
-                <figcaption className="figure-caption">Role: Chief Science Officer</figcaption>
-                <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
-              </figure>
-            </div>
-            <div className="col">
-              <figure className="figure">
-                <img src={spolzin} className="figure-img img-fluid rounded-circle" alt="Steven E. Polzin, PhD" style={{ width: '150px', height: '150px' }} />
-                <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Steven E. Polzin, PhD</figcaption>
-                <figcaption className="figure-caption">Role: Senior Adviser</figcaption>
-                <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
+                <div style={{ width: '150px', height: '150px', borderRadius: '50%', backgroundColor: '#e8f3f0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', color: '#6dafa0', fontSize: '3rem', fontWeight: 'bold' }}>TBD</div>
+                <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>To Be Determined</figcaption>
+                <figcaption className="figure-caption" style={{ color: '#999' }}>Coming Soon</figcaption>
+                <figcaption className="figure-caption" style={{ fontStyle: 'italic', color: '#999' }}>TBD</figcaption>
               </figure>
             </div>
           </div>

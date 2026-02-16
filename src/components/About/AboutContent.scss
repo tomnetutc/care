@@ -167,12 +167,30 @@ em, i {
   text-align: center;
 }
 
+// Team member links - clickable photos
+.row.text-center a {
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-3px);
+    opacity: 0.9;
+
+    .figure-img {
+      border-color: #4db39a; // Darker CARE green on hover
+    }
+  }
+}
+
 .figure-img {
   border-radius: 50%;
   border: 3px solid #6dafa0; // CARE green border
   width: 140px !important;
   height: 140px !important;
   object-fit: cover;
+  transition: border-color 0.2s ease;
 }
 
 .figure-caption {

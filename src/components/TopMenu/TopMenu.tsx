@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from "react-bootstrap/Button";
 import Select from 'react-select';
 import { useFilters } from '../../context/FilterContext';
+import InfoBox from '../InfoBox/InfoBox';
 import './TopMenu.scss';
 
 interface OptionType {
@@ -430,7 +431,6 @@ const TopMenu: React.FC = () => {
                 />
               </div>
             ))}
-            
             <div className="button-container">
               <Button 
                 variant="danger"
@@ -441,6 +441,9 @@ const TopMenu: React.FC = () => {
               >
                 Reset
               </Button>
+              <InfoBox style={{ display: 'inline-flex' }}>
+                Select up to three attributes to define a population segment and view the corresponding results. By default, the view displays data for 'all' respondents aged 18 or older.
+              </InfoBox>
             </div>
           </div>
         </div>

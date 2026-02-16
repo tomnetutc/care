@@ -35,17 +35,17 @@ const questionLabels = {
 
 // Response categories and their colors for activity change
 const responseCategories = [
-  "Much less", 
-  "Somewhat less", 
+  "Less",
+  "More",
   "About the same",
-  "Somewhat more"
+  "I don't usually do this activity"
 ];
 
 const categoryColors = [
-  "#e25b61", // Red for much less
-  "#f0b3ba", // Light red for somewhat less
+  "#e25b61", // Red for less
+  "#2ba88c", // Green for more
   "#ead97c", // Yellow for about the same
-  "#93c4b9"  // Light green for somewhat more
+  "#a0a0a0"  // Gray for "I don't usually do this activity"
 ];
 
 const Q17aVisualization: React.FC = () => {

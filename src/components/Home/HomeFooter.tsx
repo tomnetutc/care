@@ -1,5 +1,5 @@
 import React from "react";
-import asuLogo from "../../images/logos/asu-new.svg";
+import asuLogo from "../../images/logos/asu-engineering.png";
 import tbdLogo from "../../images/logos/tbd.png";
 import uwLogo from "../../images/logos/uw-new.svg";
 import nsfLogo from "../../images/logos/nsf-new.svg";
@@ -128,7 +128,7 @@ export const HomeFooter: React.FC = () => {
               src={nsfLogo}
               alt="National Science Foundation Logo"
               className="sponsor-logo"
-              style={{ maxWidth: '220px', maxHeight: '80px', width: 'auto', height: 'auto' }}
+              style={{ maxWidth: '290px', maxHeight: '105px', width: 'auto', height: 'auto' }}
             />
           </a>
           <a
@@ -141,7 +141,7 @@ export const HomeFooter: React.FC = () => {
               src={asuLogo}
               alt="Arizona State University Logo"
               className="sponsor-logo"
-              style={{ maxWidth: '220px', maxHeight: '80px', width: 'auto', height: 'auto' }}
+              style={{ maxWidth: '290px', maxHeight: '105px', width: 'auto', height: 'auto' }}
             />
           </a>
           <a
@@ -154,7 +154,7 @@ export const HomeFooter: React.FC = () => {
               src={uwLogo}
               alt="University of Washington Logo"
               className="sponsor-logo"
-              style={{ maxWidth: '220px', maxHeight: '80px', width: 'auto', height: 'auto' }}
+              style={{ maxWidth: '290px', maxHeight: '105px', width: 'auto', height: 'auto' }}
             />
           </a>
           <a
@@ -167,6 +167,7 @@ export const HomeFooter: React.FC = () => {
               src={tbdLogo}
               alt="Travel Behavior and Demand National Center Logo"
               className="sponsor-logo"
+              style={{ maxWidth: '290px', maxHeight: '105px', width: 'auto', height: 'auto' }}
             />
           </a>
         </div>
