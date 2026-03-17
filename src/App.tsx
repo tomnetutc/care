@@ -9,6 +9,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { subHeadingsData } from './data/subHeadings';
 import { FilterProvider } from './context/FilterContext';
 import { CurrentTopicProvider } from './context/CurrentTopicContext';
+import { VisitorCounterProvider } from './context/VisitorCounterContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -116,14 +117,16 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <FilterProvider>
-      <CurrentTopicProvider>
-        <Router>
-          <ScrollToTop />
-          <AppContent />
-        </Router>
-      </CurrentTopicProvider>
-    </FilterProvider>
+    <VisitorCounterProvider>
+      <FilterProvider>
+        <CurrentTopicProvider>
+          <Router>
+            <ScrollToTop />
+            <AppContent />
+          </Router>
+        </CurrentTopicProvider>
+      </FilterProvider>
+    </VisitorCounterProvider>
   );
 };
 

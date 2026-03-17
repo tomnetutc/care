@@ -4,11 +4,11 @@ import tbdLogo from "../../images/logos/tbd.png";
 import uwLogo from "../../images/logos/uw-new.svg";
 import nsfLogo from "../../images/logos/nsf-new.svg";
 import './HomeFooter.scss';
-import { useVisitorCounter } from "../../hooks/useVisitorCounter";
+import { useVisitorCounterContext } from "../../context/VisitorCounterContext";
 
 export const HomeFooter: React.FC = () => {
   const currentYear = new Date().getFullYear();
-  const { totalCount, uniqueCount } = useVisitorCounter();
+  const { totalCount, uniqueCount } = useVisitorCounterContext();
 
   return (
     <div
