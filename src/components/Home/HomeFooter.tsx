@@ -4,9 +4,11 @@ import tbdLogo from "../../images/logos/tbd.png";
 import uwLogo from "../../images/logos/uw-new.svg";
 import nsfLogo from "../../images/logos/nsf-new.svg";
 import './HomeFooter.scss';
+import { useVisitorCounter } from "../../hooks/useVisitorCounter";
 
 export const HomeFooter: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const { totalCount, uniqueCount } = useVisitorCounter();
 
   return (
     <div
@@ -80,7 +82,7 @@ export const HomeFooter: React.FC = () => {
                   height: "20px",
                 }}
               >
-                <span id="visit-count">Visit Count</span>
+                <span id="visit-count">Unique Visitors: {uniqueCount ?? '...'}</span>
 
                 <div
                   style={{
@@ -91,7 +93,7 @@ export const HomeFooter: React.FC = () => {
                   }}
                 ></div>
 
-                <span id="total-count">Total Count</span>
+                <span id="total-count">Total Visits: {totalCount ?? '...'}</span>
               </div>
             </div>
           </div>

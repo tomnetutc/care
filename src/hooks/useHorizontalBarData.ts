@@ -127,6 +127,7 @@ export const useHorizontalBarData = (options: UseHorizontalBarDataOptions) => {
       // If a custom dataProcessor is provided, use it
       if (dataProcessor) {
         setData(dataProcessor(filteredData, options));
+        setTotalResponses(filteredData.length);
         setIsLoading(false);
         return;
       }

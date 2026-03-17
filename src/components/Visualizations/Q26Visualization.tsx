@@ -51,8 +51,7 @@ const processQ26Data = (filteredData: any[]) => {
       percentage: total > 0 ? (count / total) * 100 : 0
     };
   });
-  
-  // Sort by count in descending order (highest to lowest)
+
   return processedData.sort((a, b) => b.count - a.count);
 };
 
@@ -60,11 +59,10 @@ const Q26Visualization: React.FC = () => (
   <HorizontalBarChart
     questionId="Q26"
     title="Apart from the reasons that generally require you to leave your home, such as to go to work, shop for necessities, do errands, keep appointments, or take children to school or other activities, what are the top three motivations for you to leave your home on a typical day? Please select up to three reasons."
-    dataField="tm_out_of_house" // dummy, not used by processor
+    dataField="tm_out_of_house"
     categoryOrder={categoryOrder}
     categoryLabels={categoryLabels}
     categoryColors={categoryColors}
-    
     dataProcessor={processQ26Data}
     tooltipCountLabel="Responses"
   />
