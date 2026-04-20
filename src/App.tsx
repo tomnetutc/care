@@ -30,7 +30,7 @@ const AppContent: React.FC = () => {
 
   return (
     <Routes>
-          <Route path="/" element={<Navigate to="/lifestyle/preferences" replace />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={
             <>
               <Navbar />

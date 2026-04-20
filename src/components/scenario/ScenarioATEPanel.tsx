@@ -300,6 +300,17 @@ const ScenarioATEPanel: React.FC = () => {
 
   return (
     <div className="scenario-page-wrapper">
+      <div style={{
+        background: '#c0392b',
+        color: 'white',
+        padding: '8px 20px',
+        fontSize: '13px',
+        fontWeight: 600,
+        textAlign: 'center',
+        letterSpacing: '0.01em',
+      }}>
+        ⚠ This section is under development — it will be available soon.
+      </div>
       <div className="scenario-container">
         <div className="scenario-intro-card">
           <h2 className="scenario-intro-title">CARE Scenario Analysis Tool</h2>
@@ -323,6 +334,9 @@ const ScenarioATEPanel: React.FC = () => {
           <div className="scenario-get-started">
             <p className="scenario-get-started-text">
               <span className="scenario-get-started-bold">Get Started:</span> Choose one of five extreme event types below, then follow the steps to configure your scenario and view results.
+            </p>
+            <p style={{ marginTop: '6px', marginBottom: 0, fontSize: '12px', color: '#64748b', fontStyle: 'italic' }}>
+              The design of this page is finalized; full functionality is still in progress.
             </p>
           </div>
         </div>

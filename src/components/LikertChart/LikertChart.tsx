@@ -39,6 +39,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [highlightedCategory, setHighlightedCategory] = useState<string | null>(null);
+  const [showStats, setShowStats] = useState(false);
   
   // Use the custom hook to get data
   const { data, summaryStats, isLoading, error, totalResponses } = useLikertData({
@@ -544,6 +545,7 @@ const LikertChart: React.FC<LikertChartProps> = ({
   // Render summary table
   function renderSummaryTable() {
     if (!showSummaryTable) return null;
+    if (!showStats) return null;
     
     // Sort summary stats to match the sorted data order
     const sortedSummaryStats = summaryStats.sort((a, b) => {
@@ -652,10 +654,33 @@ const LikertChart: React.FC<LikertChartProps> = ({
       {subtitle && <p>{subtitle}</p>}
       {legendWrap ? <HTMLLegend /> : null}
       <svg ref={svgRef}></svg>
-      {renderSummaryTable()}
       <div className={styles.totalResponses}>
         {summaryString ? summaryString : `Number of respondents: ${totalResponses.toLocaleString()}`}
       </div>
+      {showSummaryTable && (
+        <div style={{ marginTop: 12 }}>
+          <button
+            onClick={() => setShowStats(s => !s)}
+            style={{
+              background: showStats ? '#2c3e50' : 'white',
+              color: showStats ? 'white' : '#2c3e50',
+              border: '1px solid #2c3e50',
+              borderRadius: '6px',
+              padding: '7px 16px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <span>{showStats ? 'Hide' : 'Show'} Summary Statistics</span>
+            <span style={{ fontSize: '10px' }}>{showStats ? '▲' : '▼'}</span>
+          </button>
+        </div>
+      )}
+      {renderSummaryTable()}
     </div>
   );
 };
