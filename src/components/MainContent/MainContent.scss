@@ -11,7 +11,9 @@
     gap: 5px; // Add more spacing between visualizations
     // max-width: 1100px; // Limit the maximum width for larger screens
     // margin: 0 auto; // Center horizontally, no top margin
-    padding: 80px 25px 60px 25px; // Increase bottom padding (was 25px)
+    // Use CSS variable set by TopMenu's ResizeObserver so padding adjusts
+    // automatically when the filter bar grows taller (e.g., chips wrap).
+    padding: var(--top-menu-height, 80px) 25px 60px 25px;
     width: 100%; // Ensure the container takes up the full width
     box-sizing: border-box; // Include padding and borders in the width calculation
     background: #eee; // Match background for seamless look

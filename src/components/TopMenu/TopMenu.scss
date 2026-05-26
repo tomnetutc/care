@@ -1,164 +1,469 @@
-/* Top Menu styling */
+// ─── Top Bar ─────────────────────────────────────────────────────────────────
+// Override the fixed height from App.css so chips can wrap to a second line.
+
 .menu-container {
-  background-color: white;
-  position: fixed;
-  /* left, right, top are set in App.css to account for sidebar and navbar */
-  z-index: 15;
-  border-top: 2px solid #ccc;
-  border-bottom: 2px solid #ccc;
-  padding: 2px 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: 50px !important;
-  max-height: 50px !important;
-  overflow-y: visible !important;
-  display: flex !important;
+  height: auto !important;
+  min-height: 65px !important;
   align-items: center !important;
+  padding: 0 16px !important;
+  overflow-y: visible !important;
 }
 
-/* Segment label styling */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 0;
+}
+
 .segment-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 0;
-  padding-left: 0;
-  padding-top: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
   white-space: nowrap;
-  display: flex;
-  align-items: center;
-  vertical-align: middle;
-
+  flex-shrink: 0;
+  margin-bottom: 0;
 }
 
-/* Menu header styling */
-.menu-header {
-  flex-wrap: nowrap !important;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100%;
-  gap: 15px;
-  padding-left: 10px;
-}
-
-/* Adjust the parent container styling */
-.options-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  width: 100%;
-  position: relative;
-}
-
-/* All select checkbox styling */
 .all-select-checkbox {
   display: flex;
   align-items: center;
-  margin-right: 10px;
-  font-size: 14px;
-  height: 100%;
+  gap: 5px;
+  flex-shrink: 0;
+
+  input[type='checkbox'] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: #2a9d8f;
+    margin: 0;
+  }
 }
 
-/* Specific styling for the checkbox input */
-.all-select-checkbox input[type="checkbox"] {
-  margin: 0;
-  position: relative;
-  top: 0px;
-  width: 14px;
-  height: 14px;
-}
-
-/* All select label styling */
 .all-select-label {
-  margin-left: 5px;
-  font-size: 14px;
+  font-size: 13px;
   color: #333;
-  display: flex;
+}
+
+// ─── Trigger button ───────────────────────────────────────────────────────────
+
+.filter-trigger-btn {
+  display: inline-flex;
   align-items: center;
-  height: 100%;
+  gap: 6px;
+  padding: 5px 12px;
+  background: white;
+  border: 1.5px solid #ced4da;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #444;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+
+  &:hover {
+    border-color: #2a9d8f;
+    box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.15);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #2a9d8f;
+    outline-offset: 2px;
+  }
 }
 
-/* Dropdowns container styling */
-.dropdowns-menu-container {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-grow: 1;
-  flex-wrap: nowrap;
-}
-
-.dropdown-wrapper {
-  min-width: 150px;
-}
-
-/* Dropdown select styling */
-.dropdown-select {
-  min-height: 36px;
-  width: auto;
-}
-
-/* Dropdown indicator styling */
-.dropdown-indicator {
-  display: flex;
+.active-badge {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: #2a9d8f;
+  color: white;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
 }
 
-/* Button container styling */
+.cmd-hint {
+  font-size: 11px;
+  color: #999;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1px 5px;
+  letter-spacing: 0;
+}
+
+// ─── Chip strip ───────────────────────────────────────────────────────────────
+
+.chip-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #e8f5f3;
+  border: 1px solid #2a9d8f;
+  border-radius: 100px;
+  padding: 3px 6px 3px 10px;
+  font-size: 12px;
+  color: #1a6b60;
+  max-width: 260px;
+
+  &.filter-chip--warning {
+    background: #fff3cd;
+    border-color: #dc3545;
+    color: #b52a35;
+  }
+}
+
+.chip-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  color: inherit;
+  padding: 0 2px;
+  opacity: 0.55;
+  flex-shrink: 0;
+  font-family: inherit;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// ─── Reset + Info buttons ─────────────────────────────────────────────────────
+
 .button-container {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .reset-button {
-  padding: 0.4rem 0.8rem;
-  font-size: 0.9rem;
+  padding: 4px 12px;
+  font-size: 13px;
   line-height: 1.4;
-  border-radius: 0.25rem;
+  border-radius: 4px;
   color: #fff;
   background-color: #dc3545;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s;
-  
+  transition: background-color 0.15s;
+  font-family: inherit;
+
   &:hover {
-    opacity: 0.9;
+    background-color: #c82333;
   }
-  
+
   &:disabled {
-    background-color: #dc354580;
+    background-color: rgba(220, 53, 69, 0.45);
     cursor: not-allowed;
   }
 }
 
-/* Responsive adjustments */
+// ─── Modal backdrop ───────────────────────────────────────────────────────────
+// Centered floating panel — NOT a full-screen takeover.
+// The backdrop dims the page; the card is a compact, well-contained panel.
+
+.filter-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 80px 24px 48px; // top / sides / bottom — card never touches viewport edges
+}
+
+// ─── Modal card ───────────────────────────────────────────────────────────────
+
+.filter-modal-card {
+  width: min(960px, 92vw);
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: white;
+  border-radius: 12px;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.22),
+    0 4px 16px rgba(0, 0, 0, 0.10);
+}
+
+// ─── Search bar row ───────────────────────────────────────────────────────────
+
+.modal-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.modal-search-icon {
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.modal-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #333;
+  background: transparent;
+  font-family: inherit;
+
+  &::placeholder {
+    color: #bbb;
+  }
+}
+
+.modal-esc-btn {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: #777;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: background 0.12s;
+
+  &:hover {
+    background: #e2e2e2;
+    color: #333;
+  }
+}
+
+// ─── Filter grid (scrollable) ─────────────────────────────────────────────────
+
+.modal-grid-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.modal-empty-state {
+  text-align: center;
+  color: #888;
+  padding: 48px 20px;
+  font-size: 14px;
+  margin: 0;
+}
+
+// ─── Dimension column ─────────────────────────────────────────────────────────
+
+.dim-column {
+  background: #fafafa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  // Teal tint when this dimension has a non-default selection
+  &.dim-column--active {
+    background: #f0faf9;
+    border-color: rgba(42, 157, 143, 0.55);
+  }
+}
+
+.dim-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.dim-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #2a9d8f;
+  line-height: 1.3;
+}
+
+.dim-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.dim-action-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  color: #2a9d8f;
+  padding: 1px 3px;
+  border-radius: 3px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-family: inherit;
+
+  &:hover {
+    background: rgba(42, 157, 143, 0.12);
+    text-decoration: none;
+  }
+}
+
+// ─── Checkbox options ─────────────────────────────────────────────────────────
+
+.dim-options {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dim-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12.5px;
+  color: #333;
+  cursor: pointer;
+  line-height: 1.4;
+  margin: 0;
+  padding: 1px 0;
+  user-select: none;
+
+  input[type='checkbox'] {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: #2a9d8f;
+  }
+
+  span {
+    word-break: break-word;
+  }
+
+  &:hover span {
+    color: #2a9d8f;
+  }
+}
+
+// ─── Modal footer (sticky) ────────────────────────────────────────────────────
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 28px 20px;
+  border-top: 1px solid #e9ecef;
+  flex-shrink: 0;
+  background: #f8f9fa;
+  border-radius: 0 0 12px 12px;
+}
+
+.modal-respondent-count {
+  font-size: 12.5px;
+  color: #666;
+}
+
+.modal-footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-reset-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  border-radius: 6px;
+  background: white;
+  border: 1.5px solid #ced4da;
+  color: #555;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s, border-color 0.12s;
+
+  &:hover {
+    background: #f0f0f0;
+    border-color: #adb5bd;
+  }
+}
+
+.modal-done-btn {
+  padding: 6px 20px;
+  font-size: 13px;
+  border-radius: 6px;
+  background: #2a9d8f;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+  transition: background 0.12s;
+
+  &:hover {
+    background: #21867a;
+  }
+}
+
+// ─── Responsive adjustments for the top bar ───────────────────────────────────
+
 @media (max-width: 768px) {
-  .menu-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
+  .filter-bar {
+    gap: 6px;
   }
 
-  .options-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .dropdowns-menu-container {
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-  }
-
-  .dropdown-wrapper {
-    width: 100%;
+  .cmd-hint {
+    display: none;
   }
 
   .button-container {
-    margin-top: 10px;
     margin-left: 0;
   }
 }
