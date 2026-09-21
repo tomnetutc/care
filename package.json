@@ -56,6 +56,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:ci": "react-scripts test --watchAll=false",
+    "test:e2e": "playwright test",
+    "test:all": "npm run test:ci && npm run test:e2e",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
@@ -79,6 +82,7 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/d3-cloud": "^1.2.9",
     "@types/next": "^8.0.7",
     "@types/react-scroll": "^1.8.10",

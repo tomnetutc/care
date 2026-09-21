@@ -1,14 +1,40 @@
 /**
  * React Hook for Scenario Analysis ATE Computation
- * 
- * Manages state and provides ATE computation functionality for the Scenario Analysis component.
- * Integrates with FilterContext to get filtered data for mean calculations.
+ *
+ * Manages state and provides ATE computation functionality for the Scenario
+ * Analysis component. Coefficients come from Jinghai's per-event models
+ * (public/models/model_coeffs_by_event.json). Respondent data comes directly
+ * from Jinghai's per-event files (public/models/event_data/{event}_data.csv,
+ * via DataService.getEventScenarioData()) - NOT df_output.csv. Per Jinghai,
+ * these are the ground-truth estimation-sample files for these models: each
+ * is already restricted to that event's respondents (no ext_{event} filter
+ * needed here), and carries the severity dummies under the same names the
+ * coefficients use. This is a deliberate second, separate data source from
+ * df_output.csv - Survey Explorer and every other dashboard feature still
+ * read df_output.csv/df_dashboard.csv exclusively via DataService.getData()/
+ * getScenarioData(), untouched by this.
+ *
+ * NOTE: the segmentation filters set via the Command Palette filter modal
+ * (gender, age_category, race, travel_disability, household_income_category -
+ * see TopMenu.tsx) are NOT applied here. Jinghai's per-event files use
+ * different field names/encodings for these (female, age_3150/5165/65p
+ * dummies, dis_yes, race_cat, income_cat - no age_category equivalent at
+ * all), with no derived-field mapping to the filter modal's vocabulary.
+ * Flagging rather than guessing at that mapping.
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useFilters } from '../context/FilterContext';
 import DataService from '../services/DataService';
-import { computeATEs, ATEResult, ATEComputationOptions, ModelData, validateModelData } from '../lib/engine/computeATE';
+import {
+  computeSeverityATEs,
+  ATEResult,
+  EventModelData,
+  ModelDataByEvent,
+  validateModelData
+} from '../lib/engine/computeATE';
+import { EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE } from '../lib/engine/eventConfig';
+
+export { EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE };
 
 export interface ScenarioState {
   selectedEvent: string;
@@ -18,28 +44,16 @@ export interface ScenarioState {
   isComputing: boolean;
   results: ATEResult[];
   error: string | null;
-  modelData: ModelData | null;
+  modelData: ModelDataByEvent | null;
   isValid: boolean;
 }
 
-export interface UseScenarioATEOptions {
-  treatmentVariable: string;
-  controlValue: number;
-  treatmentValue: number;
-}
-
-const DEFAULT_OPTIONS: UseScenarioATEOptions = {
-  treatmentVariable: 'impa345',
-  controlValue: 0,
-  treatmentValue: 1
-};
-
-export const useScenarioATE = (options: UseScenarioATEOptions = DEFAULT_OPTIONS) => {
+export const useScenarioATE = () => {
   const [state, setState] = useState<ScenarioState>({
     selectedEvent: 'extreme_heat',
-    baseSeverityLevel: 1, // Default to "Not severe at all"
-    treatmentSeverityLevel: 5, // Default to "Extremely severe"
-    anticipatedChange: 'do_more', // Default to "Do more"
+    baseSeverityLevel: 1, // "Not severe at all"
+    treatmentSeverityLevel: 5, // "Extremely severe"
+    anticipatedChange: 'do_more',
     isComputing: false,
     results: [],
     error: null,
@@ -47,29 +61,25 @@ export const useScenarioATE = (options: UseScenarioATEOptions = DEFAULT_OPTIONS)
     isValid: false
   });
 
-  const { filters, isDataLoading, dataError } = useFilters();
-
-  // Load model data on mount
+  // Load the full per-event model data once on mount.
   useEffect(() => {
     const loadModelData = async () => {
       try {
-        const response = await fetch(`${process.env.PUBLIC_URL}/models/model_coeffs_with_thresholds.json`);
+        const response = await fetch(`${process.env.PUBLIC_URL}/models/model_coeffs_by_event.json`);
         if (!response.ok) {
           throw new Error('Failed to load model data');
         }
-        
-        const modelData: ModelData = await response.json();
-        
-        // Validate model data
-        const isValid = validateModelData(modelData);
-        
+
+        const modelData: ModelDataByEvent = await response.json();
+
+        const isValid = Object.values(modelData).every(eventModel => validateModelData(eventModel as EventModelData));
+
         setState(prev => ({
           ...prev,
           modelData,
           isValid,
           error: isValid ? null : 'Invalid model data structure'
         }));
-        
       } catch (error) {
         console.error('Error loading model data:', error);
         setState(prev => ({
@@ -83,238 +93,71 @@ export const useScenarioATE = (options: UseScenarioATEOptions = DEFAULT_OPTIONS)
     loadModelData();
   }, []);
 
-  // Update selected event
   const setSelectedEvent = useCallback((event: string) => {
-    setState(prev => ({
-      ...prev,
-      selectedEvent: event
-    }));
+    setState(prev => ({ ...prev, selectedEvent: event }));
   }, []);
 
-  // Update base severity level
   const setBaseSeverityLevel = useCallback((level: number) => {
-    setState(prev => ({
-      ...prev,
-      baseSeverityLevel: level
-    }));
+    setState(prev => ({ ...prev, baseSeverityLevel: level }));
   }, []);
 
-  // Update treatment severity level
   const setTreatmentSeverityLevel = useCallback((level: number) => {
-    setState(prev => ({
-      ...prev,
-      treatmentSeverityLevel: level
-    }));
+    setState(prev => ({ ...prev, treatmentSeverityLevel: level }));
   }, []);
 
-  // Update anticipated change
   const setAnticipatedChange = useCallback((change: 'do_less' | 'about_same' | 'do_more' | null) => {
-    setState(prev => ({
-      ...prev,
-      anticipatedChange: change
-    }));
-  }, []);
-
-  // Helper function to map severity level to treatment value
-  // Levels 1-2: 0 (low severity), Levels 3-5: 1 (high severity)
-  const mapSeverityToTreatmentValue = useCallback((severityLevel: number): number => {
-    return severityLevel >= 3 ? 1 : 0;
+    setState(prev => ({ ...prev, anticipatedChange: change }));
   }, []);
 
   // Compute ATEs
   const computeATE = useCallback(async () => {
     if (!state.modelData || !state.isValid) {
-      setState(prev => ({
-        ...prev,
-        error: 'Model data not loaded or invalid'
-      }));
+      setState(prev => ({ ...prev, error: 'Model data not loaded or invalid' }));
       return;
     }
 
-    if (isDataLoading) {
-      setState(prev => ({
-        ...prev,
-        error: 'Data is still loading'
-      }));
+    const eventConfig = EVENT_CONFIG[state.selectedEvent];
+    if (!eventConfig) {
+      setState(prev => ({ ...prev, error: `Unknown event: ${state.selectedEvent}` }));
       return;
     }
 
-    if (dataError) {
-      setState(prev => ({
-        ...prev,
-        error: dataError
-      }));
-      return;
-    }
-
-    setState(prev => ({
-      ...prev,
-      isComputing: true,
-      error: null
-    }));
+    setState(prev => ({ ...prev, isComputing: true, error: null }));
 
     try {
-      // Get scenario data from DataService (df_output.csv with all derived variables)
-      // This contains pre-computed model variables like CR, PR, SE, hcity, urban, etc.
-      // Dashboard visualizations continue using df_dashboard.csv via getData()
-      const rawData = await DataService.getInstance().getScenarioData();
-      
-      // Apply filters to get filtered data (similar to how visualizations do it)
-      let filteredData: any[] = rawData;
-      
-      if (filters.length > 0) {
-        filteredData = rawData.filter(row => {
-          // Group filters by field to handle multiple values for same field
-          const filtersByField: Record<string, string[]> = {};
-          filters.forEach(filter => {
-            if (!filtersByField[filter.field]) {
-              filtersByField[filter.field] = [];
-            }
-            
-            // Special handling for disability filter
-            if (filter.field === 'travel_disability') {
-              if (filter.value === 'yes') {
-                filtersByField[filter.field].push('2', '3', '4');
-              } else if (filter.value === 'no') {
-                filtersByField[filter.field].push('1');
-              } else {
-                filtersByField[filter.field].push(String(filter.value));
-              }
-            }
-            // Special handling for gender filter - combine Other and Prefer not to answer
-            else if (filter.field === 'gender' && filter.value === '4') {
-              filtersByField[filter.field].push('3', '4');
-            } else {
-              filtersByField[filter.field].push(String(filter.value));
-            }
-          });
-          
-          // Check if row matches any of the filter combinations
-          return Object.entries(filtersByField).every(([field, values]) => {
-            const rowValue = String(row[field]);
-            return values.includes(rowValue);
-          });
-        });
+      // Already restricted to this event's respondents - no ext_{event}
+      // filter needed, unlike the old df_output.csv path.
+      const filteredData = await DataService.getInstance().getEventScenarioData(eventConfig.dataFile);
+
+      const eventModelData = state.modelData[eventConfig.csvEvent];
+      if (!eventModelData) {
+        throw new Error(`No model data for event: ${eventConfig.csvEvent}`);
       }
 
-      // ISSUE 3: Filter data by selected event (e.g., only use rows where ext_heat == 1 for heat analysis)
-      // As per Jinghai: "You used heat csv calculate GBU is also not correct"
-      // The R code shows: df_heat = df[df['ext_heat']==1] for heat analysis
-      // We need to filter by the selected event before calculating means to ensure we only use
-      // data from respondents who experienced that specific event.
-      // This mapping matches the column names in df_output.csv and the Jupyter notebooks.
-      const eventToFilterColumn: Record<string, string> = {
-        'extreme_heat': 'ext_heat',
-        'extreme_cold': 'ext_cold',
-        'major_flooding': 'ext_flooding',  // Matches notebook: df_flood = df[df['ext_flooding']==1]
-        'major_earthquake': 'ext_earthquake',  // Matches notebook: df_earth = df[df['ext_earthquake']==1]
-        'power_outage': 'ext_powerout'  // Matches notebook: df_power = df[df['ext_powerout']==1]
-      };
-      
-      const eventFilterColumn = eventToFilterColumn[state.selectedEvent];
-      if (eventFilterColumn) {
-        const beforeFilterCount = filteredData.length;
-        
-        // Debug: Check distribution of event values before filtering
-        const eventValueCounts: Record<string, number> = {};
-        filteredData.forEach(row => {
-          const eventValue = String(row[eventFilterColumn] || 'missing');
-          eventValueCounts[eventValue] = (eventValueCounts[eventValue] || 0) + 1;
-        });
-        console.log(`Event filtering debug for ${state.selectedEvent} (column: ${eventFilterColumn}):`, {
-          beforeFilterCount,
-          eventValueDistribution: eventValueCounts
-        });
-        
-        filteredData = filteredData.filter(row => {
-          const eventValue = parseFloat(String(row[eventFilterColumn] || '0'));
-          return !isNaN(eventValue) && eventValue === 1; // Only include rows where the event was experienced
-        });
-        const afterFilterCount = filteredData.length;
-        
-        console.log(`Filtered data by event ${state.selectedEvent}: Reduced from ${beforeFilterCount} to ${afterFilterCount} rows (${((1 - afterFilterCount/beforeFilterCount) * 100).toFixed(1)}% reduction)`);
-        
-        if (afterFilterCount === 0) {
-          console.warn(`No data found for event ${state.selectedEvent} (filter column: ${eventFilterColumn}). Before filter: ${beforeFilterCount} rows.`);
-        }
-      } else {
-        console.warn(`No filter column mapping found for event: ${state.selectedEvent}`);
-      }
-
-      // Filter out invalid responses
-      filteredData = filteredData.filter(row => {
-        // Check if row has valid data for at least one model variable
-        const allVariables = new Set<string>();
-        Object.values(state.modelData!).forEach(config => {
-          config.variables.forEach(variable => allVariables.add(variable));
-        });
-        
-        return Array.from(allVariables).some(variable => {
-          const val = String(row[variable]);
-          return val !== "-8" && val !== "" && val != null;
-        });
+      const results = computeSeverityATEs(eventModelData, filteredData, {
+        event: eventConfig.csvEvent,
+        baseSeverityLevel: state.baseSeverityLevel,
+        treatmentSeverityLevel: state.treatmentSeverityLevel
       });
 
-      // Map selected event to correct treatment variable
-      // Each event has its own impa345 variable (heat_impa345, cold_impa345, etc.)
-      const eventToTreatmentVariable: Record<string, string> = {
-        'extreme_heat': 'heat_impa345',
-        'extreme_cold': 'cold_impa345',
-        'major_flooding': 'flood_impa345',
-        'major_earthquake': 'earth_impa345',
-        'power_outage': 'power_impa345'
-      };
-      
-      const treatmentVariable = eventToTreatmentVariable[state.selectedEvent] || 'heat_impa345';
-      
-      // Compute ATEs
-      // Map 5-level severity scale to binary treatment variable:
-      // Levels 1-2: Low severity (treatment = 0)
-      // Levels 3-5: High severity (treatment = 1)
-      const controlValue = mapSeverityToTreatmentValue(state.baseSeverityLevel);
-      const treatmentValue = mapSeverityToTreatmentValue(state.treatmentSeverityLevel);
-      
-      const computationOptions: ATEComputationOptions = {
-        treatmentVariable: treatmentVariable, // Use event-specific treatment variable
-        controlValue: controlValue,
-        treatmentValue: treatmentValue,
-        variableNameMappings: {
-          'less_hs': 'hs_less',
-          'hs_less': 'less_hs'
-        }
-      };
-
-      const results = computeATEs(state.modelData, filteredData, computationOptions);
-
-      // Debug logging - expanded to show actual ATE values
       console.log('ATE Computation Debug:', {
         selectedEvent: state.selectedEvent,
-        treatmentVariable: treatmentVariable,
+        csvEvent: eventConfig.csvEvent,
+        dataFile: eventConfig.dataFile,
         baseSeverityLevel: state.baseSeverityLevel,
         treatmentSeverityLevel: state.treatmentSeverityLevel,
-        controlValue,
-        treatmentValue,
         filteredDataLength: filteredData.length,
         results: results.map(r => ({
           activity: r.activity,
-          ate: r.ate,
-          ateFormatted: r.ate.map(v => v.toFixed(4)),
-          ateLength: r.ate.length,
+          ate: r.ate.map(v => v.toFixed(4)),
           isValid: r.isValid,
+          sampleSize: r.sampleSize,
           conservationCheck: r.conservationCheck.toFixed(6),
-          levelLabels: r.levelLabels,
-          controlProbs: r.controlProbabilities.map(p => p.toFixed(4)),
-          treatmentProbs: r.treatmentProbabilities.map(p => p.toFixed(4))
+          levelLabels: r.levelLabels
         }))
       });
 
-      setState(prev => ({
-        ...prev,
-        results,
-        isComputing: false,
-        error: null
-      }));
-
+      setState(prev => ({ ...prev, results, isComputing: false, error: null }));
     } catch (error) {
       console.error('Error computing ATEs:', error);
       setState(prev => ({
@@ -323,60 +166,37 @@ export const useScenarioATE = (options: UseScenarioATEOptions = DEFAULT_OPTIONS)
         error: (error as Error).message
       }));
     }
-  }, [state.modelData, state.isValid, state.baseSeverityLevel, state.treatmentSeverityLevel, isDataLoading, dataError, filters, options, mapSeverityToTreatmentValue]);
+  }, [state.modelData, state.isValid, state.selectedEvent, state.baseSeverityLevel, state.treatmentSeverityLevel]);
 
-  // Check if computation is ready
-  const isReady = state.modelData !== null && state.isValid && !isDataLoading && !dataError;
-  
-  // Auto-compute ATEs when options change and data is ready
+  const isReady = state.modelData !== null && state.isValid;
+
+  // Auto-compute ATEs when configuration changes and data is ready.
   useEffect(() => {
-    // Only auto-compute if we're ready and have valid settings
     if (isReady && state.selectedEvent && state.baseSeverityLevel > 0 && state.treatmentSeverityLevel > 0) {
-      // Check if the selected event is enabled
-      const availableEvents = [
-        { id: 'extreme_heat', enabled: true },
-        { id: 'extreme_cold', enabled: false },
-        { id: 'major_flooding', enabled: false },
-        { id: 'major_earthquake', enabled: false },
-        { id: 'power_outage', enabled: false }
-      ];
-      const selectedEventData = availableEvents.find(e => e.id === state.selectedEvent);
-      
-      if (selectedEventData?.enabled) {
-        // Use a small timeout to debounce rapid changes
-        const timeoutId = setTimeout(() => {
-          computeATE();
-        }, 150);
-        
-        return () => clearTimeout(timeoutId);
-      }
-    }
-    // Note: computeATE is intentionally excluded from deps to avoid unnecessary re-runs
-    // The dependencies below cover all conditions that should trigger recomputation
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady, state.selectedEvent, state.baseSeverityLevel, state.treatmentSeverityLevel, state.modelData, state.isValid, isDataLoading, dataError, filters, options]);
+      const timeoutId = setTimeout(() => {
+        computeATE();
+      }, 150);
 
-  // Clear results
+      return () => clearTimeout(timeoutId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReady, state.selectedEvent, state.baseSeverityLevel, state.treatmentSeverityLevel, state.modelData, state.isValid]);
+
   const clearResults = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      results: [],
-      error: null
-    }));
+    setState(prev => ({ ...prev, results: [], error: null }));
   }, []);
 
-  // Get available events
+  // All 5 events are now backed by real per-event models.
   const getAvailableEvents = useCallback(() => {
     return [
       { id: 'extreme_heat', name: 'Extreme Heat', enabled: true },
-      { id: 'extreme_cold', name: 'Extreme Cold', enabled: false },
-      { id: 'major_flooding', name: 'Major Flooding', enabled: false },
-      { id: 'major_earthquake', name: 'Major Earthquake', enabled: false },
-      { id: 'power_outage', name: 'Power Outage', enabled: false }
+      { id: 'extreme_cold', name: 'Extreme Cold', enabled: true },
+      { id: 'major_flooding', name: 'Major Flooding', enabled: true },
+      { id: 'major_earthquake', name: 'Major Earthquake', enabled: true },
+      { id: 'power_outage', name: 'Power Outage', enabled: true }
     ];
   }, []);
 
-  // Get severity levels
   const getSeverityLevels = useCallback(() => {
     return [
       { value: 1, label: 'Not severe at all' },
@@ -386,6 +206,11 @@ export const useScenarioATE = (options: UseScenarioATEOptions = DEFAULT_OPTIONS)
       { value: 5, label: 'Extremely severe' }
     ];
   }, []);
+
+  // Which activities have a real model for the currently selected event.
+  const getAvailableActivities = useCallback(() => {
+    return EVENT_ACTIVITY_COVERAGE[state.selectedEvent] || [];
+  }, [state.selectedEvent]);
 
   return {
     // State
@@ -397,7 +222,7 @@ export const useScenarioATE = (options: UseScenarioATEOptions = DEFAULT_OPTIONS)
     results: state.results,
     error: state.error,
     isReady,
-    
+
     // Actions
     setSelectedEvent,
     setBaseSeverityLevel,
@@ -405,9 +230,10 @@ export const useScenarioATE = (options: UseScenarioATEOptions = DEFAULT_OPTIONS)
     setAnticipatedChange,
     computeATE,
     clearResults,
-    
+
     // Utilities
     getAvailableEvents,
-    getSeverityLevels
+    getSeverityLevels,
+    getAvailableActivities
   };
 };

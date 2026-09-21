@@ -70,7 +70,10 @@ const ScenarioATEPanel: React.FC = () => {
     { value: 'use_transit', label: 'Taking public transit' },
     { value: 'stay_home', label: 'Staying at home' },
     { value: 'get_meal_delivered', label: 'Having food delivered from a restaurant' },
-    { value: 'dine_in_pickup', label: 'Dine in / Pick up' }, // Single activity in model
+    // Provisional: the new coefficient data has separate "Dine in" and "Pick up"
+    // models; this is wired to "Dine in" only pending a product decision on how
+    // to represent both under one combined activity. See model_coeffs_by_event.json.
+    { value: 'dine_in_pickup', label: 'Dine in / Pick up' },
     { value: 'work_from_home', label: 'Working from home' },
     { value: 'work_from_office', label: 'Working from the office' },
     { value: 'go_business_as_usual', label: 'Go about business as usual' },
@@ -105,58 +108,33 @@ const ScenarioATEPanel: React.FC = () => {
   const convertResultsToATEData = () => {
     if (!results || results.length === 0) return [];
     
-    // Map activity names - using 8 activities from the model
+    // Map activity names - 9 activities max per event (see EVENT_ACTIVITY_COVERAGE).
+    // Every activity - including go_business_as_usual, collapsed from its native
+    // 5-point scale - now reports the same 3-category ["Do less","About the
+    // same","Do more"] response scale (see computeATE.ts), so no per-activity
+    // index branching is needed here any more.
     const activityLabelMap: Record<string, string> = {
       'use_transit': 'Taking public transit',
       'use_car': 'Using a car for traveling',
       'stay_home': 'Staying at home',
-      'dine_in_pickup': 'Dine in / Pick up', // Single activity in model (combines both)
-      'get_meal_delivered': 'Having food delivered from a restaurant',
+      'dine_in': 'Eating indoors at a restaurant',
+      'pick_up': 'Picking up takeout',
+      'delivery': 'Having food delivered',
       'work_from_home': 'Working from home',
       'work_from_office': 'Working from the office',
       'go_business_as_usual': 'Go about business as usual'
     };
 
-    // Get the ATE value for the selected anticipated change
-    // This matches the logic from ScenarioATEChart.tsx
+    const ANTICIPATED_CHANGE_INDEX: Record<string, number> = {
+      'do_less': 0,
+      'about_same': 1,
+      'do_more': 2
+    };
+
     const getATEForChange = (result: any) => {
       if (!result.ate || result.ate.length === 0) return 0;
-      
-      const ate = result.ate;
-      let ateIndex = 0;
-      
-      if (anticipatedChange === 'do_less') {
-        ateIndex = 0;
-      } else if (anticipatedChange === 'about_same') {
-        // For 3-level models, index 1; for 5-level models, index 2 (Neutral); for 2-level, use 0
-        if (ate.length === 2) {
-          ateIndex = 0; // For GBU aggregated, "about same" maps to "Unlikely"
-        } else if (ate.length === 3) {
-          ateIndex = 1;
-        } else if (ate.length === 5) {
-          ateIndex = 2;
-        } else {
-          ateIndex = 1;
-        }
-      } else if (anticipatedChange === 'do_more') {
-        // For 3-level models, index 2; for 5-level models, index 4; for 2-level, index 1
-        if (ate.length === 2) {
-          ateIndex = 1; // For GBU aggregated, "do more" maps to "Likely"
-        } else if (ate.length === 3) {
-          ateIndex = 2;
-        } else if (ate.length === 5) {
-          ateIndex = 4;
-        } else {
-          ateIndex = ate.length - 1;
-        }
-      }
-      
-      // Ensure index is valid
-      if (ateIndex < 0 || ateIndex >= ate.length) {
-        ateIndex = 0;
-      }
-      
-      return ate[ateIndex] || 0;
+      const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
+      return result.ate[ateIndex] || 0;
     };
 
     return results

@@ -11,6 +11,9 @@ class DataService {
   // Separate cache for scenario analysis data (df_output.csv with derived variables)
   private cachedScenarioData: d3.DSVRowArray<string> | null = null;
   private loadingScenarioPromise: Promise<d3.DSVRowArray<string>> | null = null;
+  // Per-event respondent data for the severity ATE models (public/models/event_data/*.csv)
+  private cachedEventScenarioData: Map<string, d3.DSVRowArray<string>> = new Map();
+  private loadingEventScenarioPromises: Map<string, Promise<d3.DSVRowArray<string>>> = new Map();
 
   private constructor() {}
 
@@ -513,6 +516,51 @@ class DataService {
   public clearScenarioCache(): void {
     this.cachedScenarioData = null;
     this.loadingScenarioPromise = null;
+  }
+
+  /**
+   * Get the per-event respondent data backing the severity ATE models
+   * (public/models/event_data/{event}_data.csv). Per Jinghai, these are the
+   * ground-truth estimation-sample files for these models - each is already
+   * restricted to respondents who experienced that event, and carries the
+   * event's own severity dummy columns ({event}_imp_2.._imp_5, matching the
+   * coefficient CSV's naming directly - no renaming needed) alongside every
+   * predictor and dependent-variable column the models use. This is
+   * deliberately separate from getScenarioData() (df_output.csv) - the two
+   * are not the same dataset and are not meant to be reconciled; df_output.csv
+   * remains the single source for Survey Explorer and everything else.
+   */
+  public async getEventScenarioData(dataFile: string): Promise<d3.DSVRowArray<string>> {
+    const cached = this.cachedEventScenarioData.get(dataFile);
+    if (cached) {
+      return cached;
+    }
+
+    const inFlight = this.loadingEventScenarioPromises.get(dataFile);
+    if (inFlight) {
+      return inFlight;
+    }
+
+    const loadPromise = this.fetchEventScenarioData(dataFile);
+    this.loadingEventScenarioPromises.set(dataFile, loadPromise);
+
+    try {
+      const data = await loadPromise;
+      this.cachedEventScenarioData.set(dataFile, data);
+      return data;
+    } finally {
+      this.loadingEventScenarioPromises.delete(dataFile);
+    }
+  }
+
+  private async fetchEventScenarioData(dataFile: string): Promise<d3.DSVRowArray<string>> {
+    const response = await fetch(`${process.env.PUBLIC_URL}/models/event_data/${dataFile}`);
+    if (!response.ok) {
+      throw new Error(`Failed to load event scenario data (${dataFile})`);
+    }
+
+    const csvText = await response.text();
+    return d3.csvParse(csvText);
   }
 }
 

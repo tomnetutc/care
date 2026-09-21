@@ -1,0 +1,1429 @@
+{
+  "cold": {
+    "delivery": {
+      "coefficients": {
+        "CR": 0.05927317241932398,
+        "EmpDens_medium": 0.10046397711903018,
+        "NetworkDensity_high": -0.07443048195312169,
+        "PR": 0.09973966546430482,
+        "SE": 0.06921990365608838,
+        "TransitAccess_high": 0.23117131332005897,
+        "age_65p": -0.22030725992359873,
+        "asian": -0.26888035074531486,
+        "child": 0.232242092958761,
+        "cold_imp_2": 0.015210135858670499,
+        "cold_imp_3": -0.019261125529291004,
+        "cold_imp_4": 0.016466517152004357,
+        "cold_imp_5": 0.21806091737652958,
+        "dis_yes": 0.08864138628862483
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2374
+      },
+      "thresholds": {
+        "1|2": -0.7891270421084505,
+        "2|3": 0.8038826345047952
+      },
+      "variables": [
+        "CR",
+        "EmpDens_medium",
+        "NetworkDensity_high",
+        "PR",
+        "SE",
+        "TransitAccess_high",
+        "age_65p",
+        "asian",
+        "child",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "dis_yes"
+      ]
+    },
+    "dine_in": {
+      "coefficients": {
+        "NatWalkInd_high": 0.16336585802966822,
+        "NetworkDensity_medium": -0.0941990363908824,
+        "SE": 0.12005957595303077,
+        "age_65p": -0.18545970293234185,
+        "black": 0.3890459584660137,
+        "cold_imp_2": -0.12279423825479095,
+        "cold_imp_3": -0.2342480565205846,
+        "cold_imp_4": -0.1310524262496567,
+        "cold_imp_5": 0.08881186771378027,
+        "in50100": -0.19109692579308793,
+        "white": 0.2676226031283536
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2374
+      },
+      "thresholds": {
+        "1|2": -0.307222760100392,
+        "2|3": 1.2495839352886686
+      },
+      "variables": [
+        "NatWalkInd_high",
+        "NetworkDensity_medium",
+        "SE",
+        "age_65p",
+        "black",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "in50100",
+        "white"
+      ]
+    },
+    "go_business_as_usual": {
+      "coefficients": {
+        "NatWalkInd_very_high": 0.1368596602792265,
+        "PR": 0.2322727296377132,
+        "ac_c": 0.23444187943619693,
+        "child": -0.1924127265579764,
+        "cold_imp_2": -0.5690485017253456,
+        "cold_imp_3": -0.845200031594584,
+        "cold_imp_4": -1.0229130783399234,
+        "cold_imp_5": -0.7676765954686001,
+        "hhsize1": -0.2491844569307336,
+        "hhsize2": -0.25569709771634397,
+        "in50": -0.15421715515850012,
+        "work_out": 0.339891134841724
+      },
+      "metadata": {
+        "levels": 5,
+        "link": "probit",
+        "n": 1027
+      },
+      "thresholds": {
+        "1|2": -2.488361038267862,
+        "2|3": -1.57267037836895,
+        "3|4": -0.9680827435755793,
+        "4|5": 0.09454973239536157
+      },
+      "variables": [
+        "NatWalkInd_very_high",
+        "PR",
+        "ac_c",
+        "child",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "hhsize1",
+        "hhsize2",
+        "in50",
+        "work_out"
+      ]
+    },
+    "pick_up": {
+      "coefficients": {
+        "NatWalkInd_high": 0.07106591609399222,
+        "PR": 0.08782300141363066,
+        "SE": 0.08206540844955855,
+        "child": 0.12198041312542607,
+        "cold_imp_2": 5.296499929984233e-05,
+        "cold_imp_3": -0.06793605022770037,
+        "cold_imp_4": -0.022293743003023513,
+        "cold_imp_5": 0.11542336856200756,
+        "female": -0.17117935285589994
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2374
+      },
+      "thresholds": {
+        "1|2": -0.48655275974929435,
+        "2|3": 1.0274180120778102
+      },
+      "variables": [
+        "NatWalkInd_high",
+        "PR",
+        "SE",
+        "child",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "female"
+      ]
+    },
+    "stay_home": {
+      "coefficients": {
+        "CR": 0.06431058794514968,
+        "cold_imp_2": 0.2829926240746217,
+        "cold_imp_3": 0.4301980279269427,
+        "cold_imp_4": 0.3059410943681653,
+        "cold_imp_5": 0.3977182340817741,
+        "dis_yes": 0.15780137455581741,
+        "in50100": 0.06432464139643608
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2434
+      },
+      "thresholds": {
+        "1|2": -1.4190827774154275,
+        "2|3": 0.24622218513888194
+      },
+      "variables": [
+        "CR",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "dis_yes",
+        "in50100"
+      ]
+    },
+    "use_car": {
+      "coefficients": {
+        "Diversity_medium": -0.08048114502869097,
+        "NatWalkInd_high": 0.18120263575929688,
+        "NatWalkInd_very_high": 0.22838461952745356,
+        "SE": 0.09616231972026916,
+        "age_3150": -0.10850814727745485,
+        "age_5165": -0.23654038154394108,
+        "age_65p": -0.2989300908502793,
+        "black": 0.2274938475721319,
+        "cold_imp_2": -0.046951198139472,
+        "cold_imp_3": -0.04632824354392538,
+        "cold_imp_4": 0.035754041782719355,
+        "cold_imp_5": 0.21347457571903428,
+        "dis_yes": 0.039904580283442986
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2374
+      },
+      "thresholds": {
+        "1|2": -0.6100310285514661,
+        "2|3": 1.0240518744706721
+      },
+      "variables": [
+        "Diversity_medium",
+        "NatWalkInd_high",
+        "NatWalkInd_very_high",
+        "SE",
+        "age_3150",
+        "age_5165",
+        "age_65p",
+        "black",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "dis_yes"
+      ]
+    },
+    "use_transit": {
+      "coefficients": {
+        "NatWalkInd_very_high": -0.052706374506521145,
+        "NetworkDensity_medium": 0.03051544325732547,
+        "child": -0.1526056537364186,
+        "cold_imp_2": -0.08918499068835348,
+        "cold_imp_3": -0.17922900916310866,
+        "cold_imp_4": -0.21151204653812944,
+        "cold_imp_5": 0.09638169865269779,
+        "dis_yes": 0.02074448956314663,
+        "sa_home": -0.1340992024025731,
+        "work_out": 0.3049361700382089
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2374
+      },
+      "thresholds": {
+        "1|2": -0.8400838471936991,
+        "2|3": 1.1527181354153373
+      },
+      "variables": [
+        "NatWalkInd_very_high",
+        "NetworkDensity_medium",
+        "child",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "dis_yes",
+        "sa_home",
+        "work_out"
+      ]
+    },
+    "work_from_home": {
+      "coefficients": {
+        "TransitAccess_high": 0.23656741101261214,
+        "TransitAccess_medium": 0.21804050384488477,
+        "bs_grad": 0.2006441067699548,
+        "child": 0.21633910215876784,
+        "cold_imp_2": 0.06601592812777599,
+        "cold_imp_3": 0.2357337146437249,
+        "cold_imp_4": 0.11967625354645336,
+        "cold_imp_5": 0.19382126743021721,
+        "tcom_no": -0.4681834177929296
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1137
+      },
+      "thresholds": {
+        "1|2": -1.418936629109873,
+        "2|3": 0.5703265930835331
+      },
+      "variables": [
+        "TransitAccess_high",
+        "TransitAccess_medium",
+        "bs_grad",
+        "child",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "tcom_no"
+      ]
+    },
+    "work_from_office": {
+      "coefficients": {
+        "CR": -0.021561836754425072,
+        "EmpDens_high": 0.06007506873577856,
+        "TransitAccess_medium": -0.2829495469446967,
+        "black": 0.452527642394191,
+        "cold_imp_2": -0.04371633499868342,
+        "cold_imp_3": -0.16390545481780613,
+        "cold_imp_4": -0.1507190193672873,
+        "cold_imp_5": 0.19945739988097197,
+        "hhsize1": 0.033775292184189495,
+        "hhsize2": -0.013929414695791559,
+        "hhveh0": -0.2083577895880578,
+        "hispanic_c": 0.23808227653871894,
+        "in50": 0.16876766911176566,
+        "white": 0.30025405052885806,
+        "work_out": 0.2790816642641097
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1137
+      },
+      "thresholds": {
+        "1|2": -0.28640689540338643,
+        "2|3": 1.468422026328456
+      },
+      "variables": [
+        "CR",
+        "EmpDens_high",
+        "TransitAccess_medium",
+        "black",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "hhsize1",
+        "hhsize2",
+        "hhveh0",
+        "hispanic_c",
+        "in50",
+        "white",
+        "work_out"
+      ]
+    }
+  },
+  "earthquake": {
+    "go_business_as_usual": {
+      "coefficients": {
+        "Diversity_medium": 0.01573490982087507,
+        "NatWalkInd_high": -0.08403693440365166,
+        "PR": 0.15593471179220397,
+        "TransitAccess_high": 0.0032319989511723516,
+        "age_3150": 0.375059059803048,
+        "black": -0.1790372178285685,
+        "bs_grad": -0.06900857520973487,
+        "dis_yes": -0.07484851542318317,
+        "earthquake_imp_2": -0.24601678451418024,
+        "earthquake_imp_3": -0.33402009761924645,
+        "earthquake_imp_4": -0.12752466240144458,
+        "earthquake_imp_5": -0.06367993368991005,
+        "female": -0.3203608461072027
+      },
+      "metadata": {
+        "levels": 5,
+        "link": "probit",
+        "n": 586
+      },
+      "thresholds": {
+        "1|2": -1.5396543720369178,
+        "2|3": -0.8575841823601531,
+        "3|4": -0.1711389600386669,
+        "4|5": 0.759661598545955
+      },
+      "variables": [
+        "Diversity_medium",
+        "NatWalkInd_high",
+        "PR",
+        "TransitAccess_high",
+        "age_3150",
+        "black",
+        "bs_grad",
+        "dis_yes",
+        "earthquake_imp_2",
+        "earthquake_imp_3",
+        "earthquake_imp_4",
+        "earthquake_imp_5",
+        "female"
+      ]
+    },
+    "stay_home": {
+      "coefficients": {
+        "EmpDens_medium": -0.4652276915246565,
+        "NatWalkInd_low": -0.6671360470496999,
+        "PopDens_medium": 0.36387554674356454,
+        "ac_c": 0.3432555885377153,
+        "asian": 1.4656415203993947,
+        "earthquake_imp_2": 0.30971508083912874,
+        "earthquake_imp_3": 0.28350898602129726,
+        "earthquake_imp_4": 0.179007993870423,
+        "earthquake_imp_5": -0.39002382050744144
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 176
+      },
+      "thresholds": {
+        "1|2": -1.0307829363039773,
+        "2|3": 0.6409644926664639
+      },
+      "variables": [
+        "EmpDens_medium",
+        "NatWalkInd_low",
+        "PopDens_medium",
+        "ac_c",
+        "asian",
+        "earthquake_imp_2",
+        "earthquake_imp_3",
+        "earthquake_imp_4",
+        "earthquake_imp_5"
+      ]
+    },
+    "use_car": {
+      "coefficients": {
+        "NatWalkInd_low": 0.08205892897281496,
+        "age_3150": -0.2265262612296845,
+        "age_5165": -0.48279458189060914,
+        "age_65p": -0.5957544915176307,
+        "earthquake_imp_2": -0.19778628807535803,
+        "earthquake_imp_3": 0.08478112901441773,
+        "earthquake_imp_4": 0.2531517201746095,
+        "earthquake_imp_5": 0.2118962247629414,
+        "edu_bs": -0.06986348117167153,
+        "sa_home": -0.13449364629457766,
+        "tcom_no": -0.15589696505761855
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 586
+      },
+      "thresholds": {
+        "1|2": -0.9480831032874786,
+        "2|3": 0.6255448480574064
+      },
+      "variables": [
+        "NatWalkInd_low",
+        "age_3150",
+        "age_5165",
+        "age_65p",
+        "earthquake_imp_2",
+        "earthquake_imp_3",
+        "earthquake_imp_4",
+        "earthquake_imp_5",
+        "edu_bs",
+        "sa_home",
+        "tcom_no"
+      ]
+    },
+    "use_transit": {
+      "coefficients": {
+        "CR": -0.08466304132763454,
+        "NatWalkInd_high": -0.08296779020946657,
+        "PopDens_high": 0.171292594955862,
+        "age_3150": 0.00398939083928324,
+        "child": -0.13985540944824812,
+        "earthquake_imp_2": 0.07227737947828547,
+        "earthquake_imp_3": 0.2323163376657737,
+        "earthquake_imp_4": 0.32499636963553674,
+        "earthquake_imp_5": 0.25326099709188943,
+        "hhsize2": -0.10036818676973794
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 586
+      },
+      "thresholds": {
+        "1|2": -0.6237326313120609,
+        "2|3": 1.1298414620790331
+      },
+      "variables": [
+        "CR",
+        "NatWalkInd_high",
+        "PopDens_high",
+        "age_3150",
+        "child",
+        "earthquake_imp_2",
+        "earthquake_imp_3",
+        "earthquake_imp_4",
+        "earthquake_imp_5",
+        "hhsize2"
+      ]
+    },
+    "work_from_home": {
+      "coefficients": {
+        "Diversity_high": 0.12522547816383456,
+        "EmpDens_medium": -0.04352642054978596,
+        "NatWalkInd_high": 0.05999153413587142,
+        "NatWalkInd_low": -0.21545304054601452,
+        "PopDens_medium": -0.3737602873410541,
+        "SE": 0.11013101748615939,
+        "TransitAccess_high": -0.2683245957259649,
+        "age_65p": 0.028826662087340565,
+        "earthquake_imp_2": 0.18089058079997647,
+        "earthquake_imp_3": 0.36218426115061314,
+        "earthquake_imp_4": 0.3823274868861657,
+        "earthquake_imp_5": 0.10001249123765871,
+        "hhsize1": 0.18818435392354704,
+        "hhsize2": -0.020170372004025723,
+        "in50": 0.0917406081468302,
+        "in50100": -0.0663241331062265,
+        "sa_home": -0.11520188524527644,
+        "work_out": -0.10743435296935686
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 326
+      },
+      "thresholds": {
+        "1|2": -1.26776106930257,
+        "2|3": 0.608302791737023
+      },
+      "variables": [
+        "Diversity_high",
+        "EmpDens_medium",
+        "NatWalkInd_high",
+        "NatWalkInd_low",
+        "PopDens_medium",
+        "SE",
+        "TransitAccess_high",
+        "age_65p",
+        "earthquake_imp_2",
+        "earthquake_imp_3",
+        "earthquake_imp_4",
+        "earthquake_imp_5",
+        "hhsize1",
+        "hhsize2",
+        "in50",
+        "in50100",
+        "sa_home",
+        "work_out"
+      ]
+    }
+  },
+  "flooding": {
+    "go_business_as_usual": {
+      "coefficients": {
+        "CR": 0.09295528906805631,
+        "EmpDens_medium": -0.03962895155245862,
+        "NetworkDensity_medium": -0.1196234372840101,
+        "PR": 0.1322980526047207,
+        "age_65p": -0.2080348032808504,
+        "child": 0.11709340995538303,
+        "flooding_imp_2": -0.47183996442904824,
+        "flooding_imp_3": -0.5499366872483882,
+        "flooding_imp_4": -0.6833617984609388,
+        "flooding_imp_5": -0.6493950877620206,
+        "hhsize1": 0.09204083359222519,
+        "hhsize2": 0.043509527621478056,
+        "sa_home": 0.05442146374253334,
+        "tcom_no": -0.2417742327095215
+      },
+      "metadata": {
+        "levels": 5,
+        "link": "probit",
+        "n": 1041
+      },
+      "thresholds": {
+        "1|2": -1.7191496898597485,
+        "2|3": -1.020612154422908,
+        "3|4": -0.3515468848241805,
+        "4|5": 0.595748248330144
+      },
+      "variables": [
+        "CR",
+        "EmpDens_medium",
+        "NetworkDensity_medium",
+        "PR",
+        "age_65p",
+        "child",
+        "flooding_imp_2",
+        "flooding_imp_3",
+        "flooding_imp_4",
+        "flooding_imp_5",
+        "hhsize1",
+        "hhsize2",
+        "sa_home",
+        "tcom_no"
+      ]
+    },
+    "stay_home": {
+      "coefficients": {
+        "TransitAccess_high": 0.22014204935777354,
+        "TransitAccess_medium": -0.059315133164060105,
+        "flooding_imp_2": 0.24028366252375147,
+        "flooding_imp_3": 0.20878689689178162,
+        "flooding_imp_4": 0.12002929337927676,
+        "flooding_imp_5": 0.283615559415846,
+        "hhsize2": -0.07506181200728095,
+        "tcom_no": 0.1086007538533825,
+        "work_out": -0.18286956038912894
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1041
+      },
+      "thresholds": {
+        "1|2": -1.4056830490371364,
+        "2|3": 0.2307311017759739
+      },
+      "variables": [
+        "TransitAccess_high",
+        "TransitAccess_medium",
+        "flooding_imp_2",
+        "flooding_imp_3",
+        "flooding_imp_4",
+        "flooding_imp_5",
+        "hhsize2",
+        "tcom_no",
+        "work_out"
+      ]
+    },
+    "use_car": {
+      "coefficients": {
+        "NatWalkInd_low": 0.06175485262073529,
+        "PR": -0.11075278056755834,
+        "PopDens_high": 0.03024365549256709,
+        "SE": 0.13310189897248437,
+        "asian": 0.5111775120376019,
+        "black": 0.38451311559191864,
+        "flooding_imp_2": -0.05776148708004418,
+        "flooding_imp_3": -0.01983369574486536,
+        "flooding_imp_4": 0.07798334241718424,
+        "flooding_imp_5": 0.28953017117716245,
+        "in50100": -0.024547803074165597,
+        "tcom_no": -0.05012126780746144,
+        "white": 0.2103242565128495,
+        "work_out": 0.6114122778560414
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1041
+      },
+      "thresholds": {
+        "1|2": 0.021540189858804206,
+        "2|3": 1.5265832967974964
+      },
+      "variables": [
+        "NatWalkInd_low",
+        "PR",
+        "PopDens_high",
+        "SE",
+        "asian",
+        "black",
+        "flooding_imp_2",
+        "flooding_imp_3",
+        "flooding_imp_4",
+        "flooding_imp_5",
+        "in50100",
+        "tcom_no",
+        "white",
+        "work_out"
+      ]
+    },
+    "use_transit": {
+      "coefficients": {
+        "CR": 0.0948207901971793,
+        "EmpDens_high": 0.19359370649843394,
+        "EmpDens_medium": 0.11406529319010299,
+        "TransitAccess_high": -0.19954057318912227,
+        "TransitAccess_medium": 0.02045801294083056,
+        "child": 0.1219684618044259,
+        "dis_yes": -0.11010963433398313,
+        "flooding_imp_2": -0.06516630083639982,
+        "flooding_imp_3": -0.03353662072128065,
+        "flooding_imp_4": 0.05192083645408014,
+        "flooding_imp_5": -0.03060979847412698,
+        "hhveh0": 0.14119346516635406,
+        "in50100": -0.04266919510473211,
+        "rural": -0.019614399522825916,
+        "sa_home": 0.07825712456069321,
+        "work_out": 0.2406708901306546
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1041
+      },
+      "thresholds": {
+        "1|2": -0.6120335503675334,
+        "2|3": 1.285859466622656
+      },
+      "variables": [
+        "CR",
+        "EmpDens_high",
+        "EmpDens_medium",
+        "TransitAccess_high",
+        "TransitAccess_medium",
+        "child",
+        "dis_yes",
+        "flooding_imp_2",
+        "flooding_imp_3",
+        "flooding_imp_4",
+        "flooding_imp_5",
+        "hhveh0",
+        "in50100",
+        "rural",
+        "sa_home",
+        "work_out"
+      ]
+    },
+    "work_from_home": {
+      "coefficients": {
+        "CR": 0.1411119246862802,
+        "NetworkDensity_high": 0.19212928122659712,
+        "black": -0.12348657952484637,
+        "dis_yes": 0.14605174335634588,
+        "flooding_imp_2": 0.17649438816488666,
+        "flooding_imp_3": 0.22736776720127053,
+        "flooding_imp_4": 0.3362222129132753,
+        "flooding_imp_5": 0.6255467023019913,
+        "in50100": 0.020317564390201093,
+        "white": -0.04069302814885336
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 558
+      },
+      "thresholds": {
+        "1|2": -1.0966054335904223,
+        "2|3": 0.8134513707016489
+      },
+      "variables": [
+        "CR",
+        "NetworkDensity_high",
+        "black",
+        "dis_yes",
+        "flooding_imp_2",
+        "flooding_imp_3",
+        "flooding_imp_4",
+        "flooding_imp_5",
+        "in50100",
+        "white"
+      ]
+    }
+  },
+  "heat": {
+    "delivery": {
+      "coefficients": {
+        "CR": 0.07752683907863656,
+        "EmpDens_high": 0.1555143047358075,
+        "EmpDens_medium": 0.12957025548226664,
+        "NetworkDensity_medium": 0.11892146330925675,
+        "PR": 0.07072919160260352,
+        "SE": 0.05468658027762633,
+        "age_65p": -0.2546375608507514,
+        "black": 0.27363383677203507,
+        "child": 0.13385070512704508,
+        "heat_imp_2": 0.16249495298178446,
+        "heat_imp_3": 0.13850932709034092,
+        "heat_imp_4": 0.3338279779561335,
+        "heat_imp_5": 0.4316641064080075,
+        "hhveh0": 0.12412815783124144
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2565
+      },
+      "thresholds": {
+        "1|2": -0.8139474439747051,
+        "2|3": 1.0912184711633723
+      },
+      "variables": [
+        "CR",
+        "EmpDens_high",
+        "EmpDens_medium",
+        "NetworkDensity_medium",
+        "PR",
+        "SE",
+        "age_65p",
+        "black",
+        "child",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhveh0"
+      ]
+    },
+    "dine_in": {
+      "coefficients": {
+        "Diversity_high": -0.1369366679413848,
+        "SE": 0.06285287519174436,
+        "TransitAccess_high": -0.13708426106711222,
+        "age_65p": -0.11852362334427154,
+        "asian": -0.25537842540076044,
+        "bs_grad": -0.1048941783518276,
+        "heat_imp_2": 0.0841573522922833,
+        "heat_imp_3": -0.0049766459919890005,
+        "heat_imp_4": -0.10408650416855139,
+        "heat_imp_5": 0.24083950093704984,
+        "hhsize2": -0.130319083631232,
+        "in50": -0.14376718336678285,
+        "in50100": -0.13631207636250525,
+        "sa_home": -0.08505090650370535,
+        "work_out": 0.2956259941895258
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2565
+      },
+      "thresholds": {
+        "1|2": -1.0923981756621701,
+        "2|3": 0.6737996077100354
+      },
+      "variables": [
+        "Diversity_high",
+        "SE",
+        "TransitAccess_high",
+        "age_65p",
+        "asian",
+        "bs_grad",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhsize2",
+        "in50",
+        "in50100",
+        "sa_home",
+        "work_out"
+      ]
+    },
+    "go_business_as_usual": {
+      "coefficients": {
+        "CR": 0.08008043046692857,
+        "EmpDens_high": -0.09771827253964108,
+        "NatWalkInd_low": -0.1607361572646006,
+        "NetworkDensity_high": 0.08265675431519341,
+        "PR": 0.18751703520429122,
+        "PopDens_medium": 0.09048941630643514,
+        "SE": 0.05402985693464276,
+        "ac_c": 0.22920195536940208,
+        "age_3150": 0.08847135639776502,
+        "age_65p": -0.191112537014413,
+        "dis_yes": -0.12231756935120831,
+        "female": -0.09507665628754407,
+        "heat_imp_2": -0.6614624161086708,
+        "heat_imp_3": -0.8989152826414647,
+        "heat_imp_4": -1.110807776436652,
+        "heat_imp_5": -1.0417656883814699,
+        "hhveh0": -0.13760145983945893,
+        "tcom_no": 0.09068402559953928,
+        "work_out": 0.30885202742418455
+      },
+      "metadata": {
+        "levels": 5,
+        "link": "probit",
+        "n": 2564
+      },
+      "thresholds": {
+        "1|2": -2.1712340569786455,
+        "2|3": -1.4666537570713567,
+        "3|4": -0.8628854687551838,
+        "4|5": 0.16120687733007488
+      },
+      "variables": [
+        "CR",
+        "EmpDens_high",
+        "NatWalkInd_low",
+        "NetworkDensity_high",
+        "PR",
+        "PopDens_medium",
+        "SE",
+        "ac_c",
+        "age_3150",
+        "age_65p",
+        "dis_yes",
+        "female",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhveh0",
+        "tcom_no",
+        "work_out"
+      ]
+    },
+    "pick_up": {
+      "coefficients": {
+        "Diversity_high": -0.12111865528936272,
+        "EmpDens_medium": -0.08368648277631552,
+        "PR": 0.05524311010821781,
+        "SE": 0.06631382884195387,
+        "ac_c": -0.11824634821487269,
+        "age_3150": -0.13091330908307872,
+        "age_5165": -0.20821460934094244,
+        "age_65p": -0.25102802782999567,
+        "heat_imp_2": -0.03747592504197599,
+        "heat_imp_3": 0.03146420484003104,
+        "heat_imp_4": 0.016270954269519248,
+        "heat_imp_5": 0.011559507595958666,
+        "hhveh0": -0.13536421756308273,
+        "work_out": 0.20130217704877082
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2564
+      },
+      "thresholds": {
+        "1|2": -1.1095117299222865,
+        "2|3": 0.6600939924724101
+      },
+      "variables": [
+        "Diversity_high",
+        "EmpDens_medium",
+        "PR",
+        "SE",
+        "ac_c",
+        "age_3150",
+        "age_5165",
+        "age_65p",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhveh0",
+        "work_out"
+      ]
+    },
+    "stay_home": {
+      "coefficients": {
+        "CR": 0.09623893677748656,
+        "NatWalkInd_high": 0.13836564709770818,
+        "NatWalkInd_low": 0.14766269537186139,
+        "NatWalkInd_very_high": 0.2490506444036838,
+        "NetworkDensity_medium": 0.09178096505560475,
+        "ac_c": 0.20563438210667856,
+        "child": -0.15765503878569165,
+        "dis_yes": 0.14626971765416835,
+        "edu_bs": 0.10243879567906469,
+        "heat_imp_2": 0.28377904639078333,
+        "heat_imp_3": 0.298103336862964,
+        "heat_imp_4": 0.4891148466572814,
+        "heat_imp_5": 0.41115740402769285,
+        "hhsize1": -0.16526072336524075,
+        "hhsize2": -0.17576806419470628,
+        "in50": 0.09553748759463453,
+        "work_out": -0.23649623145691737
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2564
+      },
+      "thresholds": {
+        "1|2": -1.020107596896045,
+        "2|3": 0.7112014654837293
+      },
+      "variables": [
+        "CR",
+        "NatWalkInd_high",
+        "NatWalkInd_low",
+        "NatWalkInd_very_high",
+        "NetworkDensity_medium",
+        "ac_c",
+        "child",
+        "dis_yes",
+        "edu_bs",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhsize1",
+        "hhsize2",
+        "in50",
+        "work_out"
+      ]
+    },
+    "use_car": {
+      "coefficients": {
+        "PR": 0.06534990520514893,
+        "PopDens_high": 0.11713081511591572,
+        "SE": 0.0651944097079023,
+        "age_5165": -0.09192904797697261,
+        "black": 0.30191054655123695,
+        "bs_grad": 0.12245840425880566,
+        "child": 0.1167018874391354,
+        "edu_bs": -0.1482468131887115,
+        "heat_imp_2": 0.06239924328225619,
+        "heat_imp_3": 0.15350494210065657,
+        "heat_imp_4": 0.16657998495967496,
+        "heat_imp_5": 0.16613048198232666,
+        "hhsize1": 0.10371631786831215,
+        "hispanic_c": 0.1905894227028082,
+        "tcom_no": 0.12005341841311054,
+        "white": 0.17667594758250293,
+        "work_out": 0.22102619893837874
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2564
+      },
+      "thresholds": {
+        "1|2": -0.4771382697819104,
+        "2|3": 1.4020983954212285
+      },
+      "variables": [
+        "PR",
+        "PopDens_high",
+        "SE",
+        "age_5165",
+        "black",
+        "bs_grad",
+        "child",
+        "edu_bs",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhsize1",
+        "hispanic_c",
+        "tcom_no",
+        "white",
+        "work_out"
+      ]
+    },
+    "use_transit": {
+      "coefficients": {
+        "PR": -0.056947034721101346,
+        "TransitAccess_high": -0.13055729986470174,
+        "age_3150": -0.14074671467779037,
+        "age_5165": -0.12813326563491573,
+        "age_65p": -0.1385217951464179,
+        "heat_imp_2": -0.08853539420607992,
+        "heat_imp_3": -0.11692860962568945,
+        "heat_imp_4": -0.12486643701536397,
+        "heat_imp_5": -0.13059517350973382,
+        "hhveh0": 0.31691318687372216,
+        "in50100": 0.11507459484964092,
+        "tcom_no": -0.1780569277769274,
+        "work_out": 0.4769192314412402
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2565
+      },
+      "thresholds": {
+        "1|2": -0.929781684116077,
+        "2|3": 1.1836681303440453
+      },
+      "variables": [
+        "PR",
+        "TransitAccess_high",
+        "age_3150",
+        "age_5165",
+        "age_65p",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhveh0",
+        "in50100",
+        "tcom_no",
+        "work_out"
+      ]
+    },
+    "work_from_home": {
+      "coefficients": {
+        "CR": 0.1279121286672962,
+        "NetworkDensity_high": 0.19654217859967013,
+        "SE": 0.09810049794498976,
+        "ac_c": 0.17819206376665855,
+        "age_65p": -0.24565880577234347,
+        "black": 0.16928186737968728,
+        "edu_bs": 0.15295668647545163,
+        "heat_imp_2": -0.01604736718887123,
+        "heat_imp_3": -0.038780510177345996,
+        "heat_imp_4": 0.267399217602773,
+        "heat_imp_5": -0.012978588799893135,
+        "hhsize2": -0.13609128263462253,
+        "hispanic_c": 0.24863565429365264,
+        "tcom_no": -0.45589670764297524
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1213
+      },
+      "thresholds": {
+        "1|2": -1.473595802332563,
+        "2|3": 0.7662107831415113
+      },
+      "variables": [
+        "CR",
+        "NetworkDensity_high",
+        "SE",
+        "ac_c",
+        "age_65p",
+        "black",
+        "edu_bs",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhsize2",
+        "hispanic_c",
+        "tcom_no"
+      ]
+    },
+    "work_from_office": {
+      "coefficients": {
+        "asian": -0.2459946956721301,
+        "child": 0.14835400843444826,
+        "edu_bs": -0.1781886329038944,
+        "heat_imp_2": -0.04865407335510297,
+        "heat_imp_3": -0.051676598949147126,
+        "heat_imp_4": -0.1098896439124542,
+        "heat_imp_5": 0.28321362172286996,
+        "hhsize1": 0.29997588373240597,
+        "hhsize2": 0.17035216069798875,
+        "tcom_no": 0.1727524460015663,
+        "work_out": 0.21257998066046366
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1271
+      },
+      "thresholds": {
+        "1|2": -0.6715429012651412,
+        "2|3": 1.2880887443092632
+      },
+      "variables": [
+        "asian",
+        "child",
+        "edu_bs",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhsize1",
+        "hhsize2",
+        "tcom_no",
+        "work_out"
+      ]
+    }
+  },
+  "powerout": {
+    "delivery": {
+      "coefficients": {
+        "Diversity_high": -0.08425004059580636,
+        "Diversity_medium": -0.028176759894454416,
+        "EmpDens_high": 0.07475204825034343,
+        "NatWalkInd_low": -0.14731244220867445,
+        "PopDens_high": -0.03867896006217813,
+        "SE": 0.08392589881184345,
+        "TransitAccess_medium": 0.027024843235141448,
+        "powerout_imp_2": 0.0034109642587223884,
+        "powerout_imp_3": 0.12448506914689322,
+        "powerout_imp_4": 0.1087966202551201,
+        "powerout_imp_5": 0.22197066538273222
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2300
+      },
+      "thresholds": {
+        "1|2": -0.7183670472629745,
+        "2|3": 0.9528571951810213
+      },
+      "variables": [
+        "Diversity_high",
+        "Diversity_medium",
+        "EmpDens_high",
+        "NatWalkInd_low",
+        "PopDens_high",
+        "SE",
+        "TransitAccess_medium",
+        "powerout_imp_2",
+        "powerout_imp_3",
+        "powerout_imp_4",
+        "powerout_imp_5"
+      ]
+    },
+    "dine_in": {
+      "coefficients": {
+        "Diversity_medium": -0.04158359118561637,
+        "in50": -0.1121849795187501,
+        "powerout_imp_2": 0.015608925445864787,
+        "powerout_imp_3": 0.11421753592572964,
+        "powerout_imp_4": 0.2682052274631984,
+        "powerout_imp_5": 0.25311441009632446
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2300
+      },
+      "thresholds": {
+        "1|2": -0.49851421701437615,
+        "2|3": 0.9693413109293751
+      },
+      "variables": [
+        "Diversity_medium",
+        "in50",
+        "powerout_imp_2",
+        "powerout_imp_3",
+        "powerout_imp_4",
+        "powerout_imp_5"
+      ]
+    },
+    "go_business_as_usual": {
+      "coefficients": {
+        "Diversity_high": 0.15990445863473993,
+        "Diversity_medium": 0.1537243917847486,
+        "EmpDens_high": -0.18444141062105915,
+        "NetworkDensity_medium": -0.133428743229376,
+        "SE": 0.12437610176570384,
+        "ac_c": 0.19545228544582244,
+        "age_3150": -0.36574684719592054,
+        "age_5165": -0.3343877899072022,
+        "age_65p": -0.6330125135328069,
+        "powerout_imp_2": -0.39327506584807737,
+        "powerout_imp_3": -0.5337608004965829,
+        "powerout_imp_4": -0.8859059718611467,
+        "powerout_imp_5": -0.9502058829980033,
+        "work_out": 0.3526992437906132
+      },
+      "metadata": {
+        "levels": 5,
+        "link": "probit",
+        "n": 892
+      },
+      "thresholds": {
+        "1|2": -2.0484910295759784,
+        "2|3": -1.257186943662147,
+        "3|4": -0.6202068449356043,
+        "4|5": 0.3741284259307438
+      },
+      "variables": [
+        "Diversity_high",
+        "Diversity_medium",
+        "EmpDens_high",
+        "NetworkDensity_medium",
+        "SE",
+        "ac_c",
+        "age_3150",
+        "age_5165",
+        "age_65p",
+        "powerout_imp_2",
+        "powerout_imp_3",
+        "powerout_imp_4",
+        "powerout_imp_5",
+        "work_out"
+      ]
+    },
+    "pick_up": {
+      "coefficients": {
+        "Diversity_medium": -0.03418123871913002,
+        "NatWalkInd_low": -0.0955004547590936,
+        "NetworkDensity_high": 0.0021389656759381185,
+        "NetworkDensity_medium": -0.13457456074298324,
+        "TransitAccess_high": -0.14122265049672716,
+        "female": -0.1246661132006043,
+        "in50": -0.24534686189659335,
+        "in50100": -0.17932065013129173,
+        "powerout_imp_2": -0.017924612013254335,
+        "powerout_imp_3": 0.06838185815644546,
+        "powerout_imp_4": 0.2005482708107809,
+        "powerout_imp_5": 0.11659825794122969,
+        "rural": -0.12201701723590314,
+        "white": 0.07152119200863924
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2300
+      },
+      "thresholds": {
+        "1|2": -0.9207632699232177,
+        "2|3": 0.5787622462234022
+      },
+      "variables": [
+        "Diversity_medium",
+        "NatWalkInd_low",
+        "NetworkDensity_high",
+        "NetworkDensity_medium",
+        "TransitAccess_high",
+        "female",
+        "in50",
+        "in50100",
+        "powerout_imp_2",
+        "powerout_imp_3",
+        "powerout_imp_4",
+        "powerout_imp_5",
+        "rural",
+        "white"
+      ]
+    },
+    "stay_home": {
+      "coefficients": {
+        "Diversity_high": 0.03659255247345256,
+        "Diversity_medium": 0.08080637731900708,
+        "EmpDens_medium": -0.04222386590589834,
+        "PR": 0.07085908100196711,
+        "age_65p": 0.14131198935855532,
+        "dis_yes": 0.19109918875975873,
+        "in50100": -0.10239094276769516,
+        "powerout_imp_2": 0.15382581017147842,
+        "powerout_imp_3": 0.17337543256704827,
+        "powerout_imp_4": 0.0791112625199085,
+        "powerout_imp_5": 0.213288668362796
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2300
+      },
+      "thresholds": {
+        "1|2": -0.985462687386547,
+        "2|3": 0.5448045450965183
+      },
+      "variables": [
+        "Diversity_high",
+        "Diversity_medium",
+        "EmpDens_medium",
+        "PR",
+        "age_65p",
+        "dis_yes",
+        "in50100",
+        "powerout_imp_2",
+        "powerout_imp_3",
+        "powerout_imp_4",
+        "powerout_imp_5"
+      ]
+    },
+    "use_car": {
+      "coefficients": {
+        "Diversity_high": -0.09213820784801297,
+        "EmpDens_medium": -0.05542987691439247,
+        "age_65p": -0.10009368320420557,
+        "black": 0.08779850931108488,
+        "child": 0.2138246978282359,
+        "dis_yes": -0.09163826192250843,
+        "female": -0.20594537380079958,
+        "powerout_imp_2": 0.0103256054135324,
+        "powerout_imp_3": 0.08515020392212808,
+        "powerout_imp_4": 0.15429908771507306,
+        "powerout_imp_5": 0.1910271025958022,
+        "rural": -0.10555362068919498,
+        "tcom_no": 0.07367349227251811,
+        "white": 0.05831203863567436
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2300
+      },
+      "thresholds": {
+        "1|2": -0.9745337225023586,
+        "2|3": 0.7931184973296411
+      },
+      "variables": [
+        "Diversity_high",
+        "EmpDens_medium",
+        "age_65p",
+        "black",
+        "child",
+        "dis_yes",
+        "female",
+        "powerout_imp_2",
+        "powerout_imp_3",
+        "powerout_imp_4",
+        "powerout_imp_5",
+        "rural",
+        "tcom_no",
+        "white"
+      ]
+    },
+    "use_transit": {
+      "coefficients": {
+        "EmpDens_high": 0.12011250210514623,
+        "EmpDens_medium": 0.07538841144702665,
+        "NatWalkInd_high": -0.07195895537748256,
+        "age_3150": -0.15577575893457604,
+        "age_5165": -0.22299771954988487,
+        "age_65p": -0.21490073445519475,
+        "hhveh0": 0.4428561329299513,
+        "hispanic_c": -0.20134638083300305,
+        "in50": -0.09102944289485508,
+        "powerout_imp_2": -0.06938774809011372,
+        "powerout_imp_3": -0.0290642636565208,
+        "powerout_imp_4": 0.042706065375450956,
+        "powerout_imp_5": 0.2085172869323725
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2299
+      },
+      "thresholds": {
+        "1|2": -0.928522260866141,
+        "2|3": 1.1731176503459781
+      },
+      "variables": [
+        "EmpDens_high",
+        "EmpDens_medium",
+        "NatWalkInd_high",
+        "age_3150",
+        "age_5165",
+        "age_65p",
+        "hhveh0",
+        "hispanic_c",
+        "in50",
+        "powerout_imp_2",
+        "powerout_imp_3",
+        "powerout_imp_4",
+        "powerout_imp_5"
+      ]
+    }
+  }
+}
