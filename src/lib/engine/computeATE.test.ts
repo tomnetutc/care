@@ -22,6 +22,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {
   computeSeverityATEs,
+  computeSegmentATEs,
   getSeverityDummyVariables,
   getDvColumn,
   isWorkerOnlyActivity,
@@ -30,6 +31,7 @@ import {
   EventModelData
 } from './computeATE';
 import { EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE } from './eventConfig';
+import { SEGMENT_GROUPS } from './segmentConfig';
 
 function parseCsv(text: string): Record<string, string>[] {
   const rows: string[][] = [];
@@ -380,5 +382,77 @@ describe('worker-only filter (empsta<3) for WFH/WFO', () => {
 
     expect(result.isValid).toBe(true);
     expect(result.sampleSize).toBeLessThanOrEqual(workerRows.length);
+  });
+});
+
+describe('computeSegmentATEs - Gender / Age Group / Transit Access', () => {
+  const groups = Object.values(SEGMENT_GROUPS);
+  const events = Object.keys(modelData);
+  const run = (event: string, label: string, comparisonLabel: string) => {
+    const g = groups.find(x => x.label === label)!;
+    const c = g.comparisons.find(x => x.label === comparisonLabel)!;
+    return computeSegmentATEs(modelData[event], getEventRows(event), {
+      event, baseSpec: g.baseSpec, comparisonSpec: c.spec
+    });
+  };
+
+  it('every spec lists all siblings of its group (so siblings are zeroed, never left observed)', () => {
+    for (const g of groups) {
+      const vars = Object.keys(g.baseSpec);
+      for (const c of g.comparisons) {
+        expect(Object.keys(c.spec).sort()).toEqual([...vars].sort());
+        // dummies within a group are mutually exclusive in a spec
+        expect(Object.values(c.spec).reduce((a, b) => a + b, 0)).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  const cases = events.flatMap(event =>
+    groups.flatMap(g => g.comparisons.map(c => ({ event, group: g.label, comparison: c.label })))
+  );
+  it.each(cases)('$event / $group ($comparison): valid 3-level results; inModel=false implies ATE exactly 0', ({ event, group, comparison }) => {
+    const results = run(event, group, comparison);
+    expect(results.length).toBe(Object.keys(modelData[event]).length);
+    for (const r of results) {
+      expect(r.isValid).toBe(true);
+      expect(r.sampleSize).toBeGreaterThan(0);
+      expect(r.ate.length).toBe(3);
+      expect(Math.abs(r.conservationCheck)).toBeLessThan(1e-6);
+      expect(r.inModel || r.ate.every(a => a === 0)).toBe(true);
+    }
+  });
+
+  it('inModel matches whether any of the group\'s variables is a coefficient of that activity\'s model', () => {
+    for (const event of events) {
+      for (const g of groups) {
+        const results = run(event, g.label, g.comparisons[0].label);
+        for (const r of results) {
+          const expected = Object.keys(g.baseSpec).some(v => v in modelData[event][r.activity].coefficients);
+          expect(r.inModel).toBe(expected);
+        }
+      }
+    }
+  });
+
+  // Spot values from ATE_Heat.xlsx's Segment_ATE sheet (Extreme Heat). The
+  // sheet's N is Jinghai's slightly smaller estimation sample (e.g. 2564 vs
+  // 2653 here), so values agree to ~0.1-0.2pp, not exactly. GBU rows are the
+  // sheet's 5-level rows summed into the 3-category collapse.
+  const KEY: Array<{ group: string; comparison: string; activity: string; i: number; pb?: number; pc?: number; ate: number; inModel: boolean }> = [
+    { group: 'Age Group', comparison: '31-50', activity: 'use_transit', i: 0, pb: 0.194888, pc: 0.235426, ate: 0.040538, inModel: true },
+    { group: 'Age Group', comparison: '65+', activity: 'pick_up', i: 0, pb: 0.177867, pc: 0.249947, ate: 0.07208, inModel: true },
+    { group: 'Transit Access', comparison: 'High', activity: 'dine_in', i: 0, pb: 0.216279, pc: 0.257795, ate: 0.041516, inModel: true },
+    { group: 'Transit Access', comparison: 'Medium', activity: 'use_transit', i: 0, pb: 0.225104, pc: 0.225104, ate: 0, inModel: true },
+    { group: 'Gender', comparison: 'Female', activity: 'go_business_as_usual', i: 2, pb: 0.60336, pc: 0.569415, ate: -0.033945, inModel: true },
+    { group: 'Age Group', comparison: '65+', activity: 'go_business_as_usual', i: 0, pb: 0.213995, pc: 0.26866, ate: 0.054665, inModel: true },
+    { group: 'Gender', comparison: 'Female', activity: 'use_car', i: 0, ate: 0, inModel: false }
+  ];
+  it.each(KEY)('heat $activity / $group ($comparison) matches ATE_Heat.xlsx Segment_ATE', (k) => {
+    const r = run('heat', k.group, k.comparison).find(x => x.activity === k.activity)!;
+    expect(r.inModel).toBe(k.inModel);
+    expect(Math.abs(r.ate[k.i] - k.ate)).toBeLessThan(0.003);
+    const pbDiff = k.pb === undefined ? 0 : Math.abs(r.controlProbabilities[k.i] - k.pb);
+    const pcDiff = k.pc === undefined ? 0 : Math.abs(r.treatmentProbabilities[k.i] - k.pc);
+    expect(Math.max(pbDiff, pcDiff)).toBeLessThan(0.003);
   });
 });
