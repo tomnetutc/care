@@ -126,3 +126,34 @@ test.describe('Scenario Analysis - severity ATE smoke test', () => {
     });
   }
 });
+
+test('severity dropdowns: a level chosen in one is disabled in the other', async ({ page }) => {
+  await page.goto('/#/scenario');
+  await expect(page.getByRole('heading', { name: 'CARE Scenario Analysis Tool' })).toBeVisible();
+
+  const base = page.locator('select.scenario-select').nth(0);
+  const comparison = page.locator('select.scenario-select').nth(1);
+
+  // Defaults: Base = Not severe at all, Comparison = Extremely severe
+  await expect(comparison.locator('option', { hasText: 'Not severe at all' })).toBeDisabled();
+  await expect(base.locator('option', { hasText: 'Extremely severe' })).toBeDisabled();
+
+  await base.selectOption({ label: 'Moderately severe' });
+  await expect(comparison.locator('option', { hasText: 'Moderately severe' })).toBeDisabled();
+  await expect(comparison.locator('option', { hasText: 'Not severe at all' })).toBeEnabled();
+
+  await comparison.selectOption({ label: 'Slightly severe' });
+  await expect(base.locator('option', { hasText: 'Slightly severe' })).toBeDisabled();
+  await expect(base.locator('option', { hasText: 'Extremely severe' })).toBeEnabled();
+});
+
+test('GBU label is italic with an asterisk and shows Jinghai\'s note on hover', async ({ page }) => {
+  await page.goto('/#/scenario');
+  const label = page.locator('.scenario-ate-activity em', { hasText: 'Go about business as usual*' });
+  await expect(label).toBeVisible({ timeout: 15_000 });
+  expect(await label.evaluate(el => getComputedStyle(el).fontStyle)).toBe('italic');
+  await label.hover();
+  await expect(page.locator('.scenario-tooltip')).toHaveText(
+    'This was a 5-level question from very unlikely to very likely. Do less corresponds to very or somewhat unlikely. About the same corresponds to neutral. Do more corresponds to very or somewhat likely.'
+  );
+});

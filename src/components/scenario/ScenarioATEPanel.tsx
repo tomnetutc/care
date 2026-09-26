@@ -12,6 +12,8 @@ import './ScenarioATEPanel.scss';
 
 type ExpandedGroupsKey = 'attitudes' | 'socioDemo' | 'household' | 'community';
 
+const GBU_NOTE = "This was a 5-level question from very unlikely to very likely. Do less corresponds to very or somewhat unlikely. About the same corresponds to neutral. Do more corresponds to very or somewhat likely.";
+
 const ScenarioATEPanel: React.FC = () => {
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
   const [showAbsoluteATE, setShowAbsoluteATE] = useState(false);
@@ -141,6 +143,7 @@ const ScenarioATEPanel: React.FC = () => {
       .filter(r => r.isValid)
       .map(result => ({
         activity: activityLabelMap[result.activity] || result.activity,
+        activityKey: result.activity,
         ate: getATEForChange(result)
       }))
       .sort((a, b) => b.ate - a.ate); // Sort from most positive to most negative
@@ -370,7 +373,7 @@ const ScenarioATEPanel: React.FC = () => {
                   disabled={isComputing}
                 >
                   {Object.values(severityMap).map((l) => (
-                    <option key={l.value} value={l.value}>{l.label}</option>
+                    <option key={l.value} value={l.value} disabled={l.value === currentComparisonLevel.value}>{l.label}</option>
                   ))}
                 </select>
                 <p className="scenario-config-help">Perceived severity of impact on daily life from most recent event (reference category)</p>
@@ -384,7 +387,7 @@ const ScenarioATEPanel: React.FC = () => {
                   disabled={isComputing}
                 >
                   {Object.values(severityMap).map((l) => (
-                    <option key={l.value} value={l.value}>{l.label}</option>
+                    <option key={l.value} value={l.value} disabled={l.value === currentBaseLevel.value}>{l.label}</option>
                   ))}
                 </select>
                 <p className="scenario-config-help">Different severity level to compare against the base level</p>
@@ -478,7 +481,23 @@ const ScenarioATEPanel: React.FC = () => {
                     
                     return (
                       <div key={i} className="scenario-ate-item">
-                        <div className="scenario-ate-activity">{item.activity}</div>
+                        <div className="scenario-ate-activity">
+                          {item.activityKey === 'go_business_as_usual' ? (
+                            <span
+                              className="scenario-tooltip-wrapper"
+                              onMouseEnter={() => setShowTooltip('gbuNote')}
+                              onMouseLeave={() => setShowTooltip(null)}
+                            >
+                              <em>{item.activity}*</em>
+                              {showTooltip === 'gbuNote' && (
+                                <div className="scenario-tooltip" style={{ textAlign: 'left', fontWeight: 400 }}>
+                                  {GBU_NOTE}
+                                  <div className="scenario-tooltip-arrow"></div>
+                                </div>
+                              )}
+                            </span>
+                          ) : item.activity}
+                        </div>
                         <div className="scenario-ate-bar-container">
                           <div className="scenario-ate-bar-center"></div>
                           <div 
