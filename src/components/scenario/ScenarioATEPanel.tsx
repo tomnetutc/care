@@ -164,9 +164,14 @@ const ScenarioATEPanel: React.FC = () => {
   const demographicData = {
     attitudes: {
       title: 'Attitudes & Personality Traits',
+      // Continuous standardized factor scores (CR/SE/PR). Layout only - the
+      // shift size is pending Jinghai's answer ("+1 SD", already computed by
+      // his ate_continuous, vs. a literal "+1 unit", which would need new
+      // computation), so ate is an explicit null placeholder, not a number.
       variables: [
-        { variable: 'Personal Resilience', baseLevel: 'Low', comparisons: [{ treatmentLevel: 'High', ate: 0.00 }] },
-        { variable: 'Risk Aversion', baseLevel: 'Low', comparisons: [{ treatmentLevel: 'High', ate: 0.22 }] }
+        { variable: 'Personal Resilience', baseLevel: 'Observed value', comparisons: [{ treatmentLevel: 'Increase (size TBD)', ate: null as number | null }] },
+        { variable: 'Community Resilience', baseLevel: 'Observed value', comparisons: [{ treatmentLevel: 'Increase (size TBD)', ate: null as number | null }] },
+        { variable: 'Social Engagement', baseLevel: 'Observed value', comparisons: [{ treatmentLevel: 'Increase (size TBD)', ate: null as number | null }] }
       ]
     },
     socioDemo: {
@@ -179,14 +184,12 @@ const ScenarioATEPanel: React.FC = () => {
     household: {
       title: 'Household Attributes',
       variables: [
-        { variable: 'Household Income', baseLevel: 'Less than $25,000', comparisons: [
-          { treatmentLevel: '$25,000 - $49,999', ate: 0.01 },
-          { treatmentLevel: '$50,000 - $99,999', ate: 0.02 },
-          { treatmentLevel: '$100,000 or higher', ate: -0.60 }
+        { variable: 'Household Income', baseLevel: 'Less than $50,000', comparisons: [
+          { treatmentLevel: '$50,000 - $100,000', ate: 0.02 as number | null },
+          { treatmentLevel: '$100,000 or higher', ate: -0.60 as number | null }
         ]},
-        { variable: 'Housing Type', baseLevel: 'Stand-alone house', comparisons: [
-          { treatmentLevel: 'Apartment', ate: 0.32 },
-          { treatmentLevel: 'Mobile home', ate: 0.01 }
+        { variable: 'Housing Type', baseLevel: 'Not stand-alone', comparisons: [
+          { treatmentLevel: 'Stand-alone house', ate: 0.32 as number | null }
         ]}
       ]
     },
@@ -649,12 +652,16 @@ const ScenarioATEPanel: React.FC = () => {
                               <td className="scenario-table-cell">{ci === 0 ? v.baseLevel : ''}</td>
                               <td className="scenario-table-cell">{c.treatmentLevel}</td>
                               <td className="scenario-table-cell">
-                                <div className="scenario-ate-display">
-                                  {renderSparkline(c.ate)}
-                                  <span className="scenario-ate-display-value" style={{ color: c.ate >= 0 ? '#6dafa0' : '#e25b61' }}>
-                                    {c.ate > 0 ? '+' : ''}{showDemoAbsoluteATE ? c.ate.toFixed(2) : (c.ate * 100).toFixed(1) + '%'}
-                                  </span>
-                                </div>
+                                {c.ate === null ? (
+                                  <span className="scenario-ate-placeholder">TBD — pending Jinghai's SD-vs-unit clarification</span>
+                                ) : (
+                                  <div className="scenario-ate-display">
+                                    {renderSparkline(c.ate)}
+                                    <span className="scenario-ate-display-value" style={{ color: c.ate >= 0 ? '#6dafa0' : '#e25b61' }}>
+                                      {c.ate > 0 ? '+' : ''}{showDemoAbsoluteATE ? c.ate.toFixed(2) : (c.ate * 100).toFixed(1) + '%'}
+                                    </span>
+                                  </div>
+                                )}
                               </td>
                             </tr>
                           ))

@@ -4,8 +4,9 @@
  * dummy in its group so sibling dummies are forced to 0 (never left at the
  * respondent's observed value). Dependency-free, like eventConfig.ts.
  *
- * Only groups with no open product question are defined here. Household
- * Income, Housing Type, Risk Aversion and Personal Resilience are pending.
+ * Discrete groups only. Continuous attitude scores (PR/CR/SE) are not
+ * defined here - their shift size is still pending Jinghai. "Risk
+ * Aversion" was dropped: no such variable exists in the models.
  */
 export interface SegmentGroup {
   label: string;
@@ -39,5 +40,20 @@ export const SEGMENT_GROUPS: Record<string, SegmentGroup> = {
       { label: 'Medium', spec: { TransitAccess_medium: 1, TransitAccess_high: 0 } },
       { label: 'High', spec: { TransitAccess_medium: 0, TransitAccess_high: 1 } }
     ]
+  },
+  householdIncome: {
+    label: 'Household Income',
+    baseLabel: 'Less than $50k',
+    baseSpec: { in50: 1, in50100: 0 },
+    comparisons: [
+      { label: '$50k-$100k', spec: { in50: 0, in50100: 1 } },
+      { label: '$100k or higher', spec: { in50: 0, in50100: 0 } }
+    ]
+  },
+  housingType: {
+    label: 'Housing Type',
+    baseLabel: 'Not stand-alone',
+    baseSpec: { sa_home: 0 },
+    comparisons: [{ label: 'Stand-alone house', spec: { sa_home: 1 } }]
   }
 };

@@ -456,3 +456,29 @@ describe('computeSegmentATEs - Gender / Age Group / Transit Access', () => {
     expect(Math.max(pbDiff, pcDiff)).toBeLessThan(0.003);
   });
 });
+
+describe('Household Income (3 tiers) and Housing Type (binary) group definitions', () => {
+  it('income has exactly 3 tiers: <$50k base + 2 comparisons; housing is binary', () => {
+    const income = SEGMENT_GROUPS.householdIncome;
+    expect([income.baseLabel, ...income.comparisons.map(c => c.label)]).toEqual(['Less than $50k', '$50k-$100k', '$100k or higher']);
+    expect(income.baseSpec).toEqual({ in50: 1, in50100: 0 });
+    const housing = SEGMENT_GROUPS.housingType;
+    expect([housing.baseLabel, ...housing.comparisons.map(c => c.label)]).toEqual(['Not stand-alone', 'Stand-alone house']);
+    expect(housing.baseSpec).toEqual({ sa_home: 0 });
+  });
+
+  it('Risk Aversion is not a defined segment group', () => {
+    expect(Object.values(SEGMENT_GROUPS).map(g => g.label).join('|').toLowerCase()).not.toContain('risk');
+  });
+
+  it.each(Object.keys(modelData))('%s: sa_home is strictly 0/1 and income dummies are exhaustive 0/1 with no nulls (housing collapse is a plain binary)', (event) => {
+    const rows = getEventRows(event);
+    for (const row of rows) {
+      expect(['0', '1']).toContain(row['sa_home']);
+      expect(['0', '1']).toContain(row['in50']);
+      expect(['0', '1']).toContain(row['in50100']);
+      expect(Number(row['in50']) + Number(row['in50100'])).toBeLessThanOrEqual(1);
+    }
+  });
+});
+

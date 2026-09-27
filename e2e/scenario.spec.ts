@@ -157,3 +157,28 @@ test('GBU label is italic with an asterisk and shows Jinghai\'s note on hover', 
     'This was a 5-level question from very unlikely to very likely. Do less corresponds to very or somewhat unlikely. About the same corresponds to neutral. Do more corresponds to very or somewhat likely.'
   );
 });
+
+test('Population Segment table: no Risk Aversion, 3-tier income, binary housing, TBD placeholders for PR/CR/SE', async ({ page }) => {
+  await page.goto('/#/scenario');
+  const section = page.locator('.scenario-demographic-groups');
+  await expect(section).toBeVisible({ timeout: 15_000 });
+  await expect(section).not.toContainText('Risk Aversion');
+
+  const rowsFor = (variable: string) =>
+    section.locator('tr', { has: page.locator('td', { hasText: variable }) });
+  // Household Income: base <$50k, comparisons $50k-$100k and $100k+ only
+  const incomeTable = section.locator('table', { hasText: 'Household Income' });
+  await expect(incomeTable).toContainText('Less than $50,000');
+  await expect(incomeTable).toContainText('$50,000 - $100,000');
+  await expect(incomeTable).toContainText('$100,000 or higher');
+  await expect(incomeTable).not.toContainText('$25,000');
+  await expect(incomeTable).not.toContainText('Apartment');
+  await expect(incomeTable).not.toContainText('Mobile home');
+  await expect(incomeTable).toContainText('Not stand-alone');
+  await expect(incomeTable).toContainText('Stand-alone house');
+
+  for (const v of ['Personal Resilience', 'Community Resilience', 'Social Engagement']) {
+    await expect(rowsFor(v)).toContainText('TBD');
+  }
+  await expect(section.locator('.scenario-ate-placeholder')).toHaveCount(3);
+});
