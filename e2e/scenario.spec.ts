@@ -187,3 +187,93 @@ test('Population Segment table: no Risk Aversion, 3-tier income, binary housing,
     expect(Number.isFinite(parseFloat(value.replace('%', '').replace('+', '')))).toBe(true);
   }
 });
+
+test('Population Segment table is reactive to Activity and Behavioral Response (regression guard)', async ({ page }) => {
+  // This is the exact check that was missing when Gender/Age Group/Household
+  // Income/Housing Type/Transit Access were hardcoded literals in
+  // demographicData - the table rendered fine and looked plausible, but every
+  // number stayed frozen no matter what was selected. Asserting the LABELS
+  // are correct (as the previous test does) doesn't catch that; only
+  // asserting the VALUES actually change does.
+  await page.goto('/#/scenario');
+  const section = page.locator('.scenario-demographic-groups');
+  await expect(section).toBeVisible({ timeout: 15_000 });
+
+  const rowsFor = (variable: string) =>
+    section.locator('tr', { has: page.locator('td', { hasText: variable }) });
+  const firstValue = async (variable: string) =>
+    (await rowsFor(variable).locator('.scenario-ate-display-value').first().innerText()).trim();
+
+  const activitySelect = page.locator('.scenario-section-card')
+    .filter({ has: page.locator('.scenario-demographic-groups') })
+    .locator('select.scenario-select');
+
+  // --- Activity reactivity ---
+  // Household Income (in50/in50100) isn't a coefficient in either use_car or
+  // go_business_as_usual for heat - 0% there is legitimately correct, not a
+  // bug, so it needs its own pair where the variable is actually in-model
+  // (dine_in has both income dummies).
+  await activitySelect.selectOption({ value: 'use_car' });
+  await page.waitForTimeout(300);
+  const useCarValues = {
+    gender: await firstValue('Gender'),
+    ageGroup: await firstValue('Age Group'),
+    householdIncome: await firstValue('Household Income')
+  };
+
+  await activitySelect.selectOption({ value: 'go_business_as_usual' });
+  await page.waitForTimeout(300);
+  const gbuValues = {
+    gender: await firstValue('Gender'),
+    ageGroup: await firstValue('Age Group')
+  };
+
+  await activitySelect.selectOption({ value: 'dine_in' });
+  await page.waitForTimeout(300);
+  const dineInValues = {
+    householdIncome: await firstValue('Household Income')
+  };
+
+  console.log('Activity reactivity:', JSON.stringify({ useCarValues, gbuValues, dineInValues }));
+  expect(gbuValues.gender, 'Gender ATE did not change when Activity changed (use_car -> go_business_as_usual)').not.toBe(useCarValues.gender);
+  expect(gbuValues.ageGroup, 'Age Group ATE did not change when Activity changed (use_car -> go_business_as_usual)').not.toBe(useCarValues.ageGroup);
+  expect(dineInValues.householdIncome, 'Household Income ATE did not change when Activity changed (use_car -> dine_in)').not.toBe(useCarValues.householdIncome);
+
+  // --- Behavioral Response reactivity ---
+  // Same reasoning as above: pick, per variable, an activity where that
+  // variable is actually in the fitted model (go_business_as_usual for
+  // Gender/Age Group, dine_in for Household Income), and hold the activity
+  // fixed while only the response button changes.
+  const behaviorButtons = page.locator('.scenario-section-card')
+    .filter({ has: page.locator('.scenario-demographic-groups') })
+    .locator('.scenario-behavior-button');
+
+  await activitySelect.selectOption({ value: 'go_business_as_usual' });
+  await page.waitForTimeout(300);
+  await behaviorButtons.filter({ hasText: 'Do Less' }).click();
+  await page.waitForTimeout(300);
+  const doLess = {
+    gender: await firstValue('Gender'),
+    ageGroup: await firstValue('Age Group')
+  };
+  await behaviorButtons.filter({ hasText: 'Do More' }).click();
+  await page.waitForTimeout(300);
+  const doMore = {
+    gender: await firstValue('Gender'),
+    ageGroup: await firstValue('Age Group')
+  };
+
+  await activitySelect.selectOption({ value: 'dine_in' });
+  await page.waitForTimeout(300);
+  await behaviorButtons.filter({ hasText: 'Do Less' }).click();
+  await page.waitForTimeout(300);
+  const doLessIncome = await firstValue('Household Income');
+  await behaviorButtons.filter({ hasText: 'Do More' }).click();
+  await page.waitForTimeout(300);
+  const doMoreIncome = await firstValue('Household Income');
+
+  console.log('Behavioral Response reactivity:', JSON.stringify({ doLess, doMore, doLessIncome, doMoreIncome }));
+  expect(doMore.gender, 'Gender ATE did not change when Behavioral Response changed (go_business_as_usual)').not.toBe(doLess.gender);
+  expect(doMore.ageGroup, 'Age Group ATE did not change when Behavioral Response changed (go_business_as_usual)').not.toBe(doLess.ageGroup);
+  expect(doMoreIncome, 'Household Income ATE did not change when Behavioral Response changed (dine_in)').not.toBe(doLessIncome);
+});

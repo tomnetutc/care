@@ -6,7 +6,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useScenarioATE } from '../../hooks/useScenarioATE';
+import { useScenarioATE, segmentResultKey } from '../../hooks/useScenarioATE';
+import { SEGMENT_GROUPS } from '../../lib/engine/segmentConfig';
 import { Sun, Snowflake, Droplets, Mountain, Zap, TrendingDown, Minus, TrendingUp, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import './ScenarioATEPanel.scss';
 
@@ -48,6 +49,7 @@ const ScenarioATEPanel: React.FC = () => {
     isComputing,
     results,
     continuousResults,
+    segmentResults,
     error,
     isReady,
     setSelectedEvent,
@@ -181,6 +183,20 @@ const ScenarioATEPanel: React.FC = () => {
     return result.ate[ateIndex] || 0;
   };
 
+  // Gender / Age Group / Household Income / Housing Type / Transit Access:
+  // real computeSegmentATEs results (each person's own observed severity and
+  // every other variable held fixed; only the group's dummies forced to the
+  // spec), for the currently selected activity. 0 both while segmentResults
+  // hasn't loaded yet and when the group isn't in that activity's model
+  // (computeSegmentATEs' inModel=false already returns [0,0,0]).
+  const getSegmentAte = (groupKey: string, comparisonLabel: string): number => {
+    const list = segmentResults[segmentResultKey(groupKey, comparisonLabel)];
+    const result = list?.find(r => r.activity === selectedActivity);
+    if (!result || !result.isValid) return 0;
+    const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
+    return result.ate[ateIndex] || 0;
+  };
+
   // Dummy data for Population Segment Analysis
   const demographicData = {
     attitudes: {
@@ -196,26 +212,24 @@ const ScenarioATEPanel: React.FC = () => {
     socioDemo: {
       title: 'Socio-Demographics',
       variables: [
-        { variable: 'Gender', baseLevel: 'Male', comparisons: [{ treatmentLevel: 'Female', ate: 0.05 }] },
-        { variable: 'Age Group', baseLevel: '18-34', comparisons: [{ treatmentLevel: '35-54', ate: -0.03 }, { treatmentLevel: '55+', ate: 0.08 }] }
+        { variable: SEGMENT_GROUPS.gender.label, baseLevel: SEGMENT_GROUPS.gender.baseLabel, comparisons: SEGMENT_GROUPS.gender.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('gender', c.label) })) },
+        { variable: SEGMENT_GROUPS.age.label, baseLevel: SEGMENT_GROUPS.age.baseLabel, comparisons: SEGMENT_GROUPS.age.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('age', c.label) })) }
       ]
     },
     household: {
       title: 'Household Attributes',
       variables: [
         { variable: 'Household Income', baseLevel: 'Less than $50,000', comparisons: [
-          { treatmentLevel: '$50,000 - $100,000', ate: 0.02 },
-          { treatmentLevel: '$100,000 or higher', ate: -0.60 }
+          { treatmentLevel: '$50,000 - $100,000', ate: getSegmentAte('householdIncome', '$50k-$100k') },
+          { treatmentLevel: '$100,000 or higher', ate: getSegmentAte('householdIncome', '$100k or higher') }
         ]},
-        { variable: 'Housing Type', baseLevel: 'Not stand-alone', comparisons: [
-          { treatmentLevel: 'Stand-alone house', ate: 0.32 }
-        ]}
+        { variable: SEGMENT_GROUPS.housingType.label, baseLevel: SEGMENT_GROUPS.housingType.baseLabel, comparisons: SEGMENT_GROUPS.housingType.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('housingType', c.label) })) }
       ]
     },
     community: {
       title: 'Community Resources',
       variables: [
-        { variable: 'Transit Access', baseLevel: 'Low', comparisons: [{ treatmentLevel: 'High', ate: 0.25 }] }
+        { variable: SEGMENT_GROUPS.transitAccess.label, baseLevel: SEGMENT_GROUPS.transitAccess.baseLabel, comparisons: SEGMENT_GROUPS.transitAccess.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('transitAccess', c.label) })) }
       ]
     }
   };
