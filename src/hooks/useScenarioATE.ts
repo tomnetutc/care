@@ -28,13 +28,16 @@ import DataService from '../services/DataService';
 import {
   computeSeverityATEs,
   computeContinuousATE,
+  computeSegmentATEs,
   ATEResult,
   ContinuousATEResult,
+  SegmentATEResult,
   EventModelData,
   ModelDataByEvent,
   validateModelData
 } from '../lib/engine/computeATE';
 import { EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE } from '../lib/engine/eventConfig';
+import { SEGMENT_GROUPS } from '../lib/engine/segmentConfig';
 
 export { EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE };
 
@@ -44,6 +47,11 @@ export { EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE };
 const CONTINUOUS_VARIABLES = ['PR', 'CR', 'SE'];
 const CONTINUOUS_MULT = 0.01;
 
+/** Key used in segmentResults for one (group, comparison) pair - e.g. "age::65+". */
+export function segmentResultKey(groupKey: string, comparisonLabel: string): string {
+  return `${groupKey}::${comparisonLabel}`;
+}
+
 export interface ScenarioState {
   selectedEvent: string;
   baseSeverityLevel: number;
@@ -52,6 +60,7 @@ export interface ScenarioState {
   isComputing: boolean;
   results: ATEResult[];
   continuousResults: Record<string, ContinuousATEResult[]>;
+  segmentResults: Record<string, SegmentATEResult[]>;
   error: string | null;
   modelData: ModelDataByEvent | null;
   isValid: boolean;
@@ -66,6 +75,7 @@ export const useScenarioATE = () => {
     isComputing: false,
     results: [],
     continuousResults: {},
+    segmentResults: {},
     error: null,
     modelData: null,
     isValid: false
@@ -159,6 +169,17 @@ export const useScenarioATE = () => {
         });
       }
 
+      const segmentResults: Record<string, SegmentATEResult[]> = {};
+      for (const [groupKey, group] of Object.entries(SEGMENT_GROUPS)) {
+        for (const comparison of group.comparisons) {
+          segmentResults[segmentResultKey(groupKey, comparison.label)] = computeSegmentATEs(eventModelData, filteredData, {
+            event: eventConfig.csvEvent,
+            baseSpec: group.baseSpec,
+            comparisonSpec: comparison.spec
+          });
+        }
+      }
+
       console.log('ATE Computation Debug:', {
         selectedEvent: state.selectedEvent,
         csvEvent: eventConfig.csvEvent,
@@ -176,7 +197,7 @@ export const useScenarioATE = () => {
         }))
       });
 
-      setState(prev => ({ ...prev, results, continuousResults, isComputing: false, error: null }));
+      setState(prev => ({ ...prev, results, continuousResults, segmentResults, isComputing: false, error: null }));
     } catch (error) {
       console.error('Error computing ATEs:', error);
       setState(prev => ({
@@ -240,6 +261,7 @@ export const useScenarioATE = () => {
     isComputing: state.isComputing,
     results: state.results,
     continuousResults: state.continuousResults,
+    segmentResults: state.segmentResults,
     error: state.error,
     isReady,
 
