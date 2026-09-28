@@ -6,14 +6,17 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useScenarioATE, segmentResultKey } from '../../hooks/useScenarioATE';
+import { useScenarioATE, segmentResultKey, EVENT_CONFIG } from '../../hooks/useScenarioATE';
 import { SEGMENT_GROUPS } from '../../lib/engine/segmentConfig';
+import { hasVerifiedSampleMismatch } from '../../lib/engine/computeATE';
 import { Sun, Snowflake, Droplets, Mountain, Zap, TrendingDown, Minus, TrendingUp, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import './ScenarioATEPanel.scss';
 
 type ExpandedGroupsKey = 'attitudes' | 'socioDemo' | 'household' | 'community';
 
 const GBU_NOTE = "This was a 5-level question from very unlikely to very likely. Do less corresponds to very or somewhat unlikely. About the same corresponds to neutral. Do more corresponds to very or somewhat likely.";
+
+const SAMPLE_MISMATCH_NOTE = "Verified data issue: Jinghai's reported fitting sample for this specific model is far smaller than what his own method reproduces from the data he sent (e.g. Power Outage → Go about business as usual: reported n=892 vs. 2,381 recomputed). Numbers below use the full, correctly-filtered sample - the statistically sound choice - but the underlying coefficients may need to be refit by Jinghai. Flagged for his review; not a display bug.";
 
 const ANTICIPATED_CHANGE_INDEX: Record<string, number> = {
   'do_less': 0,
@@ -118,6 +121,7 @@ const ScenarioATEPanel: React.FC = () => {
 
   // Get current event info
   const currentEvent = eventMap[selectedEvent] || eventMap['extreme_heat'];
+  const currentCsvEvent = EVENT_CONFIG[selectedEvent]?.csvEvent ?? '';
   const currentBaseLevel = severityMap[baseSeverityLevel] || severityMap[1];
   const currentComparisonLevel = severityMap[treatmentSeverityLevel] || severityMap[5];
   const currentAnticipatedChange = mapAnticipatedChange(anticipatedChange);
@@ -514,7 +518,9 @@ const ScenarioATEPanel: React.FC = () => {
                     const isPos = item.ate >= 0;
                     // Use 3 decimal places for absolute ATE to match existing chart precision
                     const val = showAbsoluteATE ? item.ate.toFixed(3) : (item.ate * 100).toFixed(1) + '%';
-                    
+                    const isMismatched = hasVerifiedSampleMismatch(currentCsvEvent, item.activityKey);
+                    const mismatchTooltipKey = `sampleMismatch-${item.activityKey}`;
+
                     return (
                       <div key={i} className="scenario-ate-item">
                         <div className="scenario-ate-activity">
@@ -533,6 +539,23 @@ const ScenarioATEPanel: React.FC = () => {
                               )}
                             </span>
                           ) : item.activity}
+                          {isMismatched && (
+                            <span
+                              className="scenario-tooltip-wrapper"
+                              onMouseEnter={() => setShowTooltip(mismatchTooltipKey)}
+                              onMouseLeave={() => setShowTooltip(null)}
+                              style={{ color: '#c0392b', marginLeft: '4px', cursor: 'help' }}
+                              title="Verified data issue - see note"
+                            >
+                              ⚠
+                              {showTooltip === mismatchTooltipKey && (
+                                <div className="scenario-tooltip" style={{ textAlign: 'left', fontWeight: 400 }}>
+                                  {SAMPLE_MISMATCH_NOTE}
+                                  <div className="scenario-tooltip-arrow"></div>
+                                </div>
+                              )}
+                            </span>
+                          )}
                         </div>
                         <div className="scenario-ate-bar-container">
                           <div className="scenario-ate-bar-center"></div>
@@ -597,6 +620,11 @@ const ScenarioATEPanel: React.FC = () => {
                   ))}
                 </select>
                 <p className="scenario-config-help">Activity to analyze across population segments</p>
+                {hasVerifiedSampleMismatch(currentCsvEvent, selectedActivity) && (
+                  <p className="scenario-config-help" style={{ color: '#c0392b', fontWeight: 600 }}>
+                    ⚠ Verified data issue for this event/activity - see note under Section 2's matching result.
+                  </p>
+                )}
               </div>
 
               <div className="scenario-config-item">
