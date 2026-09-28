@@ -117,21 +117,121 @@ export interface SeverityATEOptions {
   treatmentSeverityLevel: number;
 }
 
+const RESPONSE_LABELS = ['Do less', 'About the same', 'Do more'];
+
+function emptyResult(activity: string): ATEResult {
+  return {
+    activity, controlProbabilities: [], treatmentProbabilities: [],
+    ate: [], levelLabels: [], conservationCheck: 0, isValid: false, sampleSize: 0
+  };
+}
+
+/**
+ * Shared core, step 1 - the activity's estimation sample (Jinghai's
+ * get_model(): worker filter for WFH/WFO, then sub[x_vars + [dv]].dropna()).
+ * Every coefficient variable (including the severity dummies) AND the
+ * activity's own dependent-variable column must be non-missing.
+ */
+function buildEstimationSample(
+  event: string,
+  activity: string,
+  modelConfig: OrderedModelConfig,
+  rows: any[]
+): any[] {
+  let sample = rows;
+  // Per Jinghai: "For working from home and office should use subset of
+  // sample only for worker."
+  if (isWorkerOnlyActivity(activity)) {
+    sample = rows.filter(row => {
+      const empsta = parseFloat(String(row['empsta'] ?? ''));
+      return !isNaN(empsta) && empsta < 3;
+    });
+    if (sample.length === 0) {
+      console.warn(`No workers found for activity ${activity}, skipping ATE calculation`);
+      return [];
+    }
+  }
+
+  const dvColumn = getDvColumn(event, activity);
+  const complete = sample.filter(row => {
+    const variablesOk = modelConfig.variables.every(variable => {
+      if (!(variable in row)) return false;
+      return !isNaN(parseFloat(String(row[variable] ?? '')));
+    });
+    if (!variablesOk) return false;
+    if (!(dvColumn in row)) return false;
+    return !isNaN(parseFloat(String(row[dvColumn] ?? '')));
+  });
+
+  if (complete.length === 0) {
+    console.warn(`No complete cases found for activity ${activity} (variables + DV non-NA), skipping ATE calculation`);
+  }
+  return complete;
+}
+
+/**
+ * Shared core, step 2 - per-person category probabilities from each person's
+ * own linear predictor z_i, THEN averaged across people (average of
+ * outcomes, not outcome of averages). Returns native-scale probabilities.
+ */
+function averageProbabilities(predictors: number[], modelConfig: OrderedModelConfig): number[] {
+  const thresholds = extractThresholds(modelConfig.thresholds);
+  const levels = modelConfig.metadata.levels;
+  const link = modelConfig.metadata.link;
+  const sums = new Array(levels).fill(0);
+  for (const z of predictors) {
+    const { probabilities } = calculateOrderedProbabilities(z, thresholds, levels, link);
+    probabilities.forEach((p, i) => { sums[i] += p; });
+  }
+  return sums.map(s => s / predictors.length);
+}
+
+/**
+ * Shared core, step 3 - GBU 5-to-3 collapse (after averaging), ATE, and
+ * validity checks. go_business_as_usual is natively a 5-point likelihood
+ * scale; [Very unlikely, Somewhat unlikely] -> "Do less", [Neutral] ->
+ * "About the same", [Somewhat likely, Very likely] -> "Do more". Every other
+ * activity is natively 3-category (1=Less, 2=About the same, 3=More).
+ */
+function buildATEResult(
+  activity: string,
+  modelConfig: OrderedModelConfig,
+  baseProbabilities: number[],
+  comparisonProbabilities: number[],
+  sampleSize: number
+): ATEResult {
+  let control = baseProbabilities;
+  let treatment = comparisonProbabilities;
+  if (modelConfig.metadata.levels === 5) {
+    const collapse = (p: number[]): number[] => [p[0] + p[1], p[2], p[3] + p[4]];
+    control = collapse(control);
+    treatment = collapse(treatment);
+  }
+
+  const ate = treatment.map((p, i) => p - control[i]);
+  const conservationCheck = ate.reduce((sum, delta) => sum + delta, 0);
+  const isValid = Math.abs(conservationCheck) < 1e-6 &&
+                  control.every(p => p >= 0 && p <= 1) &&
+                  treatment.every(p => p >= 0 && p <= 1);
+
+  return {
+    activity,
+    controlProbabilities: control,
+    treatmentProbabilities: treatment,
+    ate,
+    levelLabels: RESPONSE_LABELS,
+    conservationCheck,
+    isValid,
+    sampleSize
+  };
+}
+
 /**
  * Compute ATEs for every activity available for one event, comparing the
  * base severity level against the treatment (comparison) severity level.
  * Both are real severity dummy assignments (level 1 = reference, all dummies
- * 0) - not collapsed to a binary "low vs high" split.
- *
- * Every activity's result uses the same 3-category response scale
- * ["Do less", "About the same", "Do more"]. The 8 non-GBU activities are
- * natively coded that way (1=Less, 2=About the same, 3=More - confirmed by
- * Jinghai after the source codebook's stale labels were found to not match
- * the actual coding). "go_business_as_usual" (Usual) is natively a 5-point
- * likelihood scale; per Jinghai's ate_severity(), it's collapsed to the same
- * 3-category scale AFTER averaging the 5-level probabilities across people:
- * [Very unlikely, Somewhat unlikely] -> "Do less", [Neutral] -> "About the
- * same", [Somewhat likely, Very likely] -> "Do more".
+ * 0). Severity is forced to a single scalar for everyone; every other
+ * variable stays at each person's observed value.
  */
 export function computeSeverityATEs(
   eventModelData: EventModelData,
@@ -144,59 +244,15 @@ export function computeSeverityATEs(
 
   for (const [activity, modelConfig] of Object.entries(eventModelData)) {
     try {
-      // Worker-only filter: for work_from_home / work_from_office, only workers
-      // (empsta < 3) are in scope. Per Jinghai: "For working from home and
-      // office should use subset of sample only for worker."
-      let activityFilteredData = filteredData;
-      if (isWorkerOnlyActivity(activity)) {
-        activityFilteredData = filteredData.filter(row => {
-          const empsta = parseFloat(String(row['empsta'] ?? ''));
-          return !isNaN(empsta) && empsta < 3;
-        });
-
-        if (activityFilteredData.length === 0) {
-          console.warn(`No workers found for activity ${activity}, skipping ATE calculation`);
-          results.push({
-            activity, controlProbabilities: [], treatmentProbabilities: [],
-            ate: [], levelLabels: [], conservationCheck: 0, isValid: false, sampleSize: 0
-          });
-          continue;
-        }
-      }
-
-      // Complete-case / estimation-sample filtering, matching get_model()'s
-      // sub[x_vars + [dv]].dropna(): every coefficient variable (including
-      // the severity dummies themselves - a person must have answered the
-      // severity question) AND the activity's own dependent-variable column
-      // must be non-missing.
-      const dvColumn = getDvColumn(event, activity);
-      const completeCaseData = activityFilteredData.filter(row => {
-        const variablesOk = modelConfig.variables.every(variable => {
-          if (!(variable in row)) return false;
-          const value = parseFloat(String(row[variable] ?? ''));
-          return !isNaN(value);
-        });
-        if (!variablesOk) return false;
-        if (!(dvColumn in row)) return false;
-        const dvValue = parseFloat(String(row[dvColumn] ?? ''));
-        return !isNaN(dvValue);
-      });
-
-      if (completeCaseData.length === 0) {
-        console.warn(`No complete cases found for activity ${activity} (variables + DV non-NA), skipping ATE calculation`);
-        results.push({
-          activity, controlProbabilities: [], treatmentProbabilities: [],
-          ate: [], levelLabels: [], conservationCheck: 0, isValid: false, sampleSize: 0
-        });
+      const sample = buildEstimationSample(event, activity, modelConfig, filteredData);
+      if (sample.length === 0) {
+        results.push(emptyResult(activity));
         continue;
       }
 
-      // Per-person linear predictor over every NON-severity variable, using
-      // each person's own real row values (xb = sum(sample[v] * coefs[v])).
       const nonSeverityEntries = Object.entries(modelConfig.coefficients)
         .filter(([variable]) => !severityVars.includes(variable));
-
-      const basePredictors: number[] = completeCaseData.map(row => {
+      const basePredictors = sample.map(row => {
         let z = 0;
         for (const [variable, coefficient] of nonSeverityEntries) {
           z += coefficient * (parseFloat(String(row[variable] ?? '')) || 0);
@@ -204,61 +260,186 @@ export function computeSeverityATEs(
         return z;
       });
 
-      // The severity contribution is a single scalar shared by everyone in a
-      // given scenario (the forced group-level manipulation) - level 1 adds
-      // nothing (reference category), any other level adds its dummy's coefficient.
       const severityAddend = (level: number): number =>
         level === 1 ? 0 : (modelConfig.coefficients[`${event}_imp_${level}`] ?? 0);
 
-      const thresholds = extractThresholds(modelConfig.thresholds);
-      const levels = modelConfig.metadata.levels;
-      const link = modelConfig.metadata.link;
+      const base = averageProbabilities(basePredictors.map(z => z + severityAddend(baseSeverityLevel)), modelConfig);
+      const comparison = averageProbabilities(basePredictors.map(z => z + severityAddend(treatmentSeverityLevel)), modelConfig);
 
-      // Per-person probabilities, THEN averaged across people (average of
-      // outcomes, not outcome of averages - the core methodology fix).
-      const averageProbabilities = (addend: number): number[] => {
-        const sums = new Array(levels).fill(0);
-        for (const z of basePredictors) {
-          const { probabilities } = calculateOrderedProbabilities(z + addend, thresholds, levels, link);
-          probabilities.forEach((p, i) => { sums[i] += p; });
-        }
-        return sums.map(s => s / basePredictors.length);
-      };
-
-      let controlProbabilities = averageProbabilities(severityAddend(baseSeverityLevel));
-      let treatmentProbabilities = averageProbabilities(severityAddend(treatmentSeverityLevel));
-
-      if (levels === 5) {
-        // go_business_as_usual: collapse 5-level (Very unlikely..Very likely)
-        // to the same 3-category scale as every other activity, post-averaging.
-        const collapse = (p: number[]): number[] => [p[0] + p[1], p[2], p[3] + p[4]];
-        controlProbabilities = collapse(controlProbabilities);
-        treatmentProbabilities = collapse(treatmentProbabilities);
-      }
-      const levelLabels = ['Do less', 'About the same', 'Do more'];
-
-      const ate = treatmentProbabilities.map((p, i) => p - controlProbabilities[i]);
-      const conservationCheck = ate.reduce((sum, delta) => sum + delta, 0);
-      const isValid = Math.abs(conservationCheck) < 1e-6 &&
-                      controlProbabilities.every(p => p >= 0 && p <= 1) &&
-                      treatmentProbabilities.every(p => p >= 0 && p <= 1);
-
-      results.push({
-        activity,
-        controlProbabilities,
-        treatmentProbabilities,
-        ate,
-        levelLabels,
-        conservationCheck,
-        isValid,
-        sampleSize: completeCaseData.length
-      });
+      results.push(buildATEResult(activity, modelConfig, base, comparison, sample.length));
     } catch (error) {
       console.error(`Error calculating ATE for activity ${activity}:`, error);
-      results.push({
-        activity, controlProbabilities: [], treatmentProbabilities: [],
-        ate: [], levelLabels: [], conservationCheck: 0, isValid: false, sampleSize: 0
-      });
+      results.push(emptyResult(activity));
+    }
+  }
+
+  return results;
+}
+
+export interface SegmentATEOptions {
+  event: string;
+  /** {variable: forced value} for the base level - must list EVERY dummy in the group (siblings set to 0). */
+  baseSpec: Record<string, number>;
+  /** Same shape, for the comparison level. */
+  comparisonSpec: Record<string, number>;
+}
+
+export interface SegmentATEResult extends ATEResult {
+  /** False when none of the group's variables survived backward elimination in this
+   *  event/activity's fitted model - the ATE is then exactly 0 by construction. */
+  inModel: boolean;
+}
+
+/**
+ * Population-segment ATEs (Jinghai's ate_segment()). Each person keeps their
+ * OWN observed severity (and every other variable); only the segment
+ * variable group is forced to the base / comparison spec. Each person's
+ * linear predictor is their full observed x*beta plus a per-person shift
+ * sum((forced - observed) * coef) over the group's variables that are in the
+ * model. Because the spec lists every sibling dummy, siblings are zeroed out
+ * correctly (e.g. Age 31-50 = {age_3150:1, age_5165:0, age_65p:0}), and a
+ * respondent's own observed sibling value is replaced rather than added to.
+ * A group variable not in this activity's model contributes nothing.
+ */
+export function computeSegmentATEs(
+  eventModelData: EventModelData,
+  filteredData: any[],
+  options: SegmentATEOptions
+): SegmentATEResult[] {
+  const results: SegmentATEResult[] = [];
+  const { event, baseSpec, comparisonSpec } = options;
+
+  for (const [activity, modelConfig] of Object.entries(eventModelData)) {
+    try {
+      const sample = buildEstimationSample(event, activity, modelConfig, filteredData);
+      if (sample.length === 0) {
+        results.push({ ...emptyResult(activity), inModel: false });
+        continue;
+      }
+
+      const coefficients = modelConfig.coefficients;
+      const inModelVars = Object.keys(baseSpec).filter(v => v in coefficients);
+
+      if (inModelVars.length === 0) {
+        results.push({
+          activity, controlProbabilities: [], treatmentProbabilities: [],
+          ate: [0, 0, 0], levelLabels: RESPONSE_LABELS, conservationCheck: 0,
+          isValid: true, sampleSize: sample.length, inModel: false
+        });
+        continue;
+      }
+
+      const observedPredictors: number[] = [];
+      const baseShifts: number[] = [];
+      const comparisonShifts: number[] = [];
+      for (const row of sample) {
+        let z = 0;
+        for (const [variable, coefficient] of Object.entries(coefficients)) {
+          z += coefficient * (parseFloat(String(row[variable] ?? '')) || 0);
+        }
+        let shiftBase = 0;
+        let shiftComparison = 0;
+        for (const variable of inModelVars) {
+          const observed = parseFloat(String(row[variable] ?? '')) || 0;
+          shiftBase += (baseSpec[variable] - observed) * coefficients[variable];
+          shiftComparison += ((comparisonSpec[variable] ?? 0) - observed) * coefficients[variable];
+        }
+        observedPredictors.push(z);
+        baseShifts.push(shiftBase);
+        comparisonShifts.push(shiftComparison);
+      }
+
+      const base = averageProbabilities(observedPredictors.map((z, i) => z + baseShifts[i]), modelConfig);
+      const comparison = averageProbabilities(observedPredictors.map((z, i) => z + comparisonShifts[i]), modelConfig);
+
+      results.push({ ...buildATEResult(activity, modelConfig, base, comparison, sample.length), inModel: true });
+    } catch (error) {
+      console.error(`Error calculating segment ATE for activity ${activity}:`, error);
+      results.push({ ...emptyResult(activity), inModel: false });
+    }
+  }
+
+  return results;
+}
+
+export interface ContinuousATEOptions {
+  event: string;
+  /** The continuous variable's coefficient name, e.g. 'PR', 'CR', 'SE'. */
+  variable: string;
+  /** Multiplier on the estimation sample's SD of `variable` (Jinghai: 0.01 = "+1% of SD"). */
+  mult: number;
+}
+
+export interface ContinuousATEResult extends ATEResult {
+  /** False when `variable` isn't a coefficient of that event/activity's fitted model. */
+  inModel: boolean;
+}
+
+/**
+ * Continuous-variable ATEs (Jinghai's ate_continuous()). Unlike severity or
+ * the discrete segments, nothing is forced to a fixed value: the base
+ * scenario is simply each person's own full observed prediction (every
+ * coefficient, including their real severity dummies, at their real row
+ * values) with NO shift at all. The comparison scenario adds one uniform
+ * scalar shift - coefficient[variable] * mult * SD(variable) - to every
+ * person's base predictor, where SD is the standard deviation of `variable`
+ * computed over THIS activity's own estimation sample (same rows
+ * buildEstimationSample returns for this event/activity, not pooled across
+ * events or activities, and not a population SD - matches pandas' default
+ * sample SD, ddof=1, which is what `sample[var].std()` computes in the
+ * notebook).
+ */
+export function computeContinuousATE(
+  eventModelData: EventModelData,
+  filteredData: any[],
+  options: ContinuousATEOptions
+): ContinuousATEResult[] {
+  const results: ContinuousATEResult[] = [];
+  const { event, variable, mult } = options;
+
+  for (const [activity, modelConfig] of Object.entries(eventModelData)) {
+    try {
+      const sample = buildEstimationSample(event, activity, modelConfig, filteredData);
+      if (sample.length === 0) {
+        results.push({ ...emptyResult(activity), inModel: false });
+        continue;
+      }
+
+      const coefficients = modelConfig.coefficients;
+      if (!(variable in coefficients)) {
+        results.push({
+          activity, controlProbabilities: [], treatmentProbabilities: [],
+          ate: [0, 0, 0], levelLabels: RESPONSE_LABELS, conservationCheck: 0,
+          isValid: true, sampleSize: sample.length, inModel: false
+        });
+        continue;
+      }
+
+      const observedPredictors: number[] = [];
+      const values: number[] = [];
+      for (const row of sample) {
+        let z = 0;
+        for (const [v, coefficient] of Object.entries(coefficients)) {
+          z += coefficient * (parseFloat(String(row[v] ?? '')) || 0);
+        }
+        observedPredictors.push(z);
+        values.push(parseFloat(String(row[variable] ?? '')) || 0);
+      }
+
+      // Sample standard deviation (ddof=1), matching pandas' default .std().
+      const n = values.length;
+      const mean = values.reduce((sum, v) => sum + v, 0) / n;
+      const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (n - 1);
+      const sd = Math.sqrt(variance);
+      const shift = coefficients[variable] * mult * sd;
+
+      const base = averageProbabilities(observedPredictors, modelConfig);
+      const comparison = averageProbabilities(observedPredictors.map(z => z + shift), modelConfig);
+
+      results.push({ ...buildATEResult(activity, modelConfig, base, comparison, sample.length), inModel: true });
+    } catch (error) {
+      console.error(`Error calculating continuous ATE for activity ${activity}:`, error);
+      results.push({ ...emptyResult(activity), inModel: false });
     }
   }
 

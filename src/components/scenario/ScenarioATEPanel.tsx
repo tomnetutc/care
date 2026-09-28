@@ -12,6 +12,21 @@ import './ScenarioATEPanel.scss';
 
 type ExpandedGroupsKey = 'attitudes' | 'socioDemo' | 'household' | 'community';
 
+const GBU_NOTE = "This was a 5-level question from very unlikely to very likely. Do less corresponds to very or somewhat unlikely. About the same corresponds to neutral. Do more corresponds to very or somewhat likely.";
+
+const ANTICIPATED_CHANGE_INDEX: Record<string, number> = {
+  'do_less': 0,
+  'about_same': 1,
+  'do_more': 2
+};
+
+// Population Segment Analysis's continuous attitude rows -> computeContinuousATE's variable key.
+const CONTINUOUS_VARIABLE_KEY: Record<string, string> = {
+  'Personal Resilience': 'PR',
+  'Community Resilience': 'CR',
+  'Social Engagement': 'SE'
+};
+
 const ScenarioATEPanel: React.FC = () => {
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
   const [showAbsoluteATE, setShowAbsoluteATE] = useState(false);
@@ -32,6 +47,7 @@ const ScenarioATEPanel: React.FC = () => {
     anticipatedChange,
     isComputing,
     results,
+    continuousResults,
     error,
     isReady,
     setSelectedEvent,
@@ -64,16 +80,16 @@ const ScenarioATEPanel: React.FC = () => {
     5: { value: 'extremely-severe', label: 'Extremely severe' },
   };
 
-  // Activities mapping - 8 activities matching the model
+  // Activities mapping - real engine activity keys (model_coeffs_by_event.json).
+  // Must match computeATE.ts's keys exactly - Section 3's continuous-variable
+  // rows look up results by selectedActivity.
   const activities = [
     { value: 'use_car', label: 'Using a car for traveling' },
     { value: 'use_transit', label: 'Taking public transit' },
     { value: 'stay_home', label: 'Staying at home' },
-    { value: 'get_meal_delivered', label: 'Having food delivered from a restaurant' },
-    // Provisional: the new coefficient data has separate "Dine in" and "Pick up"
-    // models; this is wired to "Dine in" only pending a product decision on how
-    // to represent both under one combined activity. See model_coeffs_by_event.json.
-    { value: 'dine_in_pickup', label: 'Dine in / Pick up' },
+    { value: 'delivery', label: 'Having food delivered' },
+    { value: 'dine_in', label: 'Eating indoors at a restaurant' },
+    { value: 'pick_up', label: 'Picking up takeout' },
     { value: 'work_from_home', label: 'Working from home' },
     { value: 'work_from_office', label: 'Working from the office' },
     { value: 'go_business_as_usual', label: 'Go about business as usual' },
@@ -125,12 +141,6 @@ const ScenarioATEPanel: React.FC = () => {
       'go_business_as_usual': 'Go about business as usual'
     };
 
-    const ANTICIPATED_CHANGE_INDEX: Record<string, number> = {
-      'do_less': 0,
-      'about_same': 1,
-      'do_more': 2
-    };
-
     const getATEForChange = (result: any) => {
       if (!result.ate || result.ate.length === 0) return 0;
       const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
@@ -141,6 +151,7 @@ const ScenarioATEPanel: React.FC = () => {
       .filter(r => r.isValid)
       .map(result => ({
         activity: activityLabelMap[result.activity] || result.activity,
+        activityKey: result.activity,
         ate: getATEForChange(result)
       }))
       .sort((a, b) => b.ate - a.ate); // Sort from most positive to most negative
@@ -157,13 +168,29 @@ const ScenarioATEPanel: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady, selectedEvent, baseSeverityLevel, treatmentSeverityLevel, anticipatedChange]);
 
+  // Personal Resilience / Community Resilience / Social Engagement: real
+  // ate_continuous results (mult=0.01, "+1% of SD", confirmed by Jinghai),
+  // for the currently selected activity. 0 both while continuousResults
+  // hasn't loaded yet and when the variable isn't in that activity's model
+  // (computeContinuousATE's inModel=false already returns [0,0,0]).
+  const getContinuousAte = (variable: string): number => {
+    const list = continuousResults[CONTINUOUS_VARIABLE_KEY[variable]];
+    const result = list?.find(r => r.activity === selectedActivity);
+    if (!result || !result.isValid) return 0;
+    const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
+    return result.ate[ateIndex] || 0;
+  };
+
   // Dummy data for Population Segment Analysis
   const demographicData = {
     attitudes: {
       title: 'Attitudes & Personality Traits',
+      // Continuous standardized factor scores. Base = each person's own
+      // observed value; comparison = "+1% of SD" (ate_continuous, mult=0.01).
       variables: [
-        { variable: 'Personal Resilience', baseLevel: 'Low', comparisons: [{ treatmentLevel: 'High', ate: 0.00 }] },
-        { variable: 'Risk Aversion', baseLevel: 'Low', comparisons: [{ treatmentLevel: 'High', ate: 0.22 }] }
+        { variable: 'Personal Resilience', baseLevel: 'Observed value', comparisons: [{ treatmentLevel: '+1% of SD', ate: getContinuousAte('Personal Resilience') }] },
+        { variable: 'Community Resilience', baseLevel: 'Observed value', comparisons: [{ treatmentLevel: '+1% of SD', ate: getContinuousAte('Community Resilience') }] },
+        { variable: 'Social Engagement', baseLevel: 'Observed value', comparisons: [{ treatmentLevel: '+1% of SD', ate: getContinuousAte('Social Engagement') }] }
       ]
     },
     socioDemo: {
@@ -176,14 +203,12 @@ const ScenarioATEPanel: React.FC = () => {
     household: {
       title: 'Household Attributes',
       variables: [
-        { variable: 'Household Income', baseLevel: 'Less than $25,000', comparisons: [
-          { treatmentLevel: '$25,000 - $49,999', ate: 0.01 },
-          { treatmentLevel: '$50,000 - $99,999', ate: 0.02 },
+        { variable: 'Household Income', baseLevel: 'Less than $50,000', comparisons: [
+          { treatmentLevel: '$50,000 - $100,000', ate: 0.02 },
           { treatmentLevel: '$100,000 or higher', ate: -0.60 }
         ]},
-        { variable: 'Housing Type', baseLevel: 'Stand-alone house', comparisons: [
-          { treatmentLevel: 'Apartment', ate: 0.32 },
-          { treatmentLevel: 'Mobile home', ate: 0.01 }
+        { variable: 'Housing Type', baseLevel: 'Not stand-alone', comparisons: [
+          { treatmentLevel: 'Stand-alone house', ate: 0.32 }
         ]}
       ]
     },
@@ -370,7 +395,7 @@ const ScenarioATEPanel: React.FC = () => {
                   disabled={isComputing}
                 >
                   {Object.values(severityMap).map((l) => (
-                    <option key={l.value} value={l.value}>{l.label}</option>
+                    <option key={l.value} value={l.value} disabled={l.value === currentComparisonLevel.value}>{l.label}</option>
                   ))}
                 </select>
                 <p className="scenario-config-help">Perceived severity of impact on daily life from most recent event (reference category)</p>
@@ -384,7 +409,7 @@ const ScenarioATEPanel: React.FC = () => {
                   disabled={isComputing}
                 >
                   {Object.values(severityMap).map((l) => (
-                    <option key={l.value} value={l.value}>{l.label}</option>
+                    <option key={l.value} value={l.value} disabled={l.value === currentBaseLevel.value}>{l.label}</option>
                   ))}
                 </select>
                 <p className="scenario-config-help">Different severity level to compare against the base level</p>
@@ -478,7 +503,23 @@ const ScenarioATEPanel: React.FC = () => {
                     
                     return (
                       <div key={i} className="scenario-ate-item">
-                        <div className="scenario-ate-activity">{item.activity}</div>
+                        <div className="scenario-ate-activity">
+                          {item.activityKey === 'go_business_as_usual' ? (
+                            <span
+                              className="scenario-tooltip-wrapper"
+                              onMouseEnter={() => setShowTooltip('gbuNote')}
+                              onMouseLeave={() => setShowTooltip(null)}
+                            >
+                              <em>{item.activity}*</em>
+                              {showTooltip === 'gbuNote' && (
+                                <div className="scenario-tooltip" style={{ textAlign: 'left', fontWeight: 400 }}>
+                                  {GBU_NOTE}
+                                  <div className="scenario-tooltip-arrow"></div>
+                                </div>
+                              )}
+                            </span>
+                          ) : item.activity}
+                        </div>
                         <div className="scenario-ate-bar-container">
                           <div className="scenario-ate-bar-center"></div>
                           <div 

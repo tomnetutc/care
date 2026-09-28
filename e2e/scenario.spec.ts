@@ -126,3 +126,64 @@ test.describe('Scenario Analysis - severity ATE smoke test', () => {
     });
   }
 });
+
+test('severity dropdowns: a level chosen in one is disabled in the other', async ({ page }) => {
+  await page.goto('/#/scenario');
+  await expect(page.getByRole('heading', { name: 'CARE Scenario Analysis Tool' })).toBeVisible();
+
+  const base = page.locator('select.scenario-select').nth(0);
+  const comparison = page.locator('select.scenario-select').nth(1);
+
+  // Defaults: Base = Not severe at all, Comparison = Extremely severe
+  await expect(comparison.locator('option', { hasText: 'Not severe at all' })).toBeDisabled();
+  await expect(base.locator('option', { hasText: 'Extremely severe' })).toBeDisabled();
+
+  await base.selectOption({ label: 'Moderately severe' });
+  await expect(comparison.locator('option', { hasText: 'Moderately severe' })).toBeDisabled();
+  await expect(comparison.locator('option', { hasText: 'Not severe at all' })).toBeEnabled();
+
+  await comparison.selectOption({ label: 'Slightly severe' });
+  await expect(base.locator('option', { hasText: 'Slightly severe' })).toBeDisabled();
+  await expect(base.locator('option', { hasText: 'Extremely severe' })).toBeEnabled();
+});
+
+test('GBU label is italic with an asterisk and shows Jinghai\'s note on hover', async ({ page }) => {
+  await page.goto('/#/scenario');
+  const label = page.locator('.scenario-ate-activity em', { hasText: 'Go about business as usual*' });
+  await expect(label).toBeVisible({ timeout: 15_000 });
+  expect(await label.evaluate(el => getComputedStyle(el).fontStyle)).toBe('italic');
+  await label.hover();
+  await expect(page.locator('.scenario-tooltip')).toHaveText(
+    'This was a 5-level question from very unlikely to very likely. Do less corresponds to very or somewhat unlikely. About the same corresponds to neutral. Do more corresponds to very or somewhat likely.'
+  );
+});
+
+test('Population Segment table: no Risk Aversion, 3-tier income, binary housing, real PR/CR/SE values', async ({ page }) => {
+  await page.goto('/#/scenario');
+  const section = page.locator('.scenario-demographic-groups');
+  await expect(section).toBeVisible({ timeout: 15_000 });
+  await expect(section).not.toContainText('Risk Aversion');
+
+  const rowsFor = (variable: string) =>
+    section.locator('tr', { has: page.locator('td', { hasText: variable }) });
+  // Household Income: base <$50k, comparisons $50k-$100k and $100k+ only
+  const incomeTable = section.locator('table', { hasText: 'Household Income' });
+  await expect(incomeTable).toContainText('Less than $50,000');
+  await expect(incomeTable).toContainText('$50,000 - $100,000');
+  await expect(incomeTable).toContainText('$100,000 or higher');
+  await expect(incomeTable).not.toContainText('$25,000');
+  await expect(incomeTable).not.toContainText('Apartment');
+  await expect(incomeTable).not.toContainText('Mobile home');
+  await expect(incomeTable).toContainText('Not stand-alone');
+  await expect(incomeTable).toContainText('Stand-alone house');
+
+  // No more TBD placeholder anywhere - PR/CR/SE now show real computed values.
+  await expect(section).not.toContainText('TBD');
+  await expect(section.locator('.scenario-ate-placeholder')).toHaveCount(0);
+
+  for (const v of ['Personal Resilience', 'Community Resilience', 'Social Engagement']) {
+    await expect(rowsFor(v)).toContainText('+1% of SD');
+    const value = await rowsFor(v).locator('.scenario-ate-display-value').innerText();
+    expect(Number.isFinite(parseFloat(value.replace('%', '').replace('+', '')))).toBe(true);
+  }
+});
