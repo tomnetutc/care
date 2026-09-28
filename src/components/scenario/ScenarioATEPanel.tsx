@@ -217,7 +217,16 @@ const ScenarioATEPanel: React.FC = () => {
       title: 'Socio-Demographics',
       variables: [
         { variable: SEGMENT_GROUPS.gender.label, baseLevel: SEGMENT_GROUPS.gender.baseLabel, comparisons: SEGMENT_GROUPS.gender.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('gender', c.label) })) },
-        { variable: SEGMENT_GROUPS.age.label, baseLevel: SEGMENT_GROUPS.age.baseLabel, comparisons: SEGMENT_GROUPS.age.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('age', c.label) })) }
+        { variable: SEGMENT_GROUPS.age.label, baseLevel: SEGMENT_GROUPS.age.baseLabel, comparisons: SEGMENT_GROUPS.age.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('age', c.label) })) },
+        { variable: SEGMENT_GROUPS.educationBachelors.label, baseLevel: SEGMENT_GROUPS.educationBachelors.baseLabel, comparisons: SEGMENT_GROUPS.educationBachelors.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('educationBachelors', c.label) })) },
+        { variable: SEGMENT_GROUPS.educationBsOrHigher.label, baseLevel: SEGMENT_GROUPS.educationBsOrHigher.baseLabel, comparisons: SEGMENT_GROUPS.educationBsOrHigher.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('educationBsOrHigher', c.label) })) },
+        { variable: SEGMENT_GROUPS.raceWhite.label, baseLevel: SEGMENT_GROUPS.raceWhite.baseLabel, comparisons: SEGMENT_GROUPS.raceWhite.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('raceWhite', c.label) })) },
+        { variable: SEGMENT_GROUPS.raceBlack.label, baseLevel: SEGMENT_GROUPS.raceBlack.baseLabel, comparisons: SEGMENT_GROUPS.raceBlack.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('raceBlack', c.label) })) },
+        { variable: SEGMENT_GROUPS.raceAsian.label, baseLevel: SEGMENT_GROUPS.raceAsian.baseLabel, comparisons: SEGMENT_GROUPS.raceAsian.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('raceAsian', c.label) })) },
+        { variable: SEGMENT_GROUPS.ethnicityHispanic.label, baseLevel: SEGMENT_GROUPS.ethnicityHispanic.baseLabel, comparisons: SEGMENT_GROUPS.ethnicityHispanic.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('ethnicityHispanic', c.label) })) },
+        { variable: SEGMENT_GROUPS.disability.label, baseLevel: SEGMENT_GROUPS.disability.baseLabel, comparisons: SEGMENT_GROUPS.disability.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('disability', c.label) })) },
+        { variable: SEGMENT_GROUPS.worksOutdoors.label, baseLevel: SEGMENT_GROUPS.worksOutdoors.baseLabel, comparisons: SEGMENT_GROUPS.worksOutdoors.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('worksOutdoors', c.label) })) },
+        { variable: SEGMENT_GROUPS.doesNotTelecommute.label, baseLevel: SEGMENT_GROUPS.doesNotTelecommute.baseLabel, comparisons: SEGMENT_GROUPS.doesNotTelecommute.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('doesNotTelecommute', c.label) })) }
       ]
     },
     household: {
@@ -227,13 +236,23 @@ const ScenarioATEPanel: React.FC = () => {
           { treatmentLevel: '$50,000 - $100,000', ate: getSegmentAte('householdIncome', '$50k-$100k') },
           { treatmentLevel: '$100,000 or higher', ate: getSegmentAte('householdIncome', '$100k or higher') }
         ]},
-        { variable: SEGMENT_GROUPS.housingType.label, baseLevel: SEGMENT_GROUPS.housingType.baseLabel, comparisons: SEGMENT_GROUPS.housingType.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('housingType', c.label) })) }
+        { variable: SEGMENT_GROUPS.householdSize.label, baseLevel: SEGMENT_GROUPS.householdSize.baseLabel, comparisons: SEGMENT_GROUPS.householdSize.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('householdSize', c.label) })) },
+        { variable: SEGMENT_GROUPS.childInHousehold.label, baseLevel: SEGMENT_GROUPS.childInHousehold.baseLabel, comparisons: SEGMENT_GROUPS.childInHousehold.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('childInHousehold', c.label) })) },
+        { variable: SEGMENT_GROUPS.housingType.label, baseLevel: SEGMENT_GROUPS.housingType.baseLabel, comparisons: SEGMENT_GROUPS.housingType.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('housingType', c.label) })) },
+        { variable: SEGMENT_GROUPS.zeroVehicleHousehold.label, baseLevel: SEGMENT_GROUPS.zeroVehicleHousehold.baseLabel, comparisons: SEGMENT_GROUPS.zeroVehicleHousehold.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('zeroVehicleHousehold', c.label) })) },
+        { variable: SEGMENT_GROUPS.airConditioning.label, baseLevel: SEGMENT_GROUPS.airConditioning.baseLabel, comparisons: SEGMENT_GROUPS.airConditioning.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('airConditioning', c.label) })) }
       ]
     },
     community: {
       title: 'Community Resources',
       variables: [
-        { variable: SEGMENT_GROUPS.transitAccess.label, baseLevel: SEGMENT_GROUPS.transitAccess.baseLabel, comparisons: SEGMENT_GROUPS.transitAccess.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('transitAccess', c.label) })) }
+        { variable: SEGMENT_GROUPS.rural.label, baseLevel: SEGMENT_GROUPS.rural.baseLabel, comparisons: SEGMENT_GROUPS.rural.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('rural', c.label) })) },
+        { variable: SEGMENT_GROUPS.populationDensity.label, baseLevel: SEGMENT_GROUPS.populationDensity.baseLabel, comparisons: SEGMENT_GROUPS.populationDensity.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('populationDensity', c.label) })) },
+        { variable: SEGMENT_GROUPS.employmentDensity.label, baseLevel: SEGMENT_GROUPS.employmentDensity.baseLabel, comparisons: SEGMENT_GROUPS.employmentDensity.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('employmentDensity', c.label) })) },
+        { variable: SEGMENT_GROUPS.networkDensity.label, baseLevel: SEGMENT_GROUPS.networkDensity.baseLabel, comparisons: SEGMENT_GROUPS.networkDensity.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('networkDensity', c.label) })) },
+        { variable: SEGMENT_GROUPS.landUseDiversity.label, baseLevel: SEGMENT_GROUPS.landUseDiversity.baseLabel, comparisons: SEGMENT_GROUPS.landUseDiversity.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('landUseDiversity', c.label) })) },
+        { variable: SEGMENT_GROUPS.transitAccess.label, baseLevel: SEGMENT_GROUPS.transitAccess.baseLabel, comparisons: SEGMENT_GROUPS.transitAccess.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('transitAccess', c.label) })) },
+        { variable: SEGMENT_GROUPS.walkabilityIndex.label, baseLevel: SEGMENT_GROUPS.walkabilityIndex.baseLabel, comparisons: SEGMENT_GROUPS.walkabilityIndex.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('walkabilityIndex', c.label) })) }
       ]
     }
   };

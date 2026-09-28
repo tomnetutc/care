@@ -537,3 +537,64 @@ describe('computeContinuousATE - PR / CR / SE (ate_continuous, mult=0.01 "+1% of
   });
 });
 
+describe('computeSegmentATEs - the 19 previously-missing groups (Education x2, Race x3, ' +
+  'Ethnicity, Disability, Works outdoors, Telecommute, Household Size, Child in household, ' +
+  'Zero-vehicle, A/C, Rural, Population/Employment/Network Density, Land-use Diversity, Walkability)', () => {
+  const groups = Object.values(SEGMENT_GROUPS);
+  const run = (event: string, label: string, comparisonLabel: string) => {
+    const g = groups.find(x => x.label === label)!;
+    const c = g.comparisons.find(x => x.label === comparisonLabel)!;
+    return computeSegmentATEs(modelData[event], getEventRows(event), {
+      event, baseSpec: g.baseSpec, comparisonSpec: c.spec
+    });
+  };
+
+  it('all 24 discrete groups (5 original + 19 added) are present, matching ATE_Heat.xlsx Segment_ATE\'s group list', () => {
+    const labels = groups.map(g => g.label).sort();
+    expect(labels).toEqual([
+      'Age Group', 'Disability', "Education (BS or higher)", "Education (Bachelor's)",
+      'Employment Density', 'Ethnicity: Hispanic', 'Gender', 'Household Income', 'Household Size',
+      'Housing Type', 'Land-use Diversity', 'Network Density', 'Population Density', 'Race: Asian',
+      'Race: Black', 'Race: White', 'Rural location', 'Transit Access', 'Walkability Index',
+      'Works outdoors', 'Zero-vehicle household', 'Air conditioning', 'Child in household', 'Does not telecommute'
+    ].sort());
+  });
+
+  // Spot values from ATE_Heat.xlsx's Segment_ATE sheet (Extreme Heat), same
+  // methodology and ~0.003 tolerance as the original 5-group KEY above (the
+  // sheet's N is Jinghai's slightly smaller estimation sample). GBU rows
+  // (Disability, Zero-vehicle household, Air conditioning, Walkability
+  // Index) are the sheet's "Very unlikely" + "Somewhat unlikely" rows summed
+  // into the collapsed index-0 "Do less" category, same as the original
+  // Gender/Age Group GBU rows above.
+  const KEY: Array<{ group: string; comparison: string; activity: string; i: number; pb?: number; pc?: number; ate: number; inModel: boolean }> = [
+    { group: "Education (Bachelor's)", comparison: 'Has BS', activity: 'use_car', i: 2, pb: 0.178435, pc: 0.143173, ate: -0.035263, inModel: true },
+    { group: 'Education (BS or higher)', comparison: 'BS or higher', activity: 'use_car', i: 2, pb: 0.159558, pc: 0.190354, ate: 0.030796, inModel: true },
+    { group: 'Race: White', comparison: 'White', activity: 'use_car', i: 2, pb: 0.137946, pc: 0.179319, ate: 0.041373, inModel: true },
+    { group: 'Race: Black', comparison: 'Black', activity: 'use_car', i: 2, pb: 0.159723, pc: 0.242141, ate: 0.082418, inModel: true },
+    { group: 'Race: Asian', comparison: 'Asian', activity: 'work_from_office', i: 0, pb: 0.194433, pc: 0.267548, ate: 0.073115, inModel: true },
+    { group: 'Ethnicity: Hispanic', comparison: 'Hispanic', activity: 'use_car', i: 2, pb: 0.165577, pc: 0.216246, ate: 0.050669, inModel: true },
+    { group: 'Disability', comparison: 'Has disability', activity: 'go_business_as_usual', i: 0, pb: 0.214698, pc: 0.24912, ate: 0.034422, inModel: true },
+    { group: 'Works outdoors', comparison: 'Yes', activity: 'use_car', i: 2, pb: 0.167015, pc: 0.226844, ate: 0.059829, inModel: true },
+    { group: 'Does not telecommute', comparison: 'Does not telecommute', activity: 'use_car', i: 2, pb: 0.162304, pc: 0.192878, ate: 0.030574, inModel: true },
+    { group: 'Household Size', comparison: '1 person', activity: 'use_car', i: 2, pb: 0.162703, pc: 0.188866, ate: 0.026163, inModel: true },
+    { group: 'Child in household', comparison: 'Has child', activity: 'use_car', i: 2, pb: 0.161698, pc: 0.191335, ate: 0.029636, inModel: true },
+    { group: 'Zero-vehicle household', comparison: 'Zero vehicle', activity: 'go_business_as_usual', i: 0, pb: 0.217635, pc: 0.256753, ate: 0.039118, inModel: true },
+    { group: 'Air conditioning', comparison: 'Has A/C', activity: 'go_business_as_usual', i: 0, pb: 0.279556, pc: 0.213094, ate: -0.066462, inModel: true },
+    { group: 'Rural location', comparison: 'Rural', activity: 'go_business_as_usual', i: 0, ate: 0, inModel: false },
+    { group: 'Population Density', comparison: 'Medium', activity: 'use_car', i: 2, pb: 0.159513, pc: 0.159513, ate: 0, inModel: true },
+    { group: 'Employment Density', comparison: 'High', activity: 'delivery', i: 1, pb: 0.640675, pc: 0.630095, ate: -0.01058, inModel: true },
+    { group: 'Network Density', comparison: 'Medium', activity: 'delivery', i: 1, pb: 0.636735, pc: 0.626689, ate: -0.010046, inModel: true },
+    { group: 'Land-use Diversity', comparison: 'High', activity: 'dine_in', i: 1, pb: 0.614293, pc: 0.60649, ate: -0.007803, inModel: true },
+    { group: 'Walkability Index', comparison: 'Low', activity: 'go_business_as_usual', i: 0, pb: 0.216231, pc: 0.261931, ate: 0.0457, inModel: true }
+  ];
+  it.each(KEY)('heat $activity / $group ($comparison) matches ATE_Heat.xlsx Segment_ATE', (k) => {
+    const r = run('heat', k.group, k.comparison).find(x => x.activity === k.activity)!;
+    expect(r.inModel).toBe(k.inModel);
+    expect(Math.abs(r.ate[k.i] - k.ate)).toBeLessThan(0.003);
+    const pbDiff = k.pb === undefined ? 0 : Math.abs(r.controlProbabilities[k.i] - k.pb);
+    const pcDiff = k.pc === undefined ? 0 : Math.abs(r.treatmentProbabilities[k.i] - k.pc);
+    expect(Math.max(pbDiff, pcDiff)).toBeLessThan(0.003);
+  });
+});
+
