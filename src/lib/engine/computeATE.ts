@@ -362,6 +362,90 @@ export function computeSegmentATEs(
   return results;
 }
 
+export interface ContinuousATEOptions {
+  event: string;
+  /** The continuous variable's coefficient name, e.g. 'PR', 'CR', 'SE'. */
+  variable: string;
+  /** Multiplier on the estimation sample's SD of `variable` (Jinghai: 0.01 = "+1% of SD"). */
+  mult: number;
+}
+
+export interface ContinuousATEResult extends ATEResult {
+  /** False when `variable` isn't a coefficient of that event/activity's fitted model. */
+  inModel: boolean;
+}
+
+/**
+ * Continuous-variable ATEs (Jinghai's ate_continuous()). Unlike severity or
+ * the discrete segments, nothing is forced to a fixed value: the base
+ * scenario is simply each person's own full observed prediction (every
+ * coefficient, including their real severity dummies, at their real row
+ * values) with NO shift at all. The comparison scenario adds one uniform
+ * scalar shift - coefficient[variable] * mult * SD(variable) - to every
+ * person's base predictor, where SD is the standard deviation of `variable`
+ * computed over THIS activity's own estimation sample (same rows
+ * buildEstimationSample returns for this event/activity, not pooled across
+ * events or activities, and not a population SD - matches pandas' default
+ * sample SD, ddof=1, which is what `sample[var].std()` computes in the
+ * notebook).
+ */
+export function computeContinuousATE(
+  eventModelData: EventModelData,
+  filteredData: any[],
+  options: ContinuousATEOptions
+): ContinuousATEResult[] {
+  const results: ContinuousATEResult[] = [];
+  const { event, variable, mult } = options;
+
+  for (const [activity, modelConfig] of Object.entries(eventModelData)) {
+    try {
+      const sample = buildEstimationSample(event, activity, modelConfig, filteredData);
+      if (sample.length === 0) {
+        results.push({ ...emptyResult(activity), inModel: false });
+        continue;
+      }
+
+      const coefficients = modelConfig.coefficients;
+      if (!(variable in coefficients)) {
+        results.push({
+          activity, controlProbabilities: [], treatmentProbabilities: [],
+          ate: [0, 0, 0], levelLabels: RESPONSE_LABELS, conservationCheck: 0,
+          isValid: true, sampleSize: sample.length, inModel: false
+        });
+        continue;
+      }
+
+      const observedPredictors: number[] = [];
+      const values: number[] = [];
+      for (const row of sample) {
+        let z = 0;
+        for (const [v, coefficient] of Object.entries(coefficients)) {
+          z += coefficient * (parseFloat(String(row[v] ?? '')) || 0);
+        }
+        observedPredictors.push(z);
+        values.push(parseFloat(String(row[variable] ?? '')) || 0);
+      }
+
+      // Sample standard deviation (ddof=1), matching pandas' default .std().
+      const n = values.length;
+      const mean = values.reduce((sum, v) => sum + v, 0) / n;
+      const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (n - 1);
+      const sd = Math.sqrt(variance);
+      const shift = coefficients[variable] * mult * sd;
+
+      const base = averageProbabilities(observedPredictors, modelConfig);
+      const comparison = averageProbabilities(observedPredictors.map(z => z + shift), modelConfig);
+
+      results.push({ ...buildATEResult(activity, modelConfig, base, comparison, sample.length), inModel: true });
+    } catch (error) {
+      console.error(`Error calculating continuous ATE for activity ${activity}:`, error);
+      results.push({ ...emptyResult(activity), inModel: false });
+    }
+  }
+
+  return results;
+}
+
 /**
  * Validate model data structure for a single event's activities.
  */

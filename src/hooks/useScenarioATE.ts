@@ -27,7 +27,9 @@ import { useState, useEffect, useCallback } from 'react';
 import DataService from '../services/DataService';
 import {
   computeSeverityATEs,
+  computeContinuousATE,
   ATEResult,
+  ContinuousATEResult,
   EventModelData,
   ModelDataByEvent,
   validateModelData
@@ -36,6 +38,12 @@ import { EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE } from '../lib/engine/eventConfig
 
 export { EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE };
 
+// Population Segment Analysis's continuous attitude rows (Personal
+// Resilience, Community Resilience, Social Engagement). Per Jinghai,
+// mult=0.01 ("+1% of SD") is the confirmed shift size.
+const CONTINUOUS_VARIABLES = ['PR', 'CR', 'SE'];
+const CONTINUOUS_MULT = 0.01;
+
 export interface ScenarioState {
   selectedEvent: string;
   baseSeverityLevel: number;
@@ -43,6 +51,7 @@ export interface ScenarioState {
   anticipatedChange: 'do_less' | 'about_same' | 'do_more' | null;
   isComputing: boolean;
   results: ATEResult[];
+  continuousResults: Record<string, ContinuousATEResult[]>;
   error: string | null;
   modelData: ModelDataByEvent | null;
   isValid: boolean;
@@ -56,6 +65,7 @@ export const useScenarioATE = () => {
     anticipatedChange: 'do_more',
     isComputing: false,
     results: [],
+    continuousResults: {},
     error: null,
     modelData: null,
     isValid: false
@@ -140,6 +150,15 @@ export const useScenarioATE = () => {
         treatmentSeverityLevel: state.treatmentSeverityLevel
       });
 
+      const continuousResults: Record<string, ContinuousATEResult[]> = {};
+      for (const variable of CONTINUOUS_VARIABLES) {
+        continuousResults[variable] = computeContinuousATE(eventModelData, filteredData, {
+          event: eventConfig.csvEvent,
+          variable,
+          mult: CONTINUOUS_MULT
+        });
+      }
+
       console.log('ATE Computation Debug:', {
         selectedEvent: state.selectedEvent,
         csvEvent: eventConfig.csvEvent,
@@ -157,7 +176,7 @@ export const useScenarioATE = () => {
         }))
       });
 
-      setState(prev => ({ ...prev, results, isComputing: false, error: null }));
+      setState(prev => ({ ...prev, results, continuousResults, isComputing: false, error: null }));
     } catch (error) {
       console.error('Error computing ATEs:', error);
       setState(prev => ({
@@ -220,6 +239,7 @@ export const useScenarioATE = () => {
     anticipatedChange: state.anticipatedChange,
     isComputing: state.isComputing,
     results: state.results,
+    continuousResults: state.continuousResults,
     error: state.error,
     isReady,
 

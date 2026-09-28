@@ -158,7 +158,7 @@ test('GBU label is italic with an asterisk and shows Jinghai\'s note on hover', 
   );
 });
 
-test('Population Segment table: no Risk Aversion, 3-tier income, binary housing, TBD placeholders for PR/CR/SE', async ({ page }) => {
+test('Population Segment table: no Risk Aversion, 3-tier income, binary housing, real PR/CR/SE values', async ({ page }) => {
   await page.goto('/#/scenario');
   const section = page.locator('.scenario-demographic-groups');
   await expect(section).toBeVisible({ timeout: 15_000 });
@@ -177,8 +177,13 @@ test('Population Segment table: no Risk Aversion, 3-tier income, binary housing,
   await expect(incomeTable).toContainText('Not stand-alone');
   await expect(incomeTable).toContainText('Stand-alone house');
 
+  // No more TBD placeholder anywhere - PR/CR/SE now show real computed values.
+  await expect(section).not.toContainText('TBD');
+  await expect(section.locator('.scenario-ate-placeholder')).toHaveCount(0);
+
   for (const v of ['Personal Resilience', 'Community Resilience', 'Social Engagement']) {
-    await expect(rowsFor(v)).toContainText('TBD');
+    await expect(rowsFor(v)).toContainText('+1% of SD');
+    const value = await rowsFor(v).locator('.scenario-ate-display-value').innerText();
+    expect(Number.isFinite(parseFloat(value.replace('%', '').replace('+', '')))).toBe(true);
   }
-  await expect(section.locator('.scenario-ate-placeholder')).toHaveCount(3);
 });
