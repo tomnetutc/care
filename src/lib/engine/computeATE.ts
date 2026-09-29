@@ -3,7 +3,9 @@
  *
  * Calculates ATEs for ordered categorical outcomes using ordered probit models.
  * Coefficients come from Jinghai's per-event models (see
- * data/jinghai_2026-09-10/model_coefficients_all_events.csv, converted to
+ * data/jinghai_2026-09-28/model_coefficients_all_events.csv - his corrected
+ * refit, delivered after fixing a missing `non_wrkr` column; supersedes the
+ * original data/jinghai_2026-09-10/ delivery - converted to
  * public/models/model_coeffs_by_event.json). Each event (heat, cold, earthquake,
  * flooding, powerout) has its own coefficients per activity, and its own
  * 4-dummy severity encoding: {event}_imp_2 / _imp_3 / _imp_4 / _imp_5, with
@@ -113,37 +115,27 @@ export function isWorkerOnlyActivity(activity: string): boolean {
 
 /**
  * Verified fitting-sample mismatches (event/activity pairs where the "n"
- * recorded alongside Jinghai's coefficients - data/jinghai_2026-09-10/
- * model_coefficients_all_events.csv - cannot be reproduced by running his
- * own get_model() (ATE_Calculation.ipynb) against his own delivered
+ * recorded alongside Jinghai's coefficients cannot be reproduced by running
+ * his own get_model() (ATE_Calculation.ipynb) against his own delivered
  * event_data file for that activity).
  *
- * Checked 2026-09-28: every event/activity was re-derived from his notebook
- * logic against the CSVs he sent. Most show a small, uniform ~2.5-4% gap
- * across every activity within an event (e.g. powerout: reported ~2,300 vs
- * recomputed 2,381) - consistent with a light QC/completeness filter applied
- * once before modeling, immaterial and NOT flagged below. These three pairs
- * are outliers where the gap jumps to 40-70% within an otherwise-consistent
- * event, and cannot be explained by anything reproducible from the files we
- * have (no sentinel code, skip-logic column, or weight cutoff recovers the
- * reported n) - reported n vs recomputed n:
- *   powerout / go_business_as_usual:  892 vs 2,381
- *   cold     / go_business_as_usual: 1,027 vs 2,434
- *   earthquake / stay_home:            176 vs   611
- * This means those three coefficient sets were most likely fit on a
- * different (smaller, no longer available) sample than the file we compute
- * against - not a bug in buildEstimationSample, which is verified to match
- * Jinghai's own method everywhere else. Needs corrected coefficients from
- * Jinghai; nothing in the delivered data resolves it. Not read by the
- * calculation itself (computeSeverityATEs still runs the full correct
- * complete-case sample, which is the statistically sound choice either way)
- * - only used to flag these three results for the UI.
+ * RESOLVED 2026-09-28 (Slack, Zaid <> Jinghai): root cause was a missing
+ * `non_wrkr` column in the datafile Jinghai was fitting on. He added it,
+ * re-ran his full backward-elimination pipeline on the corrected data for
+ * ALL 35 event/activity models (not just these three), and sent updated
+ * model_coefficients_all_events.csv + event_data/*.csv - both rebuilt into
+ * public/models/ on 2026-09-28. The 3 outlier gaps below are gone: n now
+ * matches what buildEstimationSample already computed (powerout/GBU 2,381,
+ * cold/GBU 2,434, earthquake/stay_home 611) confirming buildEstimationSample
+ * was correct the whole time - the bug was entirely on Jinghai's original
+ * fitting side. Every other model's n also shifted up slightly (the ~2.5-4%
+ * gap this comment used to call "immaterial") for the same reason, and many
+ * models' selected variables changed too (backward elimination re-ran on
+ * more complete data) - this was a full refit, not a 3-model patch.
+ * Kept as an empty set (rather than deleted) so a future real mismatch has
+ * somewhere to go without re-deriving this flagging mechanism from scratch.
  */
-const VERIFIED_SAMPLE_MISMATCHES = new Set<string>([
-  'powerout::go_business_as_usual',
-  'cold::go_business_as_usual',
-  'earthquake::stay_home'
-]);
+const VERIFIED_SAMPLE_MISMATCHES = new Set<string>([]);
 
 export function hasVerifiedSampleMismatch(event: string, activity: string): boolean {
   return VERIFIED_SAMPLE_MISMATCHES.has(`${event}::${activity}`);

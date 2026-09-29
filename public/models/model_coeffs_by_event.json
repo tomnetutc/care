@@ -1,168 +1,20 @@
 {
   "cold": {
-    "delivery": {
+    "use_car": {
       "coefficients": {
-        "CR": 0.05927317241932398,
-        "EmpDens_medium": 0.10046397711903018,
-        "NetworkDensity_high": -0.07443048195312169,
-        "PR": 0.09973966546430482,
-        "SE": 0.06921990365608838,
-        "TransitAccess_high": 0.23117131332005897,
-        "age_65p": -0.22030725992359873,
-        "asian": -0.26888035074531486,
-        "child": 0.232242092958761,
-        "cold_imp_2": 0.015210135858670499,
-        "cold_imp_3": -0.019261125529291004,
-        "cold_imp_4": 0.016466517152004357,
-        "cold_imp_5": 0.21806091737652958,
-        "dis_yes": 0.08864138628862483
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 2374
-      },
-      "thresholds": {
-        "1|2": -0.7891270421084505,
-        "2|3": 0.8038826345047952
-      },
-      "variables": [
-        "CR",
-        "EmpDens_medium",
-        "NetworkDensity_high",
-        "PR",
-        "SE",
-        "TransitAccess_high",
-        "age_65p",
-        "asian",
-        "child",
-        "cold_imp_2",
-        "cold_imp_3",
-        "cold_imp_4",
-        "cold_imp_5",
-        "dis_yes"
-      ]
-    },
-    "dine_in": {
-      "coefficients": {
-        "NatWalkInd_high": 0.16336585802966822,
-        "NetworkDensity_medium": -0.0941990363908824,
-        "SE": 0.12005957595303077,
-        "age_65p": -0.18545970293234185,
-        "black": 0.3890459584660137,
-        "cold_imp_2": -0.12279423825479095,
-        "cold_imp_3": -0.2342480565205846,
-        "cold_imp_4": -0.1310524262496567,
-        "cold_imp_5": 0.08881186771378027,
-        "in50100": -0.19109692579308793,
-        "white": 0.2676226031283536
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 2374
-      },
-      "thresholds": {
-        "1|2": -0.307222760100392,
-        "2|3": 1.2495839352886686
-      },
-      "variables": [
-        "NatWalkInd_high",
-        "NetworkDensity_medium",
-        "SE",
-        "age_65p",
-        "black",
-        "cold_imp_2",
-        "cold_imp_3",
-        "cold_imp_4",
-        "cold_imp_5",
-        "in50100",
-        "white"
-      ]
-    },
-    "go_business_as_usual": {
-      "coefficients": {
-        "NatWalkInd_very_high": 0.1368596602792265,
-        "PR": 0.2322727296377132,
-        "ac_c": 0.23444187943619693,
-        "child": -0.1924127265579764,
-        "cold_imp_2": -0.5690485017253456,
-        "cold_imp_3": -0.845200031594584,
-        "cold_imp_4": -1.0229130783399234,
-        "cold_imp_5": -0.7676765954686001,
-        "hhsize1": -0.2491844569307336,
-        "hhsize2": -0.25569709771634397,
-        "in50": -0.15421715515850012,
-        "work_out": 0.339891134841724
-      },
-      "metadata": {
-        "levels": 5,
-        "link": "probit",
-        "n": 1027
-      },
-      "thresholds": {
-        "1|2": -2.488361038267862,
-        "2|3": -1.57267037836895,
-        "3|4": -0.9680827435755793,
-        "4|5": 0.09454973239536157
-      },
-      "variables": [
-        "NatWalkInd_very_high",
-        "PR",
-        "ac_c",
-        "child",
-        "cold_imp_2",
-        "cold_imp_3",
-        "cold_imp_4",
-        "cold_imp_5",
-        "hhsize1",
-        "hhsize2",
-        "in50",
-        "work_out"
-      ]
-    },
-    "pick_up": {
-      "coefficients": {
-        "NatWalkInd_high": 0.07106591609399222,
-        "PR": 0.08782300141363066,
-        "SE": 0.08206540844955855,
-        "child": 0.12198041312542607,
-        "cold_imp_2": 5.296499929984233e-05,
-        "cold_imp_3": -0.06793605022770037,
-        "cold_imp_4": -0.022293743003023513,
-        "cold_imp_5": 0.11542336856200756,
-        "female": -0.17117935285589994
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 2374
-      },
-      "thresholds": {
-        "1|2": -0.48655275974929435,
-        "2|3": 1.0274180120778102
-      },
-      "variables": [
-        "NatWalkInd_high",
-        "PR",
-        "SE",
-        "child",
-        "cold_imp_2",
-        "cold_imp_3",
-        "cold_imp_4",
-        "cold_imp_5",
-        "female"
-      ]
-    },
-    "stay_home": {
-      "coefficients": {
-        "CR": 0.06431058794514968,
-        "cold_imp_2": 0.2829926240746217,
-        "cold_imp_3": 0.4301980279269427,
-        "cold_imp_4": 0.3059410943681653,
-        "cold_imp_5": 0.3977182340817741,
-        "dis_yes": 0.15780137455581741,
-        "in50100": 0.06432464139643608
+        "PopDens_high": 0.15332787679141582,
+        "SE": 0.0823423408099369,
+        "age_5165": -0.13090307952405789,
+        "age_65p": -0.1485878563005389,
+        "black": 0.2081899255316106,
+        "cold_imp_2": -0.05951973268924681,
+        "cold_imp_3": -0.05599969323534643,
+        "cold_imp_4": 0.021267457902638988,
+        "cold_imp_5": 0.1878954926719633,
+        "female": -0.08206807236638648,
+        "in50100": -0.09685349859891827,
+        "non_wrkr": -0.12526875412993166,
+        "sa_home": -0.10874553242083035
       },
       "metadata": {
         "levels": 3,
@@ -170,50 +22,12 @@
         "n": 2434
       },
       "thresholds": {
-        "1|2": -1.4190827774154275,
-        "2|3": 0.24622218513888194
+        "1|2": -0.7446725146026858,
+        "2|3": 0.8815395904554806
       },
       "variables": [
-        "CR",
-        "cold_imp_2",
-        "cold_imp_3",
-        "cold_imp_4",
-        "cold_imp_5",
-        "dis_yes",
-        "in50100"
-      ]
-    },
-    "use_car": {
-      "coefficients": {
-        "Diversity_medium": -0.08048114502869097,
-        "NatWalkInd_high": 0.18120263575929688,
-        "NatWalkInd_very_high": 0.22838461952745356,
-        "SE": 0.09616231972026916,
-        "age_3150": -0.10850814727745485,
-        "age_5165": -0.23654038154394108,
-        "age_65p": -0.2989300908502793,
-        "black": 0.2274938475721319,
-        "cold_imp_2": -0.046951198139472,
-        "cold_imp_3": -0.04632824354392538,
-        "cold_imp_4": 0.035754041782719355,
-        "cold_imp_5": 0.21347457571903428,
-        "dis_yes": 0.039904580283442986
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 2374
-      },
-      "thresholds": {
-        "1|2": -0.6100310285514661,
-        "2|3": 1.0240518744706721
-      },
-      "variables": [
-        "Diversity_medium",
-        "NatWalkInd_high",
-        "NatWalkInd_very_high",
+        "PopDens_high",
         "SE",
-        "age_3150",
         "age_5165",
         "age_65p",
         "black",
@@ -221,566 +35,848 @@
         "cold_imp_3",
         "cold_imp_4",
         "cold_imp_5",
-        "dis_yes"
+        "female",
+        "in50100",
+        "non_wrkr",
+        "sa_home"
       ]
     },
-    "use_transit": {
+    "delivery": {
       "coefficients": {
-        "NatWalkInd_very_high": -0.052706374506521145,
-        "NetworkDensity_medium": 0.03051544325732547,
-        "child": -0.1526056537364186,
-        "cold_imp_2": -0.08918499068835348,
-        "cold_imp_3": -0.17922900916310866,
-        "cold_imp_4": -0.21151204653812944,
-        "cold_imp_5": 0.09638169865269779,
-        "dis_yes": 0.02074448956314663,
-        "sa_home": -0.1340992024025731,
-        "work_out": 0.3049361700382089
+        "CR": 0.06901428829761085,
+        "NetworkDensity_high": -0.09481925227427992,
+        "PR": 0.09127894049750689,
+        "PopDens_high": 0.11224733244021029,
+        "TransitAccess_high": 0.13181989876582625,
+        "age_65p": -0.1363389564013628,
+        "cold_imp_2": 0.009253126183393065,
+        "cold_imp_3": -0.018717179648482248,
+        "cold_imp_4": 0.018888023147886734,
+        "cold_imp_5": 0.2644142791278241,
+        "hhsize1": -0.11761197021394591,
+        "hhsize2": -0.18071101297438613,
+        "non_wrkr": -0.20453037164382318
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 2374
+        "n": 2434
       },
       "thresholds": {
-        "1|2": -0.8400838471936991,
-        "2|3": 1.1527181354153373
-      },
-      "variables": [
-        "NatWalkInd_very_high",
-        "NetworkDensity_medium",
-        "child",
-        "cold_imp_2",
-        "cold_imp_3",
-        "cold_imp_4",
-        "cold_imp_5",
-        "dis_yes",
-        "sa_home",
-        "work_out"
-      ]
-    },
-    "work_from_home": {
-      "coefficients": {
-        "TransitAccess_high": 0.23656741101261214,
-        "TransitAccess_medium": 0.21804050384488477,
-        "bs_grad": 0.2006441067699548,
-        "child": 0.21633910215876784,
-        "cold_imp_2": 0.06601592812777599,
-        "cold_imp_3": 0.2357337146437249,
-        "cold_imp_4": 0.11967625354645336,
-        "cold_imp_5": 0.19382126743021721,
-        "tcom_no": -0.4681834177929296
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 1137
-      },
-      "thresholds": {
-        "1|2": -1.418936629109873,
-        "2|3": 0.5703265930835331
-      },
-      "variables": [
-        "TransitAccess_high",
-        "TransitAccess_medium",
-        "bs_grad",
-        "child",
-        "cold_imp_2",
-        "cold_imp_3",
-        "cold_imp_4",
-        "cold_imp_5",
-        "tcom_no"
-      ]
-    },
-    "work_from_office": {
-      "coefficients": {
-        "CR": -0.021561836754425072,
-        "EmpDens_high": 0.06007506873577856,
-        "TransitAccess_medium": -0.2829495469446967,
-        "black": 0.452527642394191,
-        "cold_imp_2": -0.04371633499868342,
-        "cold_imp_3": -0.16390545481780613,
-        "cold_imp_4": -0.1507190193672873,
-        "cold_imp_5": 0.19945739988097197,
-        "hhsize1": 0.033775292184189495,
-        "hhsize2": -0.013929414695791559,
-        "hhveh0": -0.2083577895880578,
-        "hispanic_c": 0.23808227653871894,
-        "in50": 0.16876766911176566,
-        "white": 0.30025405052885806,
-        "work_out": 0.2790816642641097
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 1137
-      },
-      "thresholds": {
-        "1|2": -0.28640689540338643,
-        "2|3": 1.468422026328456
+        "1|2": -1.0469132014761358,
+        "2|3": 0.5457044883583504
       },
       "variables": [
         "CR",
-        "EmpDens_high",
-        "TransitAccess_medium",
-        "black",
+        "NetworkDensity_high",
+        "PR",
+        "PopDens_high",
+        "TransitAccess_high",
+        "age_65p",
         "cold_imp_2",
         "cold_imp_3",
         "cold_imp_4",
         "cold_imp_5",
         "hhsize1",
         "hhsize2",
+        "non_wrkr"
+      ]
+    },
+    "dine_in": {
+      "coefficients": {
+        "NatWalkInd_high": 0.15068116791531777,
+        "PopDens_high": 0.09538031154878682,
+        "SE": 0.08588094301814948,
+        "age_3150": 0.1034564245896229,
+        "cold_imp_2": -0.1374654174968679,
+        "cold_imp_3": -0.22491564851777368,
+        "cold_imp_4": -0.1511497641280556,
+        "cold_imp_5": 0.12818182361197655,
+        "female": -0.12331967227256432,
+        "in50100": -0.22741185975536915,
+        "non_wrkr": -0.1669178040943839
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2434
+      },
+      "thresholds": {
+        "1|2": -0.5987281503463497,
+        "2|3": 0.9510853424031898
+      },
+      "variables": [
+        "NatWalkInd_high",
+        "PopDens_high",
+        "SE",
+        "age_3150",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "female",
+        "in50100",
+        "non_wrkr"
+      ]
+    },
+    "stay_home": {
+      "coefficients": {
+        "CR": 0.07620433077318622,
+        "SE": -0.07925124729088412,
+        "cold_imp_2": 0.29757221630957303,
+        "cold_imp_3": 0.4574759344105827,
+        "cold_imp_4": 0.33360381106805664,
+        "cold_imp_5": 0.43000660613888586,
+        "dis_yes": 0.11252642253104869,
+        "tcom_no": -0.09882139945998646
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2434
+      },
+      "thresholds": {
+        "1|2": -1.457004322008706,
+        "2|3": 0.21417446514505523
+      },
+      "variables": [
+        "CR",
+        "SE",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "dis_yes",
+        "tcom_no"
+      ]
+    },
+    "pick_up": {
+      "coefficients": {
+        "PR": 0.09076258175533757,
+        "PopDens_high": 0.0925010206068128,
+        "SE": 0.08020778816983941,
+        "cold_imp_2": -0.015081246095378614,
+        "cold_imp_3": -0.09890629999365791,
+        "cold_imp_4": -0.04534582702291311,
+        "cold_imp_5": 0.10506488961984936,
+        "female": -0.15814652240760205,
+        "in50100": -0.16554204408605352,
+        "non_wrkr": -0.13961405953616696
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2434
+      },
+      "thresholds": {
+        "1|2": -0.6331536708595066,
+        "2|3": 0.8750213728406887
+      },
+      "variables": [
+        "PR",
+        "PopDens_high",
+        "SE",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "female",
+        "in50100",
+        "non_wrkr"
+      ]
+    },
+    "use_transit": {
+      "coefficients": {
+        "CR": 0.08862643682453084,
+        "TransitAccess_high": -0.1893495799951864,
+        "asian": -0.2443076424415471,
+        "child": -0.17394263990436493,
+        "cold_imp_2": -0.08050646779416724,
+        "cold_imp_3": -0.16966075714332107,
+        "cold_imp_4": -0.18704062519621065,
+        "cold_imp_5": 0.12869275239151393,
+        "hhsize2": -0.10717586440835664,
+        "hhveh0": 0.17559221220454727,
+        "in50": -0.18751498114111143,
+        "in50100": -0.18875454658057692,
+        "sa_home": -0.1515929601122344,
+        "work_out": 0.2812953528271901
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2434
+      },
+      "thresholds": {
+        "1|2": -1.0463516448392383,
+        "2|3": 0.9590436663298763
+      },
+      "variables": [
+        "CR",
+        "TransitAccess_high",
+        "asian",
+        "child",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "hhsize2",
         "hhveh0",
-        "hispanic_c",
         "in50",
+        "in50100",
+        "sa_home",
+        "work_out"
+      ]
+    },
+    "go_business_as_usual": {
+      "coefficients": {
+        "CR": 0.08943248934909609,
+        "PR": 0.1943623327541385,
+        "ac_c": 0.1264036269310087,
+        "age_3150": 0.1010107244243486,
+        "cold_imp_2": -0.5843827714547077,
+        "cold_imp_3": -0.7998901011950842,
+        "cold_imp_4": -0.9093450223724663,
+        "cold_imp_5": -0.9704695131988876,
+        "female": -0.13868246361828218,
+        "non_wrkr": -0.2238805811671074,
+        "sa_home": -0.08021314872144047,
+        "white": 0.20604645328427246
+      },
+      "metadata": {
+        "levels": 5,
+        "link": "probit",
+        "n": 2434
+      },
+      "thresholds": {
+        "1|2": -2.282700948900949,
+        "2|3": -1.4743967735028471,
+        "3|4": -0.8310043369170105,
+        "4|5": 0.1780025559068289
+      },
+      "variables": [
+        "CR",
+        "PR",
+        "ac_c",
+        "age_3150",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "female",
+        "non_wrkr",
+        "sa_home",
+        "white"
+      ]
+    },
+    "work_from_home": {
+      "coefficients": {
+        "asian": -0.49836473106230167,
+        "black": -0.32081971411969645,
+        "bs_grad": 0.20329972888162404,
+        "child": 0.2053897933879705,
+        "cold_imp_2": 0.05312781703568611,
+        "cold_imp_3": 0.2410821296790331,
+        "cold_imp_4": 0.03612504086295797,
+        "cold_imp_5": 0.20277282626240395,
+        "female": -0.14969961943320834,
+        "in50100": 0.11582145422855543,
+        "tcom_no": -0.4523541816883829,
+        "white": -0.41406535172060743
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1179
+      },
+      "thresholds": {
+        "1|2": -1.9136818940038745,
+        "2|3": 0.07851660429224316
+      },
+      "variables": [
+        "asian",
+        "black",
+        "bs_grad",
+        "child",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "female",
+        "in50100",
+        "tcom_no",
+        "white"
+      ]
+    },
+    "work_from_office": {
+      "coefficients": {
+        "age_3150": -0.13635007679867753,
+        "asian": 0.377721640433033,
+        "black": 0.5736749504964155,
+        "bs_grad": -0.1998937723607899,
+        "cold_imp_2": -0.045148970476886714,
+        "cold_imp_3": -0.17621816218437744,
+        "cold_imp_4": -0.08520821312051245,
+        "cold_imp_5": 0.26875336428860674,
+        "hispanic_c": 0.24418747801616644,
+        "white": 0.4541303163681096,
+        "work_out": 0.2760655454611143
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1179
+      },
+      "thresholds": {
+        "1|2": -0.3091620911696728,
+        "2|3": 1.4285038171859235
+      },
+      "variables": [
+        "age_3150",
+        "asian",
+        "black",
+        "bs_grad",
+        "cold_imp_2",
+        "cold_imp_3",
+        "cold_imp_4",
+        "cold_imp_5",
+        "hispanic_c",
         "white",
         "work_out"
       ]
     }
   },
   "earthquake": {
-    "go_business_as_usual": {
-      "coefficients": {
-        "Diversity_medium": 0.01573490982087507,
-        "NatWalkInd_high": -0.08403693440365166,
-        "PR": 0.15593471179220397,
-        "TransitAccess_high": 0.0032319989511723516,
-        "age_3150": 0.375059059803048,
-        "black": -0.1790372178285685,
-        "bs_grad": -0.06900857520973487,
-        "dis_yes": -0.07484851542318317,
-        "earthquake_imp_2": -0.24601678451418024,
-        "earthquake_imp_3": -0.33402009761924645,
-        "earthquake_imp_4": -0.12752466240144458,
-        "earthquake_imp_5": -0.06367993368991005,
-        "female": -0.3203608461072027
-      },
-      "metadata": {
-        "levels": 5,
-        "link": "probit",
-        "n": 586
-      },
-      "thresholds": {
-        "1|2": -1.5396543720369178,
-        "2|3": -0.8575841823601531,
-        "3|4": -0.1711389600386669,
-        "4|5": 0.759661598545955
-      },
-      "variables": [
-        "Diversity_medium",
-        "NatWalkInd_high",
-        "PR",
-        "TransitAccess_high",
-        "age_3150",
-        "black",
-        "bs_grad",
-        "dis_yes",
-        "earthquake_imp_2",
-        "earthquake_imp_3",
-        "earthquake_imp_4",
-        "earthquake_imp_5",
-        "female"
-      ]
-    },
-    "stay_home": {
-      "coefficients": {
-        "EmpDens_medium": -0.4652276915246565,
-        "NatWalkInd_low": -0.6671360470496999,
-        "PopDens_medium": 0.36387554674356454,
-        "ac_c": 0.3432555885377153,
-        "asian": 1.4656415203993947,
-        "earthquake_imp_2": 0.30971508083912874,
-        "earthquake_imp_3": 0.28350898602129726,
-        "earthquake_imp_4": 0.179007993870423,
-        "earthquake_imp_5": -0.39002382050744144
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 176
-      },
-      "thresholds": {
-        "1|2": -1.0307829363039773,
-        "2|3": 0.6409644926664639
-      },
-      "variables": [
-        "EmpDens_medium",
-        "NatWalkInd_low",
-        "PopDens_medium",
-        "ac_c",
-        "asian",
-        "earthquake_imp_2",
-        "earthquake_imp_3",
-        "earthquake_imp_4",
-        "earthquake_imp_5"
-      ]
-    },
     "use_car": {
       "coefficients": {
-        "NatWalkInd_low": 0.08205892897281496,
-        "age_3150": -0.2265262612296845,
-        "age_5165": -0.48279458189060914,
-        "age_65p": -0.5957544915176307,
-        "earthquake_imp_2": -0.19778628807535803,
-        "earthquake_imp_3": 0.08478112901441773,
-        "earthquake_imp_4": 0.2531517201746095,
-        "earthquake_imp_5": 0.2118962247629414,
-        "edu_bs": -0.06986348117167153,
-        "sa_home": -0.13449364629457766,
-        "tcom_no": -0.15589696505761855
+        "PR": 0.11717435477515793,
+        "age_5165": -0.37410642995414206,
+        "age_65p": -0.4970367448656601,
+        "earthquake_imp_2": -0.21296567681796866,
+        "earthquake_imp_3": 0.07811020181642009,
+        "earthquake_imp_4": 0.3309735404352161,
+        "earthquake_imp_5": 0.2035865397986438,
+        "female": -0.22202916433860237,
+        "hhsize1": 0.22246859773440125
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 586
+        "n": 611
       },
       "thresholds": {
-        "1|2": -0.9480831032874786,
-        "2|3": 0.6255448480574064
+        "1|2": -0.7755330638703093,
+        "2|3": 0.793933656599958
       },
       "variables": [
-        "NatWalkInd_low",
-        "age_3150",
+        "PR",
         "age_5165",
         "age_65p",
         "earthquake_imp_2",
         "earthquake_imp_3",
         "earthquake_imp_4",
         "earthquake_imp_5",
-        "edu_bs",
-        "sa_home",
-        "tcom_no"
-      ]
-    },
-    "use_transit": {
-      "coefficients": {
-        "CR": -0.08466304132763454,
-        "NatWalkInd_high": -0.08296779020946657,
-        "PopDens_high": 0.171292594955862,
-        "age_3150": 0.00398939083928324,
-        "child": -0.13985540944824812,
-        "earthquake_imp_2": 0.07227737947828547,
-        "earthquake_imp_3": 0.2323163376657737,
-        "earthquake_imp_4": 0.32499636963553674,
-        "earthquake_imp_5": 0.25326099709188943,
-        "hhsize2": -0.10036818676973794
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 586
-      },
-      "thresholds": {
-        "1|2": -0.6237326313120609,
-        "2|3": 1.1298414620790331
-      },
-      "variables": [
-        "CR",
-        "NatWalkInd_high",
-        "PopDens_high",
-        "age_3150",
-        "child",
-        "earthquake_imp_2",
-        "earthquake_imp_3",
-        "earthquake_imp_4",
-        "earthquake_imp_5",
-        "hhsize2"
-      ]
-    },
-    "work_from_home": {
-      "coefficients": {
-        "Diversity_high": 0.12522547816383456,
-        "EmpDens_medium": -0.04352642054978596,
-        "NatWalkInd_high": 0.05999153413587142,
-        "NatWalkInd_low": -0.21545304054601452,
-        "PopDens_medium": -0.3737602873410541,
-        "SE": 0.11013101748615939,
-        "TransitAccess_high": -0.2683245957259649,
-        "age_65p": 0.028826662087340565,
-        "earthquake_imp_2": 0.18089058079997647,
-        "earthquake_imp_3": 0.36218426115061314,
-        "earthquake_imp_4": 0.3823274868861657,
-        "earthquake_imp_5": 0.10001249123765871,
-        "hhsize1": 0.18818435392354704,
-        "hhsize2": -0.020170372004025723,
-        "in50": 0.0917406081468302,
-        "in50100": -0.0663241331062265,
-        "sa_home": -0.11520188524527644,
-        "work_out": -0.10743435296935686
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 326
-      },
-      "thresholds": {
-        "1|2": -1.26776106930257,
-        "2|3": 0.608302791737023
-      },
-      "variables": [
-        "Diversity_high",
-        "EmpDens_medium",
-        "NatWalkInd_high",
-        "NatWalkInd_low",
-        "PopDens_medium",
-        "SE",
-        "TransitAccess_high",
-        "age_65p",
-        "earthquake_imp_2",
-        "earthquake_imp_3",
-        "earthquake_imp_4",
-        "earthquake_imp_5",
-        "hhsize1",
-        "hhsize2",
-        "in50",
-        "in50100",
-        "sa_home",
-        "work_out"
-      ]
-    }
-  },
-  "flooding": {
-    "go_business_as_usual": {
-      "coefficients": {
-        "CR": 0.09295528906805631,
-        "EmpDens_medium": -0.03962895155245862,
-        "NetworkDensity_medium": -0.1196234372840101,
-        "PR": 0.1322980526047207,
-        "age_65p": -0.2080348032808504,
-        "child": 0.11709340995538303,
-        "flooding_imp_2": -0.47183996442904824,
-        "flooding_imp_3": -0.5499366872483882,
-        "flooding_imp_4": -0.6833617984609388,
-        "flooding_imp_5": -0.6493950877620206,
-        "hhsize1": 0.09204083359222519,
-        "hhsize2": 0.043509527621478056,
-        "sa_home": 0.05442146374253334,
-        "tcom_no": -0.2417742327095215
-      },
-      "metadata": {
-        "levels": 5,
-        "link": "probit",
-        "n": 1041
-      },
-      "thresholds": {
-        "1|2": -1.7191496898597485,
-        "2|3": -1.020612154422908,
-        "3|4": -0.3515468848241805,
-        "4|5": 0.595748248330144
-      },
-      "variables": [
-        "CR",
-        "EmpDens_medium",
-        "NetworkDensity_medium",
-        "PR",
-        "age_65p",
-        "child",
-        "flooding_imp_2",
-        "flooding_imp_3",
-        "flooding_imp_4",
-        "flooding_imp_5",
-        "hhsize1",
-        "hhsize2",
-        "sa_home",
-        "tcom_no"
+        "female",
+        "hhsize1"
       ]
     },
     "stay_home": {
       "coefficients": {
-        "TransitAccess_high": 0.22014204935777354,
-        "TransitAccess_medium": -0.059315133164060105,
-        "flooding_imp_2": 0.24028366252375147,
-        "flooding_imp_3": 0.20878689689178162,
-        "flooding_imp_4": 0.12002929337927676,
-        "flooding_imp_5": 0.283615559415846,
-        "hhsize2": -0.07506181200728095,
-        "tcom_no": 0.1086007538533825,
-        "work_out": -0.18286956038912894
+        "asian": 0.5653350256466375,
+        "earthquake_imp_2": 0.2861878264750298,
+        "earthquake_imp_3": 0.2755470839090552,
+        "earthquake_imp_4": 0.2668731431686852,
+        "earthquake_imp_5": 0.3579815635033426,
+        "non_wrkr": 0.22188315618211382,
+        "white": 0.1894306333338311
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 1041
+        "n": 611
       },
       "thresholds": {
-        "1|2": -1.4056830490371364,
-        "2|3": 0.2307311017759739
+        "1|2": -1.001202729741227,
+        "2|3": 0.6289820094970546
       },
       "variables": [
-        "TransitAccess_high",
-        "TransitAccess_medium",
-        "flooding_imp_2",
-        "flooding_imp_3",
-        "flooding_imp_4",
-        "flooding_imp_5",
-        "hhsize2",
-        "tcom_no",
-        "work_out"
-      ]
-    },
-    "use_car": {
-      "coefficients": {
-        "NatWalkInd_low": 0.06175485262073529,
-        "PR": -0.11075278056755834,
-        "PopDens_high": 0.03024365549256709,
-        "SE": 0.13310189897248437,
-        "asian": 0.5111775120376019,
-        "black": 0.38451311559191864,
-        "flooding_imp_2": -0.05776148708004418,
-        "flooding_imp_3": -0.01983369574486536,
-        "flooding_imp_4": 0.07798334241718424,
-        "flooding_imp_5": 0.28953017117716245,
-        "in50100": -0.024547803074165597,
-        "tcom_no": -0.05012126780746144,
-        "white": 0.2103242565128495,
-        "work_out": 0.6114122778560414
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 1041
-      },
-      "thresholds": {
-        "1|2": 0.021540189858804206,
-        "2|3": 1.5265832967974964
-      },
-      "variables": [
-        "NatWalkInd_low",
-        "PR",
-        "PopDens_high",
-        "SE",
         "asian",
-        "black",
-        "flooding_imp_2",
-        "flooding_imp_3",
-        "flooding_imp_4",
-        "flooding_imp_5",
-        "in50100",
-        "tcom_no",
-        "white",
-        "work_out"
+        "earthquake_imp_2",
+        "earthquake_imp_3",
+        "earthquake_imp_4",
+        "earthquake_imp_5",
+        "non_wrkr",
+        "white"
       ]
     },
     "use_transit": {
       "coefficients": {
-        "CR": 0.0948207901971793,
-        "EmpDens_high": 0.19359370649843394,
-        "EmpDens_medium": 0.11406529319010299,
-        "TransitAccess_high": -0.19954057318912227,
-        "TransitAccess_medium": 0.02045801294083056,
-        "child": 0.1219684618044259,
-        "dis_yes": -0.11010963433398313,
-        "flooding_imp_2": -0.06516630083639982,
-        "flooding_imp_3": -0.03353662072128065,
-        "flooding_imp_4": 0.05192083645408014,
-        "flooding_imp_5": -0.03060979847412698,
-        "hhveh0": 0.14119346516635406,
-        "in50100": -0.04266919510473211,
-        "rural": -0.019614399522825916,
-        "sa_home": 0.07825712456069321,
-        "work_out": 0.2406708901306546
+        "SE": -0.12643608304760048,
+        "bs_grad": -0.20741270261337014,
+        "earthquake_imp_2": 0.07289580864103952,
+        "earthquake_imp_3": 0.22032427862969745,
+        "earthquake_imp_4": 0.35174737986104276,
+        "earthquake_imp_5": 0.21685026364233442,
+        "female": -0.19802030194283063,
+        "hhsize1": 0.29728528554357675,
+        "hispanic_c": 0.3708037764190825,
+        "non_wrkr": -0.2710147287137482,
+        "tcom_no": -0.32176832279030154
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 1041
+        "n": 611
       },
       "thresholds": {
-        "1|2": -0.6120335503675334,
-        "2|3": 1.285859466622656
+        "1|2": -0.8816752780363697,
+        "2|3": 0.8977317761334165
       },
       "variables": [
-        "CR",
-        "EmpDens_high",
-        "EmpDens_medium",
+        "SE",
+        "bs_grad",
+        "earthquake_imp_2",
+        "earthquake_imp_3",
+        "earthquake_imp_4",
+        "earthquake_imp_5",
+        "female",
+        "hhsize1",
+        "hispanic_c",
+        "non_wrkr",
+        "tcom_no"
+      ]
+    },
+    "go_business_as_usual": {
+      "coefficients": {
+        "PR": 0.17552302379375517,
+        "age_5165": -0.43787421854746006,
+        "age_65p": -0.48321296161016447,
+        "earthquake_imp_2": -0.2676258739735628,
+        "earthquake_imp_3": -0.35323318101746154,
+        "earthquake_imp_4": -0.1865178507222644,
+        "earthquake_imp_5": -0.055120639209029085,
+        "female": -0.2741654487369669,
+        "rural": 0.4510882173377122,
+        "tcom_no": -0.20162123025192905,
+        "white": 0.18562603530664365
+      },
+      "metadata": {
+        "levels": 5,
+        "link": "probit",
+        "n": 611
+      },
+      "thresholds": {
+        "1|2": -1.7272220634814186,
+        "2|3": -1.0306219027765233,
+        "3|4": -0.3368856831300898,
+        "4|5": 0.618407579225265
+      },
+      "variables": [
+        "PR",
+        "age_5165",
+        "age_65p",
+        "earthquake_imp_2",
+        "earthquake_imp_3",
+        "earthquake_imp_4",
+        "earthquake_imp_5",
+        "female",
+        "rural",
+        "tcom_no",
+        "white"
+      ]
+    },
+    "work_from_home": {
+      "coefficients": {
+        "earthquake_imp_2": 0.02085924265116823,
+        "earthquake_imp_3": 0.3648503724885305,
+        "earthquake_imp_4": 0.18263249906378884,
+        "earthquake_imp_5": 0.0468036721260173,
+        "tcom_no": -0.48225922822190903
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 343
+      },
+      "thresholds": {
+        "1|2": -1.310798136256024,
+        "2|3": 0.5445173957427347
+      },
+      "variables": [
+        "earthquake_imp_2",
+        "earthquake_imp_3",
+        "earthquake_imp_4",
+        "earthquake_imp_5",
+        "tcom_no"
+      ]
+    }
+  },
+  "flooding": {
+    "use_car": {
+      "coefficients": {
+        "PR": -0.11707174219981413,
+        "SE": 0.1416537701404742,
+        "TransitAccess_high": -0.18338150096578526,
+        "age_65p": -0.2659180471458762,
+        "child": 0.12822779319056937,
+        "flooding_imp_2": -0.06473618201464247,
+        "flooding_imp_3": -0.03351695363763071,
+        "flooding_imp_4": 0.07551301092069368,
+        "flooding_imp_5": 0.26508397934137995,
+        "hhveh0": 0.2319797888075858,
+        "work_out": 0.6081849289225133
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1077
+      },
+      "thresholds": {
+        "1|2": -0.2370061198783654,
+        "2|3": 1.2639134235100653
+      },
+      "variables": [
+        "PR",
+        "SE",
         "TransitAccess_high",
-        "TransitAccess_medium",
+        "age_65p",
         "child",
-        "dis_yes",
         "flooding_imp_2",
         "flooding_imp_3",
         "flooding_imp_4",
         "flooding_imp_5",
         "hhveh0",
-        "in50100",
-        "rural",
-        "sa_home",
         "work_out"
       ]
     },
-    "work_from_home": {
+    "stay_home": {
       "coefficients": {
-        "CR": 0.1411119246862802,
-        "NetworkDensity_high": 0.19212928122659712,
-        "black": -0.12348657952484637,
-        "dis_yes": 0.14605174335634588,
-        "flooding_imp_2": 0.17649438816488666,
-        "flooding_imp_3": 0.22736776720127053,
-        "flooding_imp_4": 0.3362222129132753,
-        "flooding_imp_5": 0.6255467023019913,
-        "in50100": 0.020317564390201093,
-        "white": -0.04069302814885336
+        "CR": 0.11800945337682962,
+        "TransitAccess_high": 0.20948968846202295,
+        "bs_grad": 0.19453455068100337,
+        "female": 0.16906013254992994,
+        "flooding_imp_2": 0.21813856726449454,
+        "flooding_imp_3": 0.2012954062220279,
+        "flooding_imp_4": 0.08844779233841443,
+        "flooding_imp_5": 0.2529004457679948
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 558
+        "n": 1077
       },
       "thresholds": {
-        "1|2": -1.0966054335904223,
-        "2|3": 0.8134513707016489
+        "1|2": -1.2600220247161318,
+        "2|3": 0.3783569515014238
       },
       "variables": [
         "CR",
-        "NetworkDensity_high",
-        "black",
-        "dis_yes",
+        "TransitAccess_high",
+        "bs_grad",
+        "female",
+        "flooding_imp_2",
+        "flooding_imp_3",
+        "flooding_imp_4",
+        "flooding_imp_5"
+      ]
+    },
+    "use_transit": {
+      "coefficients": {
+        "CR": 0.07882293887268277,
+        "NatWalkInd_very_high": 0.22905635143586386,
+        "ac_c": 0.15369759764575017,
+        "age_3150": -0.142046342850775,
+        "child": 0.16347359060342936,
+        "edu_bs": 0.2542442769199915,
+        "flooding_imp_2": -0.05841783670110451,
+        "flooding_imp_3": 0.0005732919597554212,
+        "flooding_imp_4": 0.08715023777147089,
+        "flooding_imp_5": -0.022962718389565595
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1077
+      },
+      "thresholds": {
+        "1|2": -0.5962716651244835,
+        "2|3": 1.2966196963633427
+      },
+      "variables": [
+        "CR",
+        "NatWalkInd_very_high",
+        "ac_c",
+        "age_3150",
+        "child",
+        "edu_bs",
+        "flooding_imp_2",
+        "flooding_imp_3",
+        "flooding_imp_4",
+        "flooding_imp_5"
+      ]
+    },
+    "go_business_as_usual": {
+      "coefficients": {
+        "CR": 0.08527601575510481,
+        "PR": 0.10918742845964483,
+        "age_3150": 0.20431993697142,
+        "female": -0.17544745323549252,
+        "flooding_imp_2": -0.47633397100891983,
+        "flooding_imp_3": -0.5372925942975676,
+        "flooding_imp_4": -0.6636946111551064,
+        "flooding_imp_5": -0.6165936513449333,
+        "non_wrkr": -0.16641094964737735,
+        "tcom_no": -0.33838414366806246,
+        "white": 0.18011617540870828
+      },
+      "metadata": {
+        "levels": 5,
+        "link": "probit",
+        "n": 1077
+      },
+      "thresholds": {
+        "1|2": -1.6790583156506371,
+        "2|3": -0.9862787548507077,
+        "3|4": -0.32229223240222693,
+        "4|5": 0.6470884882494126
+      },
+      "variables": [
+        "CR",
+        "PR",
+        "age_3150",
+        "female",
         "flooding_imp_2",
         "flooding_imp_3",
         "flooding_imp_4",
         "flooding_imp_5",
-        "in50100",
+        "non_wrkr",
+        "tcom_no",
         "white"
       ]
-    }
-  },
-  "heat": {
-    "delivery": {
+    },
+    "work_from_home": {
       "coefficients": {
-        "CR": 0.07752683907863656,
-        "EmpDens_high": 0.1555143047358075,
-        "EmpDens_medium": 0.12957025548226664,
-        "NetworkDensity_medium": 0.11892146330925675,
-        "PR": 0.07072919160260352,
-        "SE": 0.05468658027762633,
-        "age_65p": -0.2546375608507514,
-        "black": 0.27363383677203507,
-        "child": 0.13385070512704508,
-        "heat_imp_2": 0.16249495298178446,
-        "heat_imp_3": 0.13850932709034092,
-        "heat_imp_4": 0.3338279779561335,
-        "heat_imp_5": 0.4316641064080075,
-        "hhveh0": 0.12412815783124144
+        "CR": 0.13077822631778177,
+        "bs_grad": 0.20547547423692347,
+        "flooding_imp_2": 0.14772045412788803,
+        "flooding_imp_3": 0.18483659734427066,
+        "flooding_imp_4": 0.15935519562887715,
+        "flooding_imp_5": 0.5211223286105676,
+        "tcom_no": -0.1497100039841232
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 2565
+        "n": 585
       },
       "thresholds": {
-        "1|2": -0.8139474439747051,
-        "2|3": 1.0912184711633723
+        "1|2": -1.156687223955946,
+        "2|3": 0.7497718745649293
       },
       "variables": [
         "CR",
-        "EmpDens_high",
-        "EmpDens_medium",
+        "bs_grad",
+        "flooding_imp_2",
+        "flooding_imp_3",
+        "flooding_imp_4",
+        "flooding_imp_5",
+        "tcom_no"
+      ]
+    }
+  },
+  "heat": {
+    "use_car": {
+      "coefficients": {
+        "PR": 0.07477661576810075,
+        "PopDens_high": 0.08830144313563075,
+        "SE": 0.07634794282534271,
+        "black": 0.2463813362489764,
+        "heat_imp_2": 0.053131680488255596,
+        "heat_imp_3": 0.12760132974015598,
+        "heat_imp_4": 0.1568988901719762,
+        "heat_imp_5": 0.1674254263379217,
+        "hhsize2": -0.11530611838645952,
+        "hispanic_c": 0.15581619974551883,
+        "non_wrkr": -0.15996873699265182,
+        "sa_home": -0.08266963059803359,
+        "white": 0.1737742323204645
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2653
+      },
+      "thresholds": {
+        "1|2": -0.7701171317725062,
+        "2|3": 1.105411767014387
+      },
+      "variables": [
+        "PR",
+        "PopDens_high",
+        "SE",
+        "black",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhsize2",
+        "hispanic_c",
+        "non_wrkr",
+        "sa_home",
+        "white"
+      ]
+    },
+    "delivery": {
+      "coefficients": {
+        "CR": 0.0674336818209775,
+        "NetworkDensity_medium": 0.10170552953493435,
+        "PR": 0.06985279739674144,
+        "TransitAccess_high": 0.15300318437028138,
+        "ac_c": 0.10396681002769448,
+        "age_65p": -0.16940167683317608,
+        "dis_yes": 0.08178477613078139,
+        "heat_imp_2": 0.15577143726764625,
+        "heat_imp_3": 0.14591595671426255,
+        "heat_imp_4": 0.3360623509596577,
+        "heat_imp_5": 0.435559022442664,
+        "hhsize2": -0.08837375239232537,
+        "hhveh0": 0.13886016247753308,
+        "non_wrkr": -0.26313508960337795,
+        "rural": -0.19008850334146143
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2653
+      },
+      "thresholds": {
+        "1|2": -1.0017293367799172,
+        "2|3": 0.9012233024465648
+      },
+      "variables": [
+        "CR",
         "NetworkDensity_medium",
         "PR",
-        "SE",
+        "TransitAccess_high",
+        "ac_c",
         "age_65p",
-        "black",
-        "child",
+        "dis_yes",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhsize2",
+        "hhveh0",
+        "non_wrkr",
+        "rural"
+      ]
+    },
+    "dine_in": {
+      "coefficients": {
+        "Diversity_high": -0.1365164265848375,
+        "edu_bs": -0.12467643772067315,
+        "heat_imp_2": 0.10114281446864028,
+        "heat_imp_3": 0.005441844115053834,
+        "heat_imp_4": -0.09151482408132822,
+        "heat_imp_5": 0.259031328534696,
+        "hhsize2": -0.11230366429416877,
+        "non_wrkr": -0.2318498018816246
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2653
+      },
+      "thresholds": {
+        "1|2": -0.956588761979066,
+        "2|3": 0.7979656057899297
+      },
+      "variables": [
+        "Diversity_high",
+        "edu_bs",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhsize2",
+        "non_wrkr"
+      ]
+    },
+    "stay_home": {
+      "coefficients": {
+        "CR": 0.08599663684742465,
+        "PopDens_high": 0.14588528752770544,
+        "ac_c": 0.1763759762848574,
+        "dis_yes": 0.14714508217489167,
+        "edu_bs": 0.10371905019646588,
+        "heat_imp_2": 0.2720976976473509,
+        "heat_imp_3": 0.2910260420449789,
+        "heat_imp_4": 0.47868437540526526,
+        "heat_imp_5": 0.3867108426559968,
+        "hhsize2": -0.08438579434990295,
+        "hispanic_c": 0.15860535874684586,
+        "non_wrkr": 0.15897339420436155,
+        "tcom_no": 0.12380046015050612,
+        "work_out": -0.23736242347883427
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2653
+      },
+      "thresholds": {
+        "1|2": -0.9554975183906668,
+        "2|3": 0.763525045467418
+      },
+      "variables": [
+        "CR",
+        "PopDens_high",
+        "ac_c",
+        "dis_yes",
+        "edu_bs",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhsize2",
+        "hispanic_c",
+        "non_wrkr",
+        "tcom_no",
+        "work_out"
+      ]
+    },
+    "pick_up": {
+      "coefficients": {
+        "Diversity_high": -0.1307630263773875,
+        "EmpDens_medium": -0.09869534344402704,
+        "PR": 0.049475771291283305,
+        "SE": 0.08167231468274566,
+        "ac_c": -0.12326346014401314,
+        "age_5165": -0.15017881155260138,
+        "age_65p": -0.17940764941152618,
+        "heat_imp_2": -0.04895090149799405,
+        "heat_imp_3": 0.016791002781496457,
+        "heat_imp_4": 0.05443163800843538,
+        "heat_imp_5": 0.029648317898304334,
+        "hhveh0": -0.1380244241648996
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2653
+      },
+      "thresholds": {
+        "1|2": -1.0492309982575205,
+        "2|3": 0.7021082425629397
+      },
+      "variables": [
+        "Diversity_high",
+        "EmpDens_medium",
+        "PR",
+        "SE",
+        "ac_c",
+        "age_5165",
+        "age_65p",
         "heat_imp_2",
         "heat_imp_3",
         "heat_imp_4",
@@ -788,95 +884,83 @@
         "hhveh0"
       ]
     },
-    "dine_in": {
+    "use_transit": {
       "coefficients": {
-        "Diversity_high": -0.1369366679413848,
-        "SE": 0.06285287519174436,
-        "TransitAccess_high": -0.13708426106711222,
-        "age_65p": -0.11852362334427154,
-        "asian": -0.25537842540076044,
-        "bs_grad": -0.1048941783518276,
-        "heat_imp_2": 0.0841573522922833,
-        "heat_imp_3": -0.0049766459919890005,
-        "heat_imp_4": -0.10408650416855139,
-        "heat_imp_5": 0.24083950093704984,
-        "hhsize2": -0.130319083631232,
-        "in50": -0.14376718336678285,
-        "in50100": -0.13631207636250525,
-        "sa_home": -0.08505090650370535,
-        "work_out": 0.2956259941895258
+        "PR": -0.059517697785014125,
+        "TransitAccess_high": -0.12565849138827168,
+        "age_3150": -0.15630246853921895,
+        "age_5165": -0.15344541779059725,
+        "age_65p": -0.15711190804586428,
+        "heat_imp_2": -0.08885095862322415,
+        "heat_imp_3": -0.1407537448373991,
+        "heat_imp_4": -0.10632717480289047,
+        "heat_imp_5": -0.14569971142368238,
+        "hhveh0": 0.31332896424933965,
+        "in50100": 0.11330374663476757,
+        "tcom_no": -0.16011546446278063,
+        "work_out": 0.4651465855674174
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 2565
+        "n": 2653
       },
       "thresholds": {
-        "1|2": -1.0923981756621701,
-        "2|3": 0.6737996077100354
+        "1|2": -0.9416855544510969,
+        "2|3": 1.1699330889045345
       },
       "variables": [
-        "Diversity_high",
-        "SE",
+        "PR",
         "TransitAccess_high",
+        "age_3150",
+        "age_5165",
         "age_65p",
-        "asian",
-        "bs_grad",
         "heat_imp_2",
         "heat_imp_3",
         "heat_imp_4",
         "heat_imp_5",
-        "hhsize2",
-        "in50",
+        "hhveh0",
         "in50100",
-        "sa_home",
+        "tcom_no",
         "work_out"
       ]
     },
     "go_business_as_usual": {
       "coefficients": {
-        "CR": 0.08008043046692857,
-        "EmpDens_high": -0.09771827253964108,
-        "NatWalkInd_low": -0.1607361572646006,
-        "NetworkDensity_high": 0.08265675431519341,
-        "PR": 0.18751703520429122,
-        "PopDens_medium": 0.09048941630643514,
-        "SE": 0.05402985693464276,
-        "ac_c": 0.22920195536940208,
-        "age_3150": 0.08847135639776502,
-        "age_65p": -0.191112537014413,
-        "dis_yes": -0.12231756935120831,
-        "female": -0.09507665628754407,
-        "heat_imp_2": -0.6614624161086708,
-        "heat_imp_3": -0.8989152826414647,
-        "heat_imp_4": -1.110807776436652,
-        "heat_imp_5": -1.0417656883814699,
-        "hhveh0": -0.13760145983945893,
-        "tcom_no": 0.09068402559953928,
-        "work_out": 0.30885202742418455
+        "CR": 0.08168685450542372,
+        "PR": 0.18214312954682987,
+        "PopDens_medium": 0.08169302023869479,
+        "ac_c": 0.23307775135577594,
+        "age_3150": 0.1878762798510617,
+        "age_5165": 0.10945829542758558,
+        "dis_yes": -0.1275789769846156,
+        "female": -0.11095991658813714,
+        "heat_imp_2": -0.6593682094934147,
+        "heat_imp_3": -0.9078526361498906,
+        "heat_imp_4": -1.0891292363764924,
+        "heat_imp_5": -1.0323924615139015,
+        "hhveh0": -0.14132724355590387,
+        "non_wrkr": -0.2055820403379054,
+        "work_out": 0.2781655073295546
       },
       "metadata": {
         "levels": 5,
         "link": "probit",
-        "n": 2564
+        "n": 2653
       },
       "thresholds": {
-        "1|2": -2.1712340569786455,
-        "2|3": -1.4666537570713567,
-        "3|4": -0.8628854687551838,
-        "4|5": 0.16120687733007488
+        "1|2": -2.1530685961229024,
+        "2|3": -1.4517568733227635,
+        "3|4": -0.8481741939555776,
+        "4|5": 0.18120648195146694
       },
       "variables": [
         "CR",
-        "EmpDens_high",
-        "NatWalkInd_low",
-        "NetworkDensity_high",
         "PR",
         "PopDens_medium",
-        "SE",
         "ac_c",
         "age_3150",
-        "age_65p",
+        "age_5165",
         "dis_yes",
         "female",
         "heat_imp_2",
@@ -884,248 +968,25 @@
         "heat_imp_4",
         "heat_imp_5",
         "hhveh0",
-        "tcom_no",
-        "work_out"
-      ]
-    },
-    "pick_up": {
-      "coefficients": {
-        "Diversity_high": -0.12111865528936272,
-        "EmpDens_medium": -0.08368648277631552,
-        "PR": 0.05524311010821781,
-        "SE": 0.06631382884195387,
-        "ac_c": -0.11824634821487269,
-        "age_3150": -0.13091330908307872,
-        "age_5165": -0.20821460934094244,
-        "age_65p": -0.25102802782999567,
-        "heat_imp_2": -0.03747592504197599,
-        "heat_imp_3": 0.03146420484003104,
-        "heat_imp_4": 0.016270954269519248,
-        "heat_imp_5": 0.011559507595958666,
-        "hhveh0": -0.13536421756308273,
-        "work_out": 0.20130217704877082
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 2564
-      },
-      "thresholds": {
-        "1|2": -1.1095117299222865,
-        "2|3": 0.6600939924724101
-      },
-      "variables": [
-        "Diversity_high",
-        "EmpDens_medium",
-        "PR",
-        "SE",
-        "ac_c",
-        "age_3150",
-        "age_5165",
-        "age_65p",
-        "heat_imp_2",
-        "heat_imp_3",
-        "heat_imp_4",
-        "heat_imp_5",
-        "hhveh0",
-        "work_out"
-      ]
-    },
-    "stay_home": {
-      "coefficients": {
-        "CR": 0.09623893677748656,
-        "NatWalkInd_high": 0.13836564709770818,
-        "NatWalkInd_low": 0.14766269537186139,
-        "NatWalkInd_very_high": 0.2490506444036838,
-        "NetworkDensity_medium": 0.09178096505560475,
-        "ac_c": 0.20563438210667856,
-        "child": -0.15765503878569165,
-        "dis_yes": 0.14626971765416835,
-        "edu_bs": 0.10243879567906469,
-        "heat_imp_2": 0.28377904639078333,
-        "heat_imp_3": 0.298103336862964,
-        "heat_imp_4": 0.4891148466572814,
-        "heat_imp_5": 0.41115740402769285,
-        "hhsize1": -0.16526072336524075,
-        "hhsize2": -0.17576806419470628,
-        "in50": 0.09553748759463453,
-        "work_out": -0.23649623145691737
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 2564
-      },
-      "thresholds": {
-        "1|2": -1.020107596896045,
-        "2|3": 0.7112014654837293
-      },
-      "variables": [
-        "CR",
-        "NatWalkInd_high",
-        "NatWalkInd_low",
-        "NatWalkInd_very_high",
-        "NetworkDensity_medium",
-        "ac_c",
-        "child",
-        "dis_yes",
-        "edu_bs",
-        "heat_imp_2",
-        "heat_imp_3",
-        "heat_imp_4",
-        "heat_imp_5",
-        "hhsize1",
-        "hhsize2",
-        "in50",
-        "work_out"
-      ]
-    },
-    "use_car": {
-      "coefficients": {
-        "PR": 0.06534990520514893,
-        "PopDens_high": 0.11713081511591572,
-        "SE": 0.0651944097079023,
-        "age_5165": -0.09192904797697261,
-        "black": 0.30191054655123695,
-        "bs_grad": 0.12245840425880566,
-        "child": 0.1167018874391354,
-        "edu_bs": -0.1482468131887115,
-        "heat_imp_2": 0.06239924328225619,
-        "heat_imp_3": 0.15350494210065657,
-        "heat_imp_4": 0.16657998495967496,
-        "heat_imp_5": 0.16613048198232666,
-        "hhsize1": 0.10371631786831215,
-        "hispanic_c": 0.1905894227028082,
-        "tcom_no": 0.12005341841311054,
-        "white": 0.17667594758250293,
-        "work_out": 0.22102619893837874
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 2564
-      },
-      "thresholds": {
-        "1|2": -0.4771382697819104,
-        "2|3": 1.4020983954212285
-      },
-      "variables": [
-        "PR",
-        "PopDens_high",
-        "SE",
-        "age_5165",
-        "black",
-        "bs_grad",
-        "child",
-        "edu_bs",
-        "heat_imp_2",
-        "heat_imp_3",
-        "heat_imp_4",
-        "heat_imp_5",
-        "hhsize1",
-        "hispanic_c",
-        "tcom_no",
-        "white",
-        "work_out"
-      ]
-    },
-    "use_transit": {
-      "coefficients": {
-        "PR": -0.056947034721101346,
-        "TransitAccess_high": -0.13055729986470174,
-        "age_3150": -0.14074671467779037,
-        "age_5165": -0.12813326563491573,
-        "age_65p": -0.1385217951464179,
-        "heat_imp_2": -0.08853539420607992,
-        "heat_imp_3": -0.11692860962568945,
-        "heat_imp_4": -0.12486643701536397,
-        "heat_imp_5": -0.13059517350973382,
-        "hhveh0": 0.31691318687372216,
-        "in50100": 0.11507459484964092,
-        "tcom_no": -0.1780569277769274,
-        "work_out": 0.4769192314412402
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 2565
-      },
-      "thresholds": {
-        "1|2": -0.929781684116077,
-        "2|3": 1.1836681303440453
-      },
-      "variables": [
-        "PR",
-        "TransitAccess_high",
-        "age_3150",
-        "age_5165",
-        "age_65p",
-        "heat_imp_2",
-        "heat_imp_3",
-        "heat_imp_4",
-        "heat_imp_5",
-        "hhveh0",
-        "in50100",
-        "tcom_no",
+        "non_wrkr",
         "work_out"
       ]
     },
     "work_from_home": {
       "coefficients": {
-        "CR": 0.1279121286672962,
-        "NetworkDensity_high": 0.19654217859967013,
-        "SE": 0.09810049794498976,
-        "ac_c": 0.17819206376665855,
-        "age_65p": -0.24565880577234347,
-        "black": 0.16928186737968728,
-        "edu_bs": 0.15295668647545163,
-        "heat_imp_2": -0.01604736718887123,
-        "heat_imp_3": -0.038780510177345996,
-        "heat_imp_4": 0.267399217602773,
-        "heat_imp_5": -0.012978588799893135,
-        "hhsize2": -0.13609128263462253,
-        "hispanic_c": 0.24863565429365264,
-        "tcom_no": -0.45589670764297524
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 1213
-      },
-      "thresholds": {
-        "1|2": -1.473595802332563,
-        "2|3": 0.7662107831415113
-      },
-      "variables": [
-        "CR",
-        "NetworkDensity_high",
-        "SE",
-        "ac_c",
-        "age_65p",
-        "black",
-        "edu_bs",
-        "heat_imp_2",
-        "heat_imp_3",
-        "heat_imp_4",
-        "heat_imp_5",
-        "hhsize2",
-        "hispanic_c",
-        "tcom_no"
-      ]
-    },
-    "work_from_office": {
-      "coefficients": {
-        "asian": -0.2459946956721301,
-        "child": 0.14835400843444826,
-        "edu_bs": -0.1781886329038944,
-        "heat_imp_2": -0.04865407335510297,
-        "heat_imp_3": -0.051676598949147126,
-        "heat_imp_4": -0.1098896439124542,
-        "heat_imp_5": 0.28321362172286996,
-        "hhsize1": 0.29997588373240597,
-        "hhsize2": 0.17035216069798875,
-        "tcom_no": 0.1727524460015663,
-        "work_out": 0.21257998066046366
+        "CR": 0.12077436124958667,
+        "ac_c": 0.20604980530831157,
+        "black": 0.215718324356209,
+        "edu_bs": 0.1550573749935935,
+        "heat_imp_2": 0.0006753952140368892,
+        "heat_imp_3": 0.026453759546501657,
+        "heat_imp_4": 0.33550853768376243,
+        "heat_imp_5": 0.06801229040179738,
+        "hhsize2": -0.17206599785335255,
+        "hispanic_c": 0.28840449233891763,
+        "in50": -0.17723279999916725,
+        "in50100": -0.15001349985023105,
+        "tcom_no": -0.4331880116271031
       },
       "metadata": {
         "levels": 3,
@@ -1133,56 +994,128 @@
         "n": 1271
       },
       "thresholds": {
-        "1|2": -0.6715429012651412,
-        "2|3": 1.2880887443092632
+        "1|2": -1.5421638127985478,
+        "2|3": 0.6615708222875172
       },
       "variables": [
-        "asian",
-        "child",
+        "CR",
+        "ac_c",
+        "black",
+        "edu_bs",
+        "heat_imp_2",
+        "heat_imp_3",
+        "heat_imp_4",
+        "heat_imp_5",
+        "hhsize2",
+        "hispanic_c",
+        "in50",
+        "in50100",
+        "tcom_no"
+      ]
+    },
+    "work_from_office": {
+      "coefficients": {
+        "CR": -0.08296695691966477,
+        "edu_bs": -0.20436564308062177,
+        "heat_imp_2": -0.03053034365376287,
+        "heat_imp_3": -0.03431849051051202,
+        "heat_imp_4": -0.08331750461833841,
+        "heat_imp_5": 0.3183838989041446,
+        "hhsize1": 0.1793881122053992,
+        "in50": -0.11700081058876684,
+        "tcom_no": 0.1804049337260635,
+        "work_out": 0.21733188517770521
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 1271
+      },
+      "thresholds": {
+        "1|2": -0.8252735104753292,
+        "2|3": 1.1341206637106054
+      },
+      "variables": [
+        "CR",
         "edu_bs",
         "heat_imp_2",
         "heat_imp_3",
         "heat_imp_4",
         "heat_imp_5",
         "hhsize1",
-        "hhsize2",
+        "in50",
         "tcom_no",
         "work_out"
       ]
     }
   },
   "powerout": {
-    "delivery": {
+    "use_car": {
       "coefficients": {
-        "Diversity_high": -0.08425004059580636,
-        "Diversity_medium": -0.028176759894454416,
-        "EmpDens_high": 0.07475204825034343,
-        "NatWalkInd_low": -0.14731244220867445,
-        "PopDens_high": -0.03867896006217813,
-        "SE": 0.08392589881184345,
-        "TransitAccess_medium": 0.027024843235141448,
-        "powerout_imp_2": 0.0034109642587223884,
-        "powerout_imp_3": 0.12448506914689322,
-        "powerout_imp_4": 0.1087966202551201,
-        "powerout_imp_5": 0.22197066538273222
+        "age_5165": -0.22863089774344744,
+        "age_65p": -0.26620470854524864,
+        "child": 0.12787050020522045,
+        "female": -0.17022381985102314,
+        "hhveh0": -0.32102533021036384,
+        "powerout_imp_2": -0.010946460814647223,
+        "powerout_imp_3": 0.06618859087178561,
+        "powerout_imp_4": 0.08868243052372175,
+        "powerout_imp_5": 0.19594532591125696
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 2300
+        "n": 2381
       },
       "thresholds": {
-        "1|2": -0.7183670472629745,
-        "2|3": 0.9528571951810213
+        "1|2": -1.1499893219431085,
+        "2|3": 0.631202876962246
       },
       "variables": [
-        "Diversity_high",
-        "Diversity_medium",
-        "EmpDens_high",
+        "age_5165",
+        "age_65p",
+        "child",
+        "female",
+        "hhveh0",
+        "powerout_imp_2",
+        "powerout_imp_3",
+        "powerout_imp_4",
+        "powerout_imp_5"
+      ]
+    },
+    "delivery": {
+      "coefficients": {
+        "NatWalkInd_low": -0.143581944376225,
+        "PR": -0.045019227875576086,
+        "SE": 0.06556154261363789,
+        "age_5165": -0.12588559367256077,
+        "hhsize1": -0.09799577169693156,
+        "hhsize2": -0.1561881092741084,
+        "in50": -0.1371612169944142,
+        "in50100": -0.17321192072784283,
+        "powerout_imp_2": -0.0231808691701183,
+        "powerout_imp_3": 0.10533316110355798,
+        "powerout_imp_4": 0.06571638241945363,
+        "powerout_imp_5": 0.18162075203733716
+      },
+      "metadata": {
+        "levels": 3,
+        "link": "probit",
+        "n": 2381
+      },
+      "thresholds": {
+        "1|2": -0.9476580264188608,
+        "2|3": 0.730677129874076
+      },
+      "variables": [
         "NatWalkInd_low",
-        "PopDens_high",
+        "PR",
         "SE",
-        "TransitAccess_medium",
+        "age_5165",
+        "hhsize1",
+        "hhsize2",
+        "in50",
+        "in50100",
         "powerout_imp_2",
         "powerout_imp_3",
         "powerout_imp_4",
@@ -1191,148 +1124,76 @@
     },
     "dine_in": {
       "coefficients": {
-        "Diversity_medium": -0.04158359118561637,
-        "in50": -0.1121849795187501,
-        "powerout_imp_2": 0.015608925445864787,
-        "powerout_imp_3": 0.11421753592572964,
-        "powerout_imp_4": 0.2682052274631984,
-        "powerout_imp_5": 0.25311441009632446
+        "NetworkDensity_high": -0.09674897200010536,
+        "NetworkDensity_medium": -0.14444705700286528,
+        "PR": -0.05758596620506887,
+        "SE": 0.05599562172848691,
+        "age_5165": -0.09638848229592083,
+        "female": -0.11669531211815198,
+        "hhsize2": -0.09448867806817764,
+        "in50": -0.18152115270053956,
+        "in50100": -0.14136016831443907,
+        "powerout_imp_2": 0.016312729258382355,
+        "powerout_imp_3": 0.11777519389120286,
+        "powerout_imp_4": 0.27057112894885565,
+        "powerout_imp_5": 0.25486679101346055,
+        "white": 0.19411904858897874
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 2300
+        "n": 2381
       },
       "thresholds": {
-        "1|2": -0.49851421701437615,
-        "2|3": 0.9693413109293751
+        "1|2": -0.6192276248790287,
+        "2|3": 0.870832333749066
       },
       "variables": [
-        "Diversity_medium",
-        "in50",
-        "powerout_imp_2",
-        "powerout_imp_3",
-        "powerout_imp_4",
-        "powerout_imp_5"
-      ]
-    },
-    "go_business_as_usual": {
-      "coefficients": {
-        "Diversity_high": 0.15990445863473993,
-        "Diversity_medium": 0.1537243917847486,
-        "EmpDens_high": -0.18444141062105915,
-        "NetworkDensity_medium": -0.133428743229376,
-        "SE": 0.12437610176570384,
-        "ac_c": 0.19545228544582244,
-        "age_3150": -0.36574684719592054,
-        "age_5165": -0.3343877899072022,
-        "age_65p": -0.6330125135328069,
-        "powerout_imp_2": -0.39327506584807737,
-        "powerout_imp_3": -0.5337608004965829,
-        "powerout_imp_4": -0.8859059718611467,
-        "powerout_imp_5": -0.9502058829980033,
-        "work_out": 0.3526992437906132
-      },
-      "metadata": {
-        "levels": 5,
-        "link": "probit",
-        "n": 892
-      },
-      "thresholds": {
-        "1|2": -2.0484910295759784,
-        "2|3": -1.257186943662147,
-        "3|4": -0.6202068449356043,
-        "4|5": 0.3741284259307438
-      },
-      "variables": [
-        "Diversity_high",
-        "Diversity_medium",
-        "EmpDens_high",
-        "NetworkDensity_medium",
-        "SE",
-        "ac_c",
-        "age_3150",
-        "age_5165",
-        "age_65p",
-        "powerout_imp_2",
-        "powerout_imp_3",
-        "powerout_imp_4",
-        "powerout_imp_5",
-        "work_out"
-      ]
-    },
-    "pick_up": {
-      "coefficients": {
-        "Diversity_medium": -0.03418123871913002,
-        "NatWalkInd_low": -0.0955004547590936,
-        "NetworkDensity_high": 0.0021389656759381185,
-        "NetworkDensity_medium": -0.13457456074298324,
-        "TransitAccess_high": -0.14122265049672716,
-        "female": -0.1246661132006043,
-        "in50": -0.24534686189659335,
-        "in50100": -0.17932065013129173,
-        "powerout_imp_2": -0.017924612013254335,
-        "powerout_imp_3": 0.06838185815644546,
-        "powerout_imp_4": 0.2005482708107809,
-        "powerout_imp_5": 0.11659825794122969,
-        "rural": -0.12201701723590314,
-        "white": 0.07152119200863924
-      },
-      "metadata": {
-        "levels": 3,
-        "link": "probit",
-        "n": 2300
-      },
-      "thresholds": {
-        "1|2": -0.9207632699232177,
-        "2|3": 0.5787622462234022
-      },
-      "variables": [
-        "Diversity_medium",
-        "NatWalkInd_low",
         "NetworkDensity_high",
         "NetworkDensity_medium",
-        "TransitAccess_high",
+        "PR",
+        "SE",
+        "age_5165",
         "female",
+        "hhsize2",
         "in50",
         "in50100",
         "powerout_imp_2",
         "powerout_imp_3",
         "powerout_imp_4",
         "powerout_imp_5",
-        "rural",
         "white"
       ]
     },
     "stay_home": {
       "coefficients": {
-        "Diversity_high": 0.03659255247345256,
-        "Diversity_medium": 0.08080637731900708,
-        "EmpDens_medium": -0.04222386590589834,
-        "PR": 0.07085908100196711,
-        "age_65p": 0.14131198935855532,
-        "dis_yes": 0.19109918875975873,
-        "in50100": -0.10239094276769516,
-        "powerout_imp_2": 0.15382581017147842,
-        "powerout_imp_3": 0.17337543256704827,
-        "powerout_imp_4": 0.0791112625199085,
-        "powerout_imp_5": 0.213288668362796
+        "EmpDens_high": 0.09231633725714335,
+        "PR": 0.07557625112482083,
+        "age_5165": 0.18394113258735245,
+        "age_65p": 0.24299037580991883,
+        "black": 0.16042947227948556,
+        "dis_yes": 0.16015196001921533,
+        "in50100": -0.09705963899356392,
+        "powerout_imp_2": 0.1486764889070895,
+        "powerout_imp_3": 0.16942803396192269,
+        "powerout_imp_4": 0.09773148126546978,
+        "powerout_imp_5": 0.2682414917046593
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 2300
+        "n": 2381
       },
       "thresholds": {
-        "1|2": -0.985462687386547,
-        "2|3": 0.5448045450965183
+        "1|2": -0.894347492669867,
+        "2|3": 0.6455071776930207
       },
       "variables": [
-        "Diversity_high",
-        "Diversity_medium",
-        "EmpDens_medium",
+        "EmpDens_high",
         "PR",
+        "age_5165",
         "age_65p",
+        "black",
         "dis_yes",
         "in50100",
         "powerout_imp_2",
@@ -1341,88 +1202,143 @@
         "powerout_imp_5"
       ]
     },
-    "use_car": {
+    "pick_up": {
       "coefficients": {
-        "Diversity_high": -0.09213820784801297,
-        "EmpDens_medium": -0.05542987691439247,
-        "age_65p": -0.10009368320420557,
-        "black": 0.08779850931108488,
-        "child": 0.2138246978282359,
-        "dis_yes": -0.09163826192250843,
-        "female": -0.20594537380079958,
-        "powerout_imp_2": 0.0103256054135324,
-        "powerout_imp_3": 0.08515020392212808,
-        "powerout_imp_4": 0.15429908771507306,
-        "powerout_imp_5": 0.1910271025958022,
-        "rural": -0.10555362068919498,
-        "tcom_no": 0.07367349227251811,
-        "white": 0.05831203863567436
+        "CR": 0.04760990399505554,
+        "NetworkDensity_medium": -0.1267108234430275,
+        "TransitAccess_high": -0.15479158257220207,
+        "age_3150": 0.08778984734269826,
+        "asian": 0.32185316635969713,
+        "female": -0.12434003351837253,
+        "in50": -0.20638744995203606,
+        "in50100": -0.18601341071108524,
+        "non_wrkr": -0.1243019835710017,
+        "powerout_imp_2": -0.0444454935456522,
+        "powerout_imp_3": 0.04405988660137483,
+        "powerout_imp_4": 0.15782462065414266,
+        "powerout_imp_5": 0.09303917617774213,
+        "white": 0.11402449783577606
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 2300
+        "n": 2381
       },
       "thresholds": {
-        "1|2": -0.9745337225023586,
-        "2|3": 0.7931184973296411
+        "1|2": -0.8901208014167286,
+        "2|3": 0.6149217551211656
       },
       "variables": [
-        "Diversity_high",
-        "EmpDens_medium",
-        "age_65p",
-        "black",
-        "child",
-        "dis_yes",
+        "CR",
+        "NetworkDensity_medium",
+        "TransitAccess_high",
+        "age_3150",
+        "asian",
         "female",
+        "in50",
+        "in50100",
+        "non_wrkr",
         "powerout_imp_2",
         "powerout_imp_3",
         "powerout_imp_4",
         "powerout_imp_5",
-        "rural",
-        "tcom_no",
         "white"
       ]
     },
     "use_transit": {
       "coefficients": {
-        "EmpDens_high": 0.12011250210514623,
-        "EmpDens_medium": 0.07538841144702665,
-        "NatWalkInd_high": -0.07195895537748256,
-        "age_3150": -0.15577575893457604,
-        "age_5165": -0.22299771954988487,
-        "age_65p": -0.21490073445519475,
-        "hhveh0": 0.4428561329299513,
-        "hispanic_c": -0.20134638083300305,
-        "in50": -0.09102944289485508,
-        "powerout_imp_2": -0.06938774809011372,
-        "powerout_imp_3": -0.0290642636565208,
-        "powerout_imp_4": 0.042706065375450956,
-        "powerout_imp_5": 0.2085172869323725
+        "CR": 0.06852613432586377,
+        "PR": -0.052903511153017675,
+        "SE": 0.05678200496499382,
+        "age_3150": -0.21850698098760443,
+        "age_5165": -0.2646741823897325,
+        "age_65p": -0.2715341988123666,
+        "child": 0.09883237117502068,
+        "female": -0.09793019861456294,
+        "hhveh0": 0.48394589609284905,
+        "hispanic_c": -0.20880698651496396,
+        "in50": -0.16676265378603886,
+        "in50100": -0.15557324051797394,
+        "powerout_imp_2": -0.08792730123576835,
+        "powerout_imp_3": -0.05412507020210211,
+        "powerout_imp_4": -0.014620360980862767,
+        "powerout_imp_5": 0.1558230334602258,
+        "sa_home": -0.08952798135551142
       },
       "metadata": {
         "levels": 3,
         "link": "probit",
-        "n": 2299
+        "n": 2381
       },
       "thresholds": {
-        "1|2": -0.928522260866141,
-        "2|3": 1.1731176503459781
+        "1|2": -1.215242362607274,
+        "2|3": 0.9100728438503025
       },
       "variables": [
-        "EmpDens_high",
-        "EmpDens_medium",
-        "NatWalkInd_high",
+        "CR",
+        "PR",
+        "SE",
         "age_3150",
         "age_5165",
         "age_65p",
+        "child",
+        "female",
         "hhveh0",
         "hispanic_c",
         "in50",
+        "in50100",
         "powerout_imp_2",
         "powerout_imp_3",
         "powerout_imp_4",
-        "powerout_imp_5"
+        "powerout_imp_5",
+        "sa_home"
+      ]
+    },
+    "go_business_as_usual": {
+      "coefficients": {
+        "CR": 0.08382611364529531,
+        "PR": 0.08726459329478801,
+        "PopDens_high": 0.07738121410762178,
+        "SE": 0.0992282787504804,
+        "age_5165": -0.12148907914255153,
+        "age_65p": -0.30719729524633516,
+        "female": -0.11855954294596646,
+        "in50": -0.1328581243115177,
+        "in50100": -0.15952320721999708,
+        "powerout_imp_2": -0.4187240440965555,
+        "powerout_imp_3": -0.5378538311675933,
+        "powerout_imp_4": -0.7678078037397663,
+        "powerout_imp_5": -0.9174694505818303,
+        "rural": 0.16242273084321254,
+        "work_out": 0.31538133195380813
+      },
+      "metadata": {
+        "levels": 5,
+        "link": "probit",
+        "n": 2381
+      },
+      "thresholds": {
+        "1|2": -2.012551913851904,
+        "2|3": -1.2474402411525705,
+        "3|4": -0.617834600389369,
+        "4|5": 0.35095473290800816
+      },
+      "variables": [
+        "CR",
+        "PR",
+        "PopDens_high",
+        "SE",
+        "age_5165",
+        "age_65p",
+        "female",
+        "in50",
+        "in50100",
+        "powerout_imp_2",
+        "powerout_imp_3",
+        "powerout_imp_4",
+        "powerout_imp_5",
+        "rural",
+        "work_out"
       ]
     }
   }

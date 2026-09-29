@@ -3,9 +3,21 @@
  *
  * These run against the REAL data files - public/models/event_data/*.csv
  * (Jinghai's per-event estimation-sample files), public/models/
- * model_coeffs_by_event.json, and (for cross-checking N) data/jinghai_2026-09-10/
+ * model_coeffs_by_event.json, and (for cross-checking N) data/jinghai_2026-09-28/
  * model_coefficients_all_events.csv - not mocks or synthetic fixtures. This
  * is the same production code path useScenarioATE.ts drives at runtime.
+ *
+ * data/jinghai_2026-09-28/ is Jinghai's corrected refit (he found a missing
+ * `non_wrkr` column, fixed it, and re-ran all 35 event/activity models),
+ * delivered 2026-09-28 and superseding the original data/jinghai_2026-09-10/
+ * delivery. The 18 "matches ATE_Heat.xlsx Segment_ATE" expectations below
+ * that reference heat activities were regenerated from the rebuilt engine
+ * output itself (see git history around 2026-09-28), NOT independently
+ * re-verified against a fresh xlsx from Jinghai - ATE_Heat.xlsx in
+ * data/jinghai_2026-09-10/ is his answer key for the OLD, buggy coefficients
+ * and is now stale for numeric comparison (its group/label wording is still
+ * accurate and unaffected). Ask Jinghai for a regenerated ATE_Heat.xlsx to
+ * get independent verification back on these.
  *
  * NOTE ON THE CSV PARSER BELOW: this project already has a CSV parser (d3's
  * csvParse, used by DataService.ts), but d3 v7 ships ESM-only and Create
@@ -122,7 +134,7 @@ const COEFFICIENT_ACTIVITY_KEY_MAP: Record<string, string> = {
 };
 
 const reportedN = new Map<string, number>();
-for (const row of parseCsv(fs.readFileSync(path.join(REPO_ROOT, 'data/jinghai_2026-09-10/model_coefficients_all_events.csv'), 'utf8'))) {
+for (const row of parseCsv(fs.readFileSync(path.join(REPO_ROOT, 'data/jinghai_2026-09-28/model_coefficients_all_events.csv'), 'utf8'))) {
   const activityKey = COEFFICIENT_ACTIVITY_KEY_MAP[row.activity];
   if (!activityKey) continue;
   const key = `${row.event}/${activityKey}`;
@@ -435,17 +447,22 @@ describe('computeSegmentATEs - Gender / Age Group / Transit Access', () => {
     }
   });
 
-  // Spot values from ATE_Heat.xlsx's Segment_ATE sheet (Extreme Heat). The
-  // sheet's N is Jinghai's slightly smaller estimation sample (e.g. 2564 vs
-  // 2653 here), so values agree to ~0.1-0.2pp, not exactly. GBU rows are the
-  // sheet's 5-level rows summed into the 3-category collapse.
+  // REGENERATED 2026-09-28 from the rebuilt engine itself (Jinghai's
+  // corrected data/jinghai_2026-09-28/ refit), not independently re-verified
+  // against a fresh ATE_Heat.xlsx - his old one (data/jinghai_2026-09-10/)
+  // was fit on the pre-fix data and is stale for numeric comparison. These
+  // are regression-guard values, not cross-checks, until he sends an
+  // updated xlsx. "Transit Access High/dine_in" and "Gender Female/use_car"
+  // flipped to inModel:false under the new variable selection (they were
+  // true before); several activities dropped variables that used to put
+  // them in-model here.
   const KEY: Array<{ group: string; comparison: string; activity: string; i: number; pb?: number; pc?: number; ate: number; inModel: boolean }> = [
-    { group: 'Age Group', comparison: '31-50', activity: 'use_transit', i: 0, pb: 0.194888, pc: 0.235426, ate: 0.040538, inModel: true },
-    { group: 'Age Group', comparison: '65+', activity: 'pick_up', i: 0, pb: 0.177867, pc: 0.249947, ate: 0.07208, inModel: true },
-    { group: 'Transit Access', comparison: 'High', activity: 'dine_in', i: 0, pb: 0.216279, pc: 0.257795, ate: 0.041516, inModel: true },
-    { group: 'Transit Access', comparison: 'Medium', activity: 'use_transit', i: 0, pb: 0.225104, pc: 0.225104, ate: 0, inModel: true },
-    { group: 'Gender', comparison: 'Female', activity: 'go_business_as_usual', i: 2, pb: 0.60336, pc: 0.569415, ate: -0.033945, inModel: true },
-    { group: 'Age Group', comparison: '65+', activity: 'go_business_as_usual', i: 0, pb: 0.213995, pc: 0.26866, ate: 0.054665, inModel: true },
+    { group: 'Age Group', comparison: '31-50', activity: 'use_transit', i: 0, pb: 0.192533, pc: 0.237536, ate: 0.045003, inModel: true },
+    { group: 'Age Group', comparison: '65+', activity: 'pick_up', i: 0, pb: 0.199362, pc: 0.252654, ate: 0.053293, inModel: true },
+    { group: 'Transit Access', comparison: 'High', activity: 'dine_in', i: 0, ate: 0, inModel: false },
+    { group: 'Transit Access', comparison: 'Medium', activity: 'use_transit', i: 0, pb: 0.227226, pc: 0.227226, ate: 0, inModel: true },
+    { group: 'Gender', comparison: 'Female', activity: 'go_business_as_usual', i: 2, pb: 0.607576, pc: 0.568002, ate: -0.039574, inModel: true },
+    { group: 'Age Group', comparison: '65+', activity: 'go_business_as_usual', i: 0, pb: 0.246614, pc: 0.246614, ate: 0, inModel: true },
     { group: 'Gender', comparison: 'Female', activity: 'use_car', i: 0, ate: 0, inModel: false }
   ];
   it.each(KEY)('heat $activity / $group ($comparison) matches ATE_Heat.xlsx Segment_ATE', (k) => {
@@ -513,17 +530,17 @@ describe('computeContinuousATE - PR / CR / SE (ate_continuous, mult=0.01 "+1% of
     }
   });
 
-  // Spot values from ATE_Heat.xlsx's Segment_ATE sheet ("+1% of SD" rows).
-  // GBU rows there are still 5-level (Very unlikely..Very likely); collapsed
-  // here into the same 3-category scale as everywhere else: [VeryUnlikely+
-  // Unlikely, Neutral, Likely+VeryLikely]. The sheet's N (2564) is Jinghai's
-  // slightly smaller estimation sample vs. the revised file's 2653, so values
-  // agree to ~0.001, not exactly (same gap as the discrete groups).
+  // REGENERATED 2026-09-28 from the rebuilt engine itself (Jinghai's
+  // corrected data/jinghai_2026-09-28/ refit) - see the KEY comment above
+  // for why these are regression-guard values, not independent xlsx
+  // cross-checks, until Jinghai sends an updated ATE_Heat.xlsx. SE flipped
+  // to inModel:false for go_business_as_usual under the new variable
+  // selection (it was true before).
   const KEY: Array<{ variable: string; activity: string; i: number; pb: number; pc: number; ate: number; inModel: boolean }> = [
-    { variable: 'CR', activity: 'go_business_as_usual', i: 0, pb: 0.078984 + 0.143748, pc: 0.078894 + 0.143656, ate: -0.00009 - 0.000091, inModel: true },
-    { variable: 'CR', activity: 'go_business_as_usual', i: 2, pb: 0.3479 + 0.235129, pc: 0.347952 + 0.235313, ate: 0.000052 + 0.000184, inModel: true },
-    { variable: 'SE', activity: 'go_business_as_usual', i: 1, pb: 0.19424, pc: 0.194203, ate: -0.000037, inModel: true },
-    { variable: 'PR', activity: 'go_business_as_usual', i: 2, pb: 0.3479 + 0.235129, pc: 0.348018 + 0.235551, ate: 0.000119 + 0.000422, inModel: true },
+    { variable: 'CR', activity: 'go_business_as_usual', i: 0, pb: 0.222178, pc: 0.221994, ate: -0.000184, inModel: true },
+    { variable: 'CR', activity: 'go_business_as_usual', i: 2, pb: 0.583978, pc: 0.584218, ate: 0.00024, inModel: true },
+    { variable: 'SE', activity: 'go_business_as_usual', i: 1, pb: 0, pc: 0, ate: 0, inModel: false },
+    { variable: 'PR', activity: 'go_business_as_usual', i: 2, pb: 0.583978, pc: 0.584502, ate: 0.000524, inModel: true },
     { variable: 'CR', activity: 'use_car', i: 2, pb: 0, pc: 0, ate: 0, inModel: false }
   ];
   it.each(KEY)('heat $activity / $variable (+1% of SD) matches ATE_Heat.xlsx Segment_ATE', (k) => {
@@ -560,33 +577,34 @@ describe('computeSegmentATEs - the 19 previously-missing groups (Education x2, R
     ].sort());
   });
 
-  // Spot values from ATE_Heat.xlsx's Segment_ATE sheet (Extreme Heat), same
-  // methodology and ~0.003 tolerance as the original 5-group KEY above (the
-  // sheet's N is Jinghai's slightly smaller estimation sample). GBU rows
-  // (Disability, Zero-vehicle household, Air conditioning, Walkability
-  // Index) are the sheet's "Very unlikely" + "Somewhat unlikely" rows summed
-  // into the collapsed index-0 "Do less" category, same as the original
-  // Gender/Age Group GBU rows above.
+  // REGENERATED 2026-09-28 from the rebuilt engine itself (Jinghai's
+  // corrected data/jinghai_2026-09-28/ refit) - see the first KEY comment
+  // above for why these are regression-guard values, not independent xlsx
+  // cross-checks, until Jinghai sends an updated ATE_Heat.xlsx. Several rows
+  // flipped to inModel:false under the new variable selection (Education x2,
+  // Race: Asian, Works outdoors, Does not telecommute, Child in household,
+  // Employment Density, Walkability Index all dropped out of the models
+  // they used to be in for these activities).
   const KEY: Array<{ group: string; comparison: string; activity: string; i: number; pb?: number; pc?: number; ate: number; inModel: boolean }> = [
-    { group: "Education (Bachelor's)", comparison: 'Has BS', activity: 'use_car', i: 2, pb: 0.178435, pc: 0.143173, ate: -0.035263, inModel: true },
-    { group: 'Education (BS or higher)', comparison: 'BS or higher', activity: 'use_car', i: 2, pb: 0.159558, pc: 0.190354, ate: 0.030796, inModel: true },
-    { group: 'Race: White', comparison: 'White', activity: 'use_car', i: 2, pb: 0.137946, pc: 0.179319, ate: 0.041373, inModel: true },
-    { group: 'Race: Black', comparison: 'Black', activity: 'use_car', i: 2, pb: 0.159723, pc: 0.242141, ate: 0.082418, inModel: true },
-    { group: 'Race: Asian', comparison: 'Asian', activity: 'work_from_office', i: 0, pb: 0.194433, pc: 0.267548, ate: 0.073115, inModel: true },
-    { group: 'Ethnicity: Hispanic', comparison: 'Hispanic', activity: 'use_car', i: 2, pb: 0.165577, pc: 0.216246, ate: 0.050669, inModel: true },
-    { group: 'Disability', comparison: 'Has disability', activity: 'go_business_as_usual', i: 0, pb: 0.214698, pc: 0.24912, ate: 0.034422, inModel: true },
-    { group: 'Works outdoors', comparison: 'Yes', activity: 'use_car', i: 2, pb: 0.167015, pc: 0.226844, ate: 0.059829, inModel: true },
-    { group: 'Does not telecommute', comparison: 'Does not telecommute', activity: 'use_car', i: 2, pb: 0.162304, pc: 0.192878, ate: 0.030574, inModel: true },
-    { group: 'Household Size', comparison: '1 person', activity: 'use_car', i: 2, pb: 0.162703, pc: 0.188866, ate: 0.026163, inModel: true },
-    { group: 'Child in household', comparison: 'Has child', activity: 'use_car', i: 2, pb: 0.161698, pc: 0.191335, ate: 0.029636, inModel: true },
-    { group: 'Zero-vehicle household', comparison: 'Zero vehicle', activity: 'go_business_as_usual', i: 0, pb: 0.217635, pc: 0.256753, ate: 0.039118, inModel: true },
-    { group: 'Air conditioning', comparison: 'Has A/C', activity: 'go_business_as_usual', i: 0, pb: 0.279556, pc: 0.213094, ate: -0.066462, inModel: true },
+    { group: "Education (Bachelor's)", comparison: 'Has BS', activity: 'use_car', i: 2, ate: 0, inModel: false },
+    { group: 'Education (BS or higher)', comparison: 'BS or higher', activity: 'use_car', i: 2, ate: 0, inModel: false },
+    { group: 'Race: White', comparison: 'White', activity: 'use_car', i: 2, pb: 0.140522, pc: 0.181733, ate: 0.04121, inModel: true },
+    { group: 'Race: Black', comparison: 'Black', activity: 'use_car', i: 2, pb: 0.163963, pc: 0.230788, ate: 0.066825, inModel: true },
+    { group: 'Race: Asian', comparison: 'Asian', activity: 'work_from_office', i: 0, ate: 0, inModel: false },
+    { group: 'Ethnicity: Hispanic', comparison: 'Hispanic', activity: 'use_car', i: 2, pb: 0.168926, pc: 0.210277, ate: 0.041351, inModel: true },
+    { group: 'Disability', comparison: 'Has disability', activity: 'go_business_as_usual', i: 0, pb: 0.213781, pc: 0.249662, ate: 0.035881, inModel: true },
+    { group: 'Works outdoors', comparison: 'Yes', activity: 'use_car', i: 2, ate: 0, inModel: false },
+    { group: 'Does not telecommute', comparison: 'Does not telecommute', activity: 'use_car', i: 2, ate: 0, inModel: false },
+    { group: 'Household Size', comparison: '1 person', activity: 'use_car', i: 2, pb: 0.181568, pc: 0.181568, ate: 0, inModel: true },
+    { group: 'Child in household', comparison: 'Has child', activity: 'use_car', i: 2, ate: 0, inModel: false },
+    { group: 'Zero-vehicle household', comparison: 'Zero vehicle', activity: 'go_business_as_usual', i: 0, pb: 0.217031, pc: 0.257176, ate: 0.040145, inModel: true },
+    { group: 'Air conditioning', comparison: 'Has A/C', activity: 'go_business_as_usual', i: 0, pb: 0.280149, pc: 0.21261, ate: -0.06754, inModel: true },
     { group: 'Rural location', comparison: 'Rural', activity: 'go_business_as_usual', i: 0, ate: 0, inModel: false },
-    { group: 'Population Density', comparison: 'Medium', activity: 'use_car', i: 2, pb: 0.159513, pc: 0.159513, ate: 0, inModel: true },
-    { group: 'Employment Density', comparison: 'High', activity: 'delivery', i: 1, pb: 0.640675, pc: 0.630095, ate: -0.01058, inModel: true },
-    { group: 'Network Density', comparison: 'Medium', activity: 'delivery', i: 1, pb: 0.636735, pc: 0.626689, ate: -0.010046, inModel: true },
-    { group: 'Land-use Diversity', comparison: 'High', activity: 'dine_in', i: 1, pb: 0.614293, pc: 0.60649, ate: -0.007803, inModel: true },
-    { group: 'Walkability Index', comparison: 'Low', activity: 'go_business_as_usual', i: 0, pb: 0.216231, pc: 0.261931, ate: 0.0457, inModel: true }
+    { group: 'Population Density', comparison: 'Medium', activity: 'use_car', i: 2, pb: 0.164728, pc: 0.164728, ate: 0, inModel: true },
+    { group: 'Employment Density', comparison: 'High', activity: 'delivery', i: 1, ate: 0, inModel: false },
+    { group: 'Network Density', comparison: 'Medium', activity: 'delivery', i: 1, pb: 0.635765, pc: 0.627096, ate: -0.008669, inModel: true },
+    { group: 'Land-use Diversity', comparison: 'High', activity: 'dine_in', i: 1, pb: 0.612506, pc: 0.604386, ate: -0.00812, inModel: true },
+    { group: 'Walkability Index', comparison: 'Low', activity: 'go_business_as_usual', i: 0, ate: 0, inModel: false }
   ];
   it.each(KEY)('heat $activity / $group ($comparison) matches ATE_Heat.xlsx Segment_ATE', (k) => {
     const r = run('heat', k.group, k.comparison).find(x => x.activity === k.activity)!;
