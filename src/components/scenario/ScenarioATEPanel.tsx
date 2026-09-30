@@ -31,6 +31,22 @@ const CONTINUOUS_VARIABLE_KEY: Record<string, string> = {
   'Social Engagement': 'SE'
 };
 
+/**
+ * One ATE in both display formats. Per Jinghai's ATE workbook:
+ *   Absolute ATE = P_comp - P_base
+ *   Percent  ATE = (P_comp - P_base) / P_base   (relative change)
+ * P_base is the engine's control probability for the selected response.
+ * A result with no base probability (variable not in that model, ATE = 0 by
+ * construction) reports 0 for both.
+ */
+interface Ate { abs: number; pct: number; }
+
+const toAte = (result: { ate: number[]; controlProbabilities: number[] }, index: number): Ate => {
+  const abs = result.ate[index] || 0;
+  const base = result.controlProbabilities?.[index] ?? 0;
+  return { abs, pct: base > 0 ? (abs / base) * 100 : 0 };
+};
+
 const ScenarioATEPanel: React.FC = () => {
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
   const [showAbsoluteATE, setShowAbsoluteATE] = useState(false);
@@ -147,10 +163,10 @@ const ScenarioATEPanel: React.FC = () => {
       'go_business_as_usual': 'Go about business as usual'
     };
 
-    const getATEForChange = (result: any) => {
-      if (!result.ate || result.ate.length === 0) return 0;
+    const getATEForChange = (result: any): Ate => {
+      if (!result.ate || result.ate.length === 0) return { abs: 0, pct: 0 };
       const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
-      return result.ate[ateIndex] || 0;
+      return toAte(result, ateIndex);
     };
 
     return results
@@ -160,7 +176,8 @@ const ScenarioATEPanel: React.FC = () => {
         activityKey: result.activity,
         ate: getATEForChange(result)
       }))
-      .sort((a, b) => b.ate - a.ate); // Sort from most positive to most negative
+      // Sort from most positive to most negative of the value actually shown
+      .sort((a, b) => (showAbsoluteATE ? b.ate.abs - a.ate.abs : b.ate.pct - a.ate.pct));
   };
 
   const ateData = convertResultsToATEData();
@@ -179,12 +196,12 @@ const ScenarioATEPanel: React.FC = () => {
   // for the currently selected activity. 0 both while continuousResults
   // hasn't loaded yet and when the variable isn't in that activity's model
   // (computeContinuousATE's inModel=false already returns [0,0,0]).
-  const getContinuousAte = (variable: string): number => {
+  const getContinuousAte = (variable: string): Ate => {
     const list = continuousResults[CONTINUOUS_VARIABLE_KEY[variable]];
     const result = list?.find(r => r.activity === selectedActivity);
-    if (!result || !result.isValid) return 0;
+    if (!result || !result.isValid) return { abs: 0, pct: 0 };
     const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
-    return result.ate[ateIndex] || 0;
+    return toAte(result, ateIndex);
   };
 
   // Gender / Age Group / Household Income / Housing Type / Transit Access:
@@ -193,12 +210,12 @@ const ScenarioATEPanel: React.FC = () => {
   // spec), for the currently selected activity. 0 both while segmentResults
   // hasn't loaded yet and when the group isn't in that activity's model
   // (computeSegmentATEs' inModel=false already returns [0,0,0]).
-  const getSegmentAte = (groupKey: string, comparisonLabel: string): number => {
+  const getSegmentAte = (groupKey: string, comparisonLabel: string): Ate => {
     const list = segmentResults[segmentResultKey(groupKey, comparisonLabel)];
     const result = list?.find(r => r.activity === selectedActivity);
-    if (!result || !result.isValid) return 0;
+    if (!result || !result.isValid) return { abs: 0, pct: 0 };
     const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
-    return result.ate[ateIndex] || 0;
+    return toAte(result, ateIndex);
   };
 
   // Dummy data for Population Segment Analysis
@@ -289,7 +306,7 @@ const ScenarioATEPanel: React.FC = () => {
     );
   };
 
-  const renderSparkline = (ate: number) => {
+  const renderSparkline = (ate: number) => { // always driven by the absolute ATE (same visual scale in both formats)
     const maxAte = 0.60;
     const width = Math.min(Math.abs(ate) / maxAte * 100, 100);
     const isPositive = ate >= 0;
@@ -525,18 +542,19 @@ const ScenarioATEPanel: React.FC = () => {
               <div className="scenario-ate-list">
                 {(() => {
                   // Calculate max absolute value once, outside the map
+                  const shown = (d: { ate: Ate }) => (showAbsoluteATE ? d.ate.abs : d.ate.pct);
                   const maxAbs = ateData.length > 0 
-                    ? Math.max(...ateData.map(d => Math.abs(d.ate))) 
+                    ? Math.max(...ateData.map(d => Math.abs(shown(d)))) 
                     : 0;
                   
                   return ateData.map((item, i) => {
                     // Calculate bar width based on the actual ATE value
                     // Use the exact ATE value (not rounded) for width calculation to ensure precision
-                    const absATE = Math.abs(item.ate);
+                    const absATE = Math.abs(shown(item));
                     const barWidth = maxAbs > 0 ? (absATE / maxAbs) * 100 : 0;
-                    const isPos = item.ate >= 0;
+                    const isPos = shown(item) >= 0;
                     // Use 3 decimal places for absolute ATE to match existing chart precision
-                    const val = showAbsoluteATE ? item.ate.toFixed(3) : (item.ate * 100).toFixed(1) + '%';
+                    const val = showAbsoluteATE ? item.ate.abs.toFixed(3) : item.ate.pct.toFixed(1) + '%';
                     const isMismatched = hasVerifiedSampleMismatch(currentCsvEvent, item.activityKey);
                     const mismatchTooltipKey = `sampleMismatch-${item.activityKey}`;
 
@@ -588,7 +606,7 @@ const ScenarioATEPanel: React.FC = () => {
                           ></div>
                         </div>
                         <div className="scenario-ate-value" style={{ color: isPos ? '#6dafa0' : '#e25b61' }}>
-                          {item.ate > 0 ? '+' : ''}{val}
+                          {shown(item) > 0 ? '+' : ''}{val}
                         </div>
                       </div>
                     );
@@ -733,9 +751,9 @@ const ScenarioATEPanel: React.FC = () => {
                               <td className="scenario-table-cell">{c.treatmentLevel}</td>
                               <td className="scenario-table-cell">
                                 <div className="scenario-ate-display">
-                                  {renderSparkline(c.ate)}
-                                  <span className="scenario-ate-display-value" style={{ color: c.ate >= 0 ? '#6dafa0' : '#e25b61' }}>
-                                    {c.ate > 0 ? '+' : ''}{showDemoAbsoluteATE ? c.ate.toFixed(2) : (c.ate * 100).toFixed(1) + '%'}
+                                  {renderSparkline(c.ate.abs)}
+                                  <span className="scenario-ate-display-value" style={{ color: c.ate.abs >= 0 ? '#6dafa0' : '#e25b61' }}>
+                                    {(showDemoAbsoluteATE ? c.ate.abs : c.ate.pct) > 0 ? '+' : ''}{showDemoAbsoluteATE ? c.ate.abs.toFixed(2) : c.ate.pct.toFixed(1) + '%'}
                                   </span>
                                 </div>
                               </td>
