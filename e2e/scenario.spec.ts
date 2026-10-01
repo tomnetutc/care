@@ -181,10 +181,30 @@ test('Population Segment table: no Risk Aversion, 3-tier income, binary housing,
   await expect(section).not.toContainText('TBD');
   await expect(section.locator('.scenario-ate-placeholder')).toHaveCount(0);
 
-  for (const v of ['Personal Resilience', 'Community Resilience', 'Social Engagement']) {
-    await expect(rowsFor(v)).toContainText('+1% of SD');
-    const value = await rowsFor(v).locator('.scenario-ate-display-value').innerText();
-    expect(Number.isFinite(parseFloat(value.replace('%', '').replace('+', '')))).toBe(true);
+  // Each PR/CR/SE row is either a real finite number or "Not in model" (the
+  // variable wasn't retained in that activity's fitted model). Across heat's 9
+  // activity models every one of the three is in-model somewhere, so each must
+  // show at least one real, finite, computed value - and never NaN/TBD.
+  const activitySelectForAttitudes = page.locator('.scenario-section-card')
+    .filter({ has: page.locator('.scenario-demographic-groups') })
+    .locator('select.scenario-select');
+  const activityValues = await activitySelectForAttitudes.locator('option').evaluateAll(o => o.map(x => (x as HTMLOptionElement).value));
+  expect(activityValues.length).toBe(9);
+  const finiteSeen: Record<string, boolean> = { 'Personal Resilience': false, 'Community Resilience': false, 'Social Engagement': false };
+  for (const activity of activityValues) {
+    await activitySelectForAttitudes.selectOption({ value: activity });
+    await page.waitForTimeout(150);
+    for (const v of Object.keys(finiteSeen)) {
+      await expect(rowsFor(v)).toContainText('+1% of SD');
+      const value = (await rowsFor(v).locator('.scenario-ate-display-value').innerText()).trim();
+      if (value === 'Not in model') continue;
+      const parsed = parseFloat(value.replace('%', '').replace('+', ''));
+      expect(Number.isFinite(parsed), `${v} / ${activity}: "${value}" is not a finite number`).toBe(true);
+      finiteSeen[v] = true;
+    }
+  }
+  for (const [v, seen] of Object.entries(finiteSeen)) {
+    expect(seen, `${v} never showed a real computed value in any activity`).toBe(true);
   }
 });
 
@@ -195,6 +215,15 @@ test('Population Segment table is reactive to Activity and Behavioral Response (
   // number stayed frozen no matter what was selected. Asserting the LABELS
   // are correct (as the previous test does) doesn't catch that; only
   // asserting the VALUES actually change does.
+  //
+  // Which activity has which variable depends on Jinghai's fitted models
+  // (public/models/model_coeffs_by_event.json, heat, 2026-09-28 refit):
+  //   female (Gender)          : go_business_as_usual only
+  //   age_3150 (Age 31-50)     : use_transit, go_business_as_usual
+  //   in50 ($50k-$100k income) : work_from_home, work_from_office
+  // A variable that is NOT in an activity's model renders "Not in model", so
+  // reactivity is asserted between two in-model activities where possible
+  // (numbers must differ) and between in-model and not-in-model otherwise.
   await page.goto('/#/scenario');
   const section = page.locator('.scenario-demographic-groups');
   await expect(section).toBeVisible({ timeout: 15_000 });
@@ -203,68 +232,50 @@ test('Population Segment table is reactive to Activity and Behavioral Response (
     section.locator('tr', { has: page.locator('td', { hasText: variable }) });
   const firstValue = async (variable: string) =>
     (await rowsFor(variable).locator('.scenario-ate-display-value').first().innerText()).trim();
+  const isNumber = (v: string) => Number.isFinite(parseFloat(v.replace('%', '').replace('+', '')));
 
   const activitySelect = page.locator('.scenario-section-card')
     .filter({ has: page.locator('.scenario-demographic-groups') })
     .locator('select.scenario-select');
+  const pick = async (activity: string) => { await activitySelect.selectOption({ value: activity }); await page.waitForTimeout(300); };
 
   // --- Activity reactivity ---
-  // Household Income (in50/in50100) isn't a coefficient in either use_car or
-  // go_business_as_usual for heat - 0% there is legitimately correct, not a
-  // bug, so it needs its own pair where the variable is actually in-model
-  // (dine_in has both income dummies).
-  await activitySelect.selectOption({ value: 'use_car' });
-  await page.waitForTimeout(300);
-  const useCarValues = {
-    gender: await firstValue('Gender'),
-    ageGroup: await firstValue('Age Group'),
-    householdIncome: await firstValue('Household Income')
-  };
+  await pick('use_car');
+  const useCar = { gender: await firstValue('Gender'), age: await firstValue('Age Group'), income: await firstValue('Household Income') };
+  expect(useCar, 'Gender/Age/Income are all absent from heat use_car, so all must read "Not in model"')
+    .toEqual({ gender: 'Not in model', age: 'Not in model', income: 'Not in model' });
 
-  await activitySelect.selectOption({ value: 'go_business_as_usual' });
-  await page.waitForTimeout(300);
-  const gbuValues = {
-    gender: await firstValue('Gender'),
-    ageGroup: await firstValue('Age Group')
-  };
+  await pick('go_business_as_usual');
+  const gbu = { gender: await firstValue('Gender'), age: await firstValue('Age Group') };
+  expect(isNumber(gbu.gender) && isNumber(gbu.age), `GBU Gender/Age should be real numbers, got ${JSON.stringify(gbu)}`).toBe(true);
 
-  await activitySelect.selectOption({ value: 'dine_in' });
-  await page.waitForTimeout(300);
-  const dineInValues = {
-    householdIncome: await firstValue('Household Income')
-  };
+  await pick('use_transit');
+  const transit = { age: await firstValue('Age Group') };
+  expect(isNumber(transit.age), `Transit Age should be a real number, got ${transit.age}`).toBe(true);
+  expect(transit.age, 'Age Group ATE did not change when Activity changed (go_business_as_usual -> use_transit)').not.toBe(gbu.age);
 
-  console.log('Activity reactivity:', JSON.stringify({ useCarValues, gbuValues, dineInValues }));
-  expect(gbuValues.gender, 'Gender ATE did not change when Activity changed (use_car -> go_business_as_usual)').not.toBe(useCarValues.gender);
-  expect(gbuValues.ageGroup, 'Age Group ATE did not change when Activity changed (use_car -> go_business_as_usual)').not.toBe(useCarValues.ageGroup);
-  expect(dineInValues.householdIncome, 'Household Income ATE did not change when Activity changed (use_car -> dine_in)').not.toBe(useCarValues.householdIncome);
+  await pick('work_from_home');
+  const wfh = { income: await firstValue('Household Income') };
+  await pick('work_from_office');
+  const wfo = { income: await firstValue('Household Income') };
+  expect(isNumber(wfh.income) && isNumber(wfo.income), `WFH/WFO Income should be real numbers, got ${JSON.stringify({ wfh, wfo })}`).toBe(true);
+  expect(wfo.income, 'Household Income ATE did not change when Activity changed (work_from_home -> work_from_office)').not.toBe(wfh.income);
+  console.log('Activity reactivity:', JSON.stringify({ useCar, gbu, transit, wfh, wfo }));
 
-  // --- Behavioral Response reactivity ---
-  // Same reasoning as above: pick, per variable, an activity where that
-  // variable is actually in the fitted model (go_business_as_usual for
-  // Gender/Age Group, dine_in for Household Income), and hold the activity
-  // fixed while only the response button changes.
+  // --- Behavioral Response reactivity (activity held fixed) ---
   const behaviorButtons = page.locator('.scenario-section-card')
     .filter({ has: page.locator('.scenario-demographic-groups') })
     .locator('.scenario-behavior-button');
 
-  await activitySelect.selectOption({ value: 'go_business_as_usual' });
-  await page.waitForTimeout(300);
+  await pick('go_business_as_usual');
   await behaviorButtons.filter({ hasText: 'Do Less' }).click();
   await page.waitForTimeout(300);
-  const doLess = {
-    gender: await firstValue('Gender'),
-    ageGroup: await firstValue('Age Group')
-  };
+  const doLess = { gender: await firstValue('Gender'), age: await firstValue('Age Group') };
   await behaviorButtons.filter({ hasText: 'Do More' }).click();
   await page.waitForTimeout(300);
-  const doMore = {
-    gender: await firstValue('Gender'),
-    ageGroup: await firstValue('Age Group')
-  };
+  const doMore = { gender: await firstValue('Gender'), age: await firstValue('Age Group') };
 
-  await activitySelect.selectOption({ value: 'dine_in' });
-  await page.waitForTimeout(300);
+  await pick('work_from_home');
   await behaviorButtons.filter({ hasText: 'Do Less' }).click();
   await page.waitForTimeout(300);
   const doLessIncome = await firstValue('Household Income');
@@ -274,6 +285,35 @@ test('Population Segment table is reactive to Activity and Behavioral Response (
 
   console.log('Behavioral Response reactivity:', JSON.stringify({ doLess, doMore, doLessIncome, doMoreIncome }));
   expect(doMore.gender, 'Gender ATE did not change when Behavioral Response changed (go_business_as_usual)').not.toBe(doLess.gender);
-  expect(doMore.ageGroup, 'Age Group ATE did not change when Behavioral Response changed (go_business_as_usual)').not.toBe(doLess.ageGroup);
-  expect(doMoreIncome, 'Household Income ATE did not change when Behavioral Response changed (dine_in)').not.toBe(doLessIncome);
+  expect(doMore.age, 'Age Group ATE did not change when Behavioral Response changed (go_business_as_usual)').not.toBe(doLess.age);
+  expect(doMoreIncome, 'Household Income ATE did not change when Behavioral Response changed (work_from_home)').not.toBe(doLessIncome);
+});
+
+test('Percent ATE is relative change and Absolute ATE is the probability difference (Jinghai ATE_severity_all_events.csv)', async ({ page }) => {
+  // heat / Using a car / Not severe at all -> Extremely severe / Do more, from
+  // data/jinghai_2026-09-30/ATE_severity_all_events.csv:
+  //   ATE_abs = 0.04153...  ATE_pct = 27.8066...  (= ATE_abs / P_base, P_base = 0.14936)
+  // The page used to show ATE_abs x 100 (= 4.2%) under the "Percent ATE" label.
+  await page.goto('/#/scenario');
+  const carRow = page.locator('.scenario-ate-item', { hasText: 'Using a car for traveling' });
+  await expect(carRow).toBeVisible({ timeout: 15_000 });
+  await expect(carRow.locator('.scenario-ate-value')).toHaveText('+27.8%');
+  await page.locator('.scenario-ate-toggle').first().getByRole('button', { name: 'Absolute ATE' }).click();
+  await expect(carRow.locator('.scenario-ate-value')).toHaveText('+0.042');
+});
+
+test('Section 3 only offers the activities the selected event has a model for, and flags variables not in the model', async ({ page }) => {
+  await page.goto('/#/scenario');
+  const segmentCard = page.locator('.scenario-section-card').filter({ has: page.locator('.scenario-demographic-groups') });
+  const activitySelect = segmentCard.locator('select.scenario-select');
+  await expect(segmentCard.locator('.scenario-demographic-groups')).toBeVisible({ timeout: 15_000 });
+  for (const { buttonLabel, expectedActivityCount } of EVENT_CASES) {
+    await page.getByText(buttonLabel, { exact: true }).click();
+    await expect(activitySelect.locator('option')).toHaveCount(expectedActivityCount);
+  }
+  // Heat / use_car has no Gender term -> its cell must say so instead of "0.0%".
+  await page.getByText('Extreme Heat', { exact: true }).click();
+  await activitySelect.selectOption({ value: 'use_car' });
+  await expect(segmentCard.locator('tr', { hasText: 'Gender' }).locator('.scenario-ate-display-value')).toHaveText('Not in model');
+  await expect(segmentCard).toContainText('not a measured zero');
 });
