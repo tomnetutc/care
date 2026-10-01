@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useScenarioATE, segmentResultKey, EVENT_CONFIG } from '../../hooks/useScenarioATE';
+import { useScenarioATE, segmentResultKey, EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE } from '../../hooks/useScenarioATE';
 import { SEGMENT_GROUPS } from '../../lib/engine/segmentConfig';
 import { hasVerifiedSampleMismatch } from '../../lib/engine/computeATE';
 import { Sun, Snowflake, Droplets, Mountain, Zap, TrendingDown, Minus, TrendingUp, Info, ChevronDown, ChevronUp } from 'lucide-react';
@@ -39,13 +39,19 @@ const CONTINUOUS_VARIABLE_KEY: Record<string, string> = {
  * A result with no base probability (variable not in that model, ATE = 0 by
  * construction) reports 0 for both.
  */
-interface Ate { abs: number; pct: number; }
+interface Ate { abs: number; pct: number; inModel: boolean; }
 
-const toAte = (result: { ate: number[]; controlProbabilities: number[] }, index: number): Ate => {
+const toAte = (result: { ate: number[]; controlProbabilities: number[]; inModel?: boolean }, index: number): Ate => {
   const abs = result.ate[index] || 0;
   const base = result.controlProbabilities?.[index] ?? 0;
-  return { abs, pct: base > 0 ? (abs / base) * 100 : 0 };
+  return { abs, pct: base > 0 ? (abs / base) * 100 : 0, inModel: result.inModel !== false };
 };
+
+// Shown instead of a number when a variable was not retained in the fitted
+// model for the selected activity: its effect is zero by construction, which
+// must not read as a measured "0.0%".
+const NOT_IN_MODEL_TEXT = 'Not in model';
+const NOT_IN_MODEL_HELP = "Not in model: this variable was not retained in the fitted model for the selected activity (dropped during model selection), so it has no modeled effect on it.";
 
 const ScenarioATEPanel: React.FC = () => {
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
@@ -81,6 +87,11 @@ const ScenarioATEPanel: React.FC = () => {
   } = useScenarioATE();
 
   const availableEvents = getAvailableEvents();
+  // Section 3 only offers activities this event actually has a model for
+  // (e.g. flooding/earthquake have 5, power outage 7); if the chosen activity
+  // isn't modeled for a newly selected event, fall back to the first one.
+  const eventActivities = EVENT_ACTIVITY_COVERAGE[selectedEvent] ?? [];
+  const effectiveActivity = eventActivities.includes(selectedActivity) ? selectedActivity : (eventActivities[0] ?? selectedActivity);
   const severityLevels = getSeverityLevels();
 
   // Map event IDs to new design
@@ -164,7 +175,7 @@ const ScenarioATEPanel: React.FC = () => {
     };
 
     const getATEForChange = (result: any): Ate => {
-      if (!result.ate || result.ate.length === 0) return { abs: 0, pct: 0 };
+      if (!result.ate || result.ate.length === 0) return { abs: 0, pct: 0, inModel: true };
       const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
       return toAte(result, ateIndex);
     };
@@ -197,9 +208,10 @@ const ScenarioATEPanel: React.FC = () => {
   // hasn't loaded yet and when the variable isn't in that activity's model
   // (computeContinuousATE's inModel=false already returns [0,0,0]).
   const getContinuousAte = (variable: string): Ate => {
+    if (Object.keys(continuousResults).length === 0) return { abs: 0, pct: 0, inModel: true }; // not loaded yet
     const list = continuousResults[CONTINUOUS_VARIABLE_KEY[variable]];
-    const result = list?.find(r => r.activity === selectedActivity);
-    if (!result || !result.isValid) return { abs: 0, pct: 0 };
+    const result = list?.find(r => r.activity === effectiveActivity);
+    if (!result || !result.isValid) return { abs: 0, pct: 0, inModel: false };
     const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
     return toAte(result, ateIndex);
   };
@@ -211,9 +223,10 @@ const ScenarioATEPanel: React.FC = () => {
   // hasn't loaded yet and when the group isn't in that activity's model
   // (computeSegmentATEs' inModel=false already returns [0,0,0]).
   const getSegmentAte = (groupKey: string, comparisonLabel: string): Ate => {
+    if (Object.keys(segmentResults).length === 0) return { abs: 0, pct: 0, inModel: true }; // not loaded yet
     const list = segmentResults[segmentResultKey(groupKey, comparisonLabel)];
-    const result = list?.find(r => r.activity === selectedActivity);
-    if (!result || !result.isValid) return { abs: 0, pct: 0 };
+    const result = list?.find(r => r.activity === effectiveActivity);
+    if (!result || !result.isValid) return { abs: 0, pct: 0, inModel: false };
     const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
     return toAte(result, ateIndex);
   };
@@ -648,16 +661,16 @@ const ScenarioATEPanel: React.FC = () => {
               <div className="scenario-config-item">
                 <label className="scenario-config-label">Select Activity/Travel Type</label>
                 <select 
-                  value={selectedActivity} 
+                  value={effectiveActivity} 
                   onChange={(e) => setSelectedActivity(e.target.value)} 
                   className="scenario-select"
                 >
-                  {activities.map(a => (
+                  {activities.filter(a => eventActivities.includes(a.value)).map(a => (
                     <option key={a.value} value={a.value}>{a.label}</option>
                   ))}
                 </select>
                 <p className="scenario-config-help">Activity to analyze across population segments</p>
-                {hasVerifiedSampleMismatch(currentCsvEvent, selectedActivity) && (
+                {hasVerifiedSampleMismatch(currentCsvEvent, effectiveActivity) && (
                   <p className="scenario-config-help" style={{ color: '#c0392b', fontWeight: 600 }}>
                     ⚠ Verified data issue for this event/activity - see note under Section 2's matching result.
                   </p>
@@ -751,10 +764,18 @@ const ScenarioATEPanel: React.FC = () => {
                               <td className="scenario-table-cell">{c.treatmentLevel}</td>
                               <td className="scenario-table-cell">
                                 <div className="scenario-ate-display">
-                                  {renderSparkline(c.ate.abs)}
-                                  <span className="scenario-ate-display-value" style={{ color: c.ate.abs >= 0 ? '#6dafa0' : '#e25b61' }}>
-                                    {(showDemoAbsoluteATE ? c.ate.abs : c.ate.pct) > 0 ? '+' : ''}{showDemoAbsoluteATE ? c.ate.abs.toFixed(2) : c.ate.pct.toFixed(1) + '%'}
-                                  </span>
+                                  {c.ate.inModel ? (
+                                    <>
+                                      {renderSparkline(c.ate.abs)}
+                                      <span className="scenario-ate-display-value" style={{ color: c.ate.abs >= 0 ? '#6dafa0' : '#e25b61' }}>
+                                        {(showDemoAbsoluteATE ? c.ate.abs : c.ate.pct) > 0 ? '+' : ''}{showDemoAbsoluteATE ? c.ate.abs.toFixed(2) : c.ate.pct.toFixed(1) + '%'}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span className="scenario-ate-display-value scenario-ate-not-in-model" title={NOT_IN_MODEL_HELP} style={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                                      {NOT_IN_MODEL_TEXT}
+                                    </span>
+                                  )}
                                 </div>
                               </td>
                             </tr>
@@ -769,12 +790,16 @@ const ScenarioATEPanel: React.FC = () => {
             })}
           </div>
 
+          <p className="scenario-config-help" style={{ marginTop: '12px' }}>
+            <em>{NOT_IN_MODEL_TEXT}</em> marks a variable that was not retained in the fitted model for the selected activity (dropped during model selection), so it has no modeled effect there. It is not a measured zero.
+          </p>
+
           <div className="scenario-interpretation">
             <p className="scenario-interpretation-text">
               <span className="scenario-interpretation-bold">How to interpret:</span> {showDemoAbsoluteATE ? (
-                <>An absolute ATE of say +0.10 means if we take a sample of 100 individuals from the base group (e.g., "Male") and replace them with a sample of 100 from the comparison group (e.g., "Female"), there would be 10 more people choosing to "{currentAnticipatedChange === 'more' ? 'do more' : currentAnticipatedChange === 'less' ? 'do less' : 'maintain the same level'}" of {activities.find(a => a.value === selectedActivity)?.label} during the next {currentEvent.name.toLowerCase()} event.</>
+                <>An absolute ATE of say +0.10 means if we take a sample of 100 individuals from the base group (e.g., "Male") and replace them with a sample of 100 from the comparison group (e.g., "Female"), there would be 10 more people choosing to "{currentAnticipatedChange === 'more' ? 'do more' : currentAnticipatedChange === 'less' ? 'do less' : 'maintain the same level'}" of {activities.find(a => a.value === effectiveActivity)?.label} during the next {currentEvent.name.toLowerCase()} event.</>
               ) : (
-                <>A percent ATE of say +20% means if we take a sample of individuals from the base group (e.g., "Male") and replace them with a sample from the comparison group (e.g., "Female"), there would be a 20% increase in those choosing to "{currentAnticipatedChange === 'more' ? 'do more' : currentAnticipatedChange === 'less' ? 'do less' : 'maintain the same level'}" of {activities.find(a => a.value === selectedActivity)?.label} during the next {currentEvent.name.toLowerCase()} event.</>
+                <>A percent ATE of say +20% means if we take a sample of individuals from the base group (e.g., "Male") and replace them with a sample from the comparison group (e.g., "Female"), there would be a 20% increase in those choosing to "{currentAnticipatedChange === 'more' ? 'do more' : currentAnticipatedChange === 'less' ? 'do less' : 'maintain the same level'}" of {activities.find(a => a.value === effectiveActivity)?.label} during the next {currentEvent.name.toLowerCase()} event.</>
               )}
             </p>
           </div>
