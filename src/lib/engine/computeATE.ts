@@ -35,7 +35,7 @@
  */
 
 import {
-  calculateOrderedProbabilities,
+  averageOrderedProbabilities,
   extractThresholds,
   OrderedModelConfig
 } from './orderedCategorical';
@@ -200,20 +200,82 @@ function buildEstimationSample(
 }
 
 /**
+ * Everything about one (event, activity) estimation sample that does NOT
+ * depend on the scenario being asked about: the complete-case rows, each
+ * coefficient variable's parsed per-person values, and each person's full
+ * observed linear predictor. A page view asks for severity ATEs plus ~35
+ * segment comparisons plus 3 continuous ATEs on the same sample; rebuilding
+ * and re-parsing it for every one of those (the previous behaviour) was what
+ * made the Scenario page lag. Built once and reused - the arithmetic that
+ * consumes it is unchanged, so every result is identical.
+ */
+interface PreparedActivity {
+  sample: any[];
+  /** Parsed per-person value of every coefficient variable (NaN -> 0, as before). */
+  values: Record<string, Float64Array>;
+  /** sum(coef * value) over every coefficient, in coefficient order, per person. */
+  observedZ: Float64Array;
+  /** Same sum excluding the severity dummies (severity ATEs force severity themselves). */
+  nonSeverityZ: Float64Array | null;
+  /** Segment base-scenario probabilities, keyed by the base spec restricted to in-model variables. */
+  baseProbabilities: Map<string, number[]>;
+}
+
+// rows array -> model config -> "event::activity" -> prepared sample. WeakMaps, so
+// nothing outlives the loaded dataset / model objects it was derived from.
+const preparedCache = new WeakMap<object, WeakMap<object, Map<string, PreparedActivity>>>();
+
+function getPreparedActivity(
+  event: string,
+  activity: string,
+  modelConfig: OrderedModelConfig,
+  rows: any[]
+): PreparedActivity {
+  let byModel = preparedCache.get(rows);
+  if (!byModel) {
+    byModel = new WeakMap();
+    preparedCache.set(rows, byModel);
+  }
+  let byActivity = byModel.get(modelConfig);
+  if (!byActivity) {
+    byActivity = new Map();
+    byModel.set(modelConfig, byActivity);
+  }
+  const key = `${event}::${activity}`;
+  const cached = byActivity.get(key);
+  if (cached) return cached;
+
+  const sample = buildEstimationSample(event, activity, modelConfig, rows);
+  const n = sample.length;
+  const values: Record<string, Float64Array> = {};
+  const observedZ = new Float64Array(n);
+  for (const [variable, coefficient] of Object.entries(modelConfig.coefficients)) {
+    const column = new Float64Array(n);
+    for (let i = 0; i < n; i++) {
+      const value = parseFloat(String(sample[i][variable] ?? '')) || 0;
+      column[i] = value;
+      observedZ[i] += coefficient * value;
+    }
+    values[variable] = column;
+  }
+
+  const prepared: PreparedActivity = { sample, values, observedZ, nonSeverityZ: null, baseProbabilities: new Map() };
+  byActivity.set(key, prepared);
+  return prepared;
+}
+
+/**
  * Shared core, step 2 - per-person category probabilities from each person's
  * own linear predictor z_i, THEN averaged across people (average of
  * outcomes, not outcome of averages). Returns native-scale probabilities.
  */
-function averageProbabilities(predictors: number[], modelConfig: OrderedModelConfig): number[] {
-  const thresholds = extractThresholds(modelConfig.thresholds);
-  const levels = modelConfig.metadata.levels;
-  const link = modelConfig.metadata.link;
-  const sums = new Array(levels).fill(0);
-  for (const z of predictors) {
-    const { probabilities } = calculateOrderedProbabilities(z, thresholds, levels, link);
-    probabilities.forEach((p, i) => { sums[i] += p; });
-  }
-  return sums.map(s => s / predictors.length);
+function averageProbabilities(predictors: ArrayLike<number>, modelConfig: OrderedModelConfig): number[] {
+  return averageOrderedProbabilities(
+    predictors,
+    extractThresholds(modelConfig.thresholds),
+    modelConfig.metadata.levels,
+    modelConfig.metadata.link
+  );
 }
 
 /**
@@ -274,27 +336,36 @@ export function computeSeverityATEs(
 
   for (const [activity, modelConfig] of Object.entries(eventModelData)) {
     try {
-      const sample = buildEstimationSample(event, activity, modelConfig, filteredData);
+      const prepared = getPreparedActivity(event, activity, modelConfig, filteredData);
+      const sample = prepared.sample;
       if (sample.length === 0) {
         results.push(emptyResult(activity));
         continue;
       }
 
-      const nonSeverityEntries = Object.entries(modelConfig.coefficients)
-        .filter(([variable]) => !severityVars.includes(variable));
-      const basePredictors = sample.map(row => {
-        let z = 0;
+      if (!prepared.nonSeverityZ) {
+        const nonSeverityEntries = Object.entries(modelConfig.coefficients)
+          .filter(([variable]) => !severityVars.includes(variable));
+        const z = new Float64Array(sample.length);
         for (const [variable, coefficient] of nonSeverityEntries) {
-          z += coefficient * (parseFloat(String(row[variable] ?? '')) || 0);
+          const column = prepared.values[variable];
+          for (let i = 0; i < z.length; i++) z[i] += coefficient * column[i];
         }
-        return z;
-      });
+        prepared.nonSeverityZ = z;
+      }
+      const basePredictors = prepared.nonSeverityZ;
 
       const severityAddend = (level: number): number =>
         level === 1 ? 0 : (modelConfig.coefficients[`${event}_imp_${level}`] ?? 0);
 
-      const base = averageProbabilities(basePredictors.map(z => z + severityAddend(baseSeverityLevel)), modelConfig);
-      const comparison = averageProbabilities(basePredictors.map(z => z + severityAddend(treatmentSeverityLevel)), modelConfig);
+      const shifted = (addend: number): Float64Array => {
+        const out = new Float64Array(basePredictors.length);
+        for (let i = 0; i < out.length; i++) out[i] = basePredictors[i] + addend;
+        return out;
+      };
+
+      const base = averageProbabilities(shifted(severityAddend(baseSeverityLevel)), modelConfig);
+      const comparison = averageProbabilities(shifted(severityAddend(treatmentSeverityLevel)), modelConfig);
 
       results.push(buildATEResult(activity, modelConfig, base, comparison, sample.length));
     } catch (error) {
@@ -341,7 +412,8 @@ export function computeSegmentATEs(
 
   for (const [activity, modelConfig] of Object.entries(eventModelData)) {
     try {
-      const sample = buildEstimationSample(event, activity, modelConfig, filteredData);
+      const prepared = getPreparedActivity(event, activity, modelConfig, filteredData);
+      const sample = prepared.sample;
       if (sample.length === 0) {
         results.push({ ...emptyResult(activity), inModel: false });
         continue;
@@ -359,28 +431,28 @@ export function computeSegmentATEs(
         continue;
       }
 
-      const observedPredictors: number[] = [];
-      const baseShifts: number[] = [];
-      const comparisonShifts: number[] = [];
-      for (const row of sample) {
-        let z = 0;
-        for (const [variable, coefficient] of Object.entries(coefficients)) {
-          z += coefficient * (parseFloat(String(row[variable] ?? '')) || 0);
+      // Per-person linear predictor with the group's variables forced to a spec:
+      // observed x*beta plus sum((forced - observed) * coef) over in-model group variables.
+      const forcedPredictors = (spec: Record<string, number>): Float64Array => {
+        const out = new Float64Array(sample.length);
+        for (let i = 0; i < out.length; i++) {
+          let shift = 0;
+          for (const variable of inModelVars) {
+            shift += ((spec[variable] ?? 0) - prepared.values[variable][i]) * coefficients[variable];
+          }
+          out[i] = prepared.observedZ[i] + shift;
         }
-        let shiftBase = 0;
-        let shiftComparison = 0;
-        for (const variable of inModelVars) {
-          const observed = parseFloat(String(row[variable] ?? '')) || 0;
-          shiftBase += (baseSpec[variable] - observed) * coefficients[variable];
-          shiftComparison += ((comparisonSpec[variable] ?? 0) - observed) * coefficients[variable];
-        }
-        observedPredictors.push(z);
-        baseShifts.push(shiftBase);
-        comparisonShifts.push(shiftComparison);
-      }
+        return out;
+      };
 
-      const base = averageProbabilities(observedPredictors.map((z, i) => z + baseShifts[i]), modelConfig);
-      const comparison = averageProbabilities(observedPredictors.map((z, i) => z + comparisonShifts[i]), modelConfig);
+      // The base scenario is shared by every comparison in the same group - compute once.
+      const baseKey = inModelVars.map(v => `${v}=${baseSpec[v]}`).join('|');
+      let base = prepared.baseProbabilities.get(baseKey);
+      if (!base) {
+        base = averageProbabilities(forcedPredictors(baseSpec), modelConfig);
+        prepared.baseProbabilities.set(baseKey, base);
+      }
+      const comparison = averageProbabilities(forcedPredictors(comparisonSpec), modelConfig);
 
       results.push({ ...buildATEResult(activity, modelConfig, base, comparison, sample.length), inModel: true });
     } catch (error) {
@@ -429,7 +501,8 @@ export function computeContinuousATE(
 
   for (const [activity, modelConfig] of Object.entries(eventModelData)) {
     try {
-      const sample = buildEstimationSample(event, activity, modelConfig, filteredData);
+      const prepared = getPreparedActivity(event, activity, modelConfig, filteredData);
+      const sample = prepared.sample;
       if (sample.length === 0) {
         results.push({ ...emptyResult(activity), inModel: false });
         continue;
@@ -445,26 +518,24 @@ export function computeContinuousATE(
         continue;
       }
 
-      const observedPredictors: number[] = [];
-      const values: number[] = [];
-      for (const row of sample) {
-        let z = 0;
-        for (const [v, coefficient] of Object.entries(coefficients)) {
-          z += coefficient * (parseFloat(String(row[v] ?? '')) || 0);
-        }
-        observedPredictors.push(z);
-        values.push(parseFloat(String(row[variable] ?? '')) || 0);
-      }
+      const observedPredictors = prepared.observedZ;
+      const values = prepared.values[variable];
 
       // Sample standard deviation (ddof=1), matching pandas' default .std().
       const n = values.length;
-      const mean = values.reduce((sum, v) => sum + v, 0) / n;
-      const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (n - 1);
-      const sd = Math.sqrt(variance);
+      let total = 0;
+      for (let i = 0; i < n; i++) total += values[i];
+      const mean = total / n;
+      let squares = 0;
+      for (let i = 0; i < n; i++) squares += (values[i] - mean) ** 2;
+      const sd = Math.sqrt(squares / (n - 1));
       const shift = coefficients[variable] * mult * sd;
 
+      const shiftedPredictors = new Float64Array(n);
+      for (let i = 0; i < n; i++) shiftedPredictors[i] = observedPredictors[i] + shift;
+
       const base = averageProbabilities(observedPredictors, modelConfig);
-      const comparison = averageProbabilities(observedPredictors.map(z => z + shift), modelConfig);
+      const comparison = averageProbabilities(shiftedPredictors, modelConfig);
 
       results.push({ ...buildATEResult(activity, modelConfig, base, comparison, sample.length), inModel: true });
     } catch (error) {

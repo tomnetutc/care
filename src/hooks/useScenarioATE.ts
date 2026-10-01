@@ -23,7 +23,7 @@
  * Flagging rather than guessing at that mapping.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import DataService from '../services/DataService';
 import {
   computeSeverityATEs,
@@ -61,10 +61,33 @@ export interface ScenarioState {
   results: ATEResult[];
   continuousResults: Record<string, ContinuousATEResult[]>;
   segmentResults: Record<string, SegmentATEResult[]>;
+  /** Event the severity `results` were computed for (null until the first compute). */
+  resultsEvent: string | null;
+  /** Event the continuous/segment results belong to (null until the first compute). */
+  segmentsEvent: string | null;
   error: string | null;
   modelData: ModelDataByEvent | null;
   isValid: boolean;
 }
+
+interface EventLevelResults {
+  continuousResults: Record<string, ContinuousATEResult[]>;
+  segmentResults: Record<string, SegmentATEResult[]>;
+}
+
+/**
+ * Resolves after the browser has had a chance to paint. Used to put the fast
+ * severity results on screen before the heavier per-event work starts. The
+ * timeout fallback keeps it from hanging in a hidden tab, where
+ * requestAnimationFrame is paused.
+ */
+const nextPaint = (): Promise<void> =>
+  new Promise(resolve => {
+    let done = false;
+    const finish = () => { if (!done) { done = true; setTimeout(resolve, 0); } };
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(finish);
+    setTimeout(finish, 60);
+  });
 
 export const useScenarioATE = () => {
   const [state, setState] = useState<ScenarioState>({
@@ -76,10 +99,19 @@ export const useScenarioATE = () => {
     results: [],
     continuousResults: {},
     segmentResults: {},
+    resultsEvent: null,
+    segmentsEvent: null,
     error: null,
     modelData: null,
     isValid: false
   });
+
+  // Continuous + segment ATEs depend only on the event (not on the severity
+  // pair or the response button), so each event's are computed once and kept.
+  const eventLevelCache = useRef<Map<string, EventLevelResults>>(new Map());
+  // Monotonic ids so a slow, superseded computation can never overwrite a newer one.
+  const severityRequest = useRef(0);
+  const eventLevelRequest = useRef(0);
 
   // Load the full per-event model data once on mount.
   useEffect(() => {
@@ -129,8 +161,9 @@ export const useScenarioATE = () => {
     setState(prev => ({ ...prev, anticipatedChange: change }));
   }, []);
 
-  // Compute ATEs
-  const computeATE = useCallback(async () => {
+  // Severity ATEs: depend on event + the base/comparison severity pair. Fast
+  // (one pass over each activity's sample), so this runs on every such change.
+  const computeSeverity = useCallback(async () => {
     if (!state.modelData || !state.isValid) {
       setState(prev => ({ ...prev, error: 'Model data not loaded or invalid' }));
       return;
@@ -142,6 +175,7 @@ export const useScenarioATE = () => {
       return;
     }
 
+    const requestId = ++severityRequest.current;
     setState(prev => ({ ...prev, isComputing: true, error: null }));
 
     try {
@@ -159,6 +193,57 @@ export const useScenarioATE = () => {
         baseSeverityLevel: state.baseSeverityLevel,
         treatmentSeverityLevel: state.treatmentSeverityLevel
       });
+
+      if (requestId !== severityRequest.current) return; // superseded by a newer request
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('ATE severity computation:', {
+          selectedEvent: state.selectedEvent,
+          baseSeverityLevel: state.baseSeverityLevel,
+          treatmentSeverityLevel: state.treatmentSeverityLevel,
+          filteredDataLength: filteredData.length,
+          results: results.map(r => ({ activity: r.activity, ate: r.ate.map(v => v.toFixed(4)), isValid: r.isValid, sampleSize: r.sampleSize }))
+        });
+      }
+
+      setState(prev => ({ ...prev, results, resultsEvent: state.selectedEvent, isComputing: false, error: null }));
+    } catch (error) {
+      if (requestId !== severityRequest.current) return;
+      console.error('Error computing ATEs:', error);
+      setState(prev => ({
+        ...prev,
+        isComputing: false,
+        error: (error as Error).message
+      }));
+    }
+  }, [state.modelData, state.isValid, state.selectedEvent, state.baseSeverityLevel, state.treatmentSeverityLevel]);
+
+  // Continuous (PR/CR/SE) + population-segment ATEs: depend only on the event.
+  // Computed once per event, after the severity results have been painted, and
+  // served from cache when the user comes back to an event.
+  const computeEventLevel = useCallback(async () => {
+    if (!state.modelData || !state.isValid) return;
+    const eventId = state.selectedEvent;
+    const eventConfig = EVENT_CONFIG[eventId];
+    if (!eventConfig) return;
+
+    const requestId = ++eventLevelRequest.current;
+
+    try {
+      const cached = eventLevelCache.current.get(eventId);
+      if (cached) {
+        setState(prev => ({ ...prev, ...cached, segmentsEvent: eventId }));
+        return;
+      }
+
+      const filteredData = await DataService.getInstance().getEventScenarioData(eventConfig.dataFile);
+      await nextPaint();
+      if (requestId !== eventLevelRequest.current) return;
+
+      const eventModelData = state.modelData[eventConfig.csvEvent];
+      if (!eventModelData) {
+        throw new Error(`No model data for event: ${eventConfig.csvEvent}`);
+      }
 
       const continuousResults: Record<string, ContinuousATEResult[]> = {};
       for (const variable of CONTINUOUS_VARIABLES) {
@@ -180,47 +265,42 @@ export const useScenarioATE = () => {
         }
       }
 
-      console.log('ATE Computation Debug:', {
-        selectedEvent: state.selectedEvent,
-        csvEvent: eventConfig.csvEvent,
-        dataFile: eventConfig.dataFile,
-        baseSeverityLevel: state.baseSeverityLevel,
-        treatmentSeverityLevel: state.treatmentSeverityLevel,
-        filteredDataLength: filteredData.length,
-        results: results.map(r => ({
-          activity: r.activity,
-          ate: r.ate.map(v => v.toFixed(4)),
-          isValid: r.isValid,
-          sampleSize: r.sampleSize,
-          conservationCheck: r.conservationCheck.toFixed(6),
-          levelLabels: r.levelLabels
-        }))
-      });
-
-      setState(prev => ({ ...prev, results, continuousResults, segmentResults, isComputing: false, error: null }));
+      eventLevelCache.current.set(eventId, { continuousResults, segmentResults });
+      if (requestId !== eventLevelRequest.current) return;
+      setState(prev => ({ ...prev, continuousResults, segmentResults, segmentsEvent: eventId }));
     } catch (error) {
-      console.error('Error computing ATEs:', error);
-      setState(prev => ({
-        ...prev,
-        isComputing: false,
-        error: (error as Error).message
-      }));
+      if (requestId !== eventLevelRequest.current) return;
+      console.error('Error computing population-segment ATEs:', error);
+      setState(prev => ({ ...prev, error: (error as Error).message }));
     }
-  }, [state.modelData, state.isValid, state.selectedEvent, state.baseSeverityLevel, state.treatmentSeverityLevel]);
+  }, [state.modelData, state.isValid, state.selectedEvent]);
+
+  // Recompute everything for the current configuration (kept for callers that
+  // want an explicit refresh; the effects below do this automatically).
+  const computeATE = useCallback(async () => {
+    await computeSeverity();
+    await computeEventLevel();
+  }, [computeSeverity, computeEventLevel]);
 
   const isReady = state.modelData !== null && state.isValid;
 
-  // Auto-compute ATEs when configuration changes and data is ready.
+  // Severity ATEs: when the event or the severity pair changes.
   useEffect(() => {
     if (isReady && state.selectedEvent && state.baseSeverityLevel > 0 && state.treatmentSeverityLevel > 0) {
-      const timeoutId = setTimeout(() => {
-        computeATE();
-      }, 150);
-
+      const timeoutId = setTimeout(() => { computeSeverity(); }, 0);
       return () => clearTimeout(timeoutId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady, state.selectedEvent, state.baseSeverityLevel, state.treatmentSeverityLevel, state.modelData, state.isValid]);
+  }, [isReady, state.selectedEvent, state.baseSeverityLevel, state.treatmentSeverityLevel]);
+
+  // Population-segment + continuous ATEs: only when the event changes. Clicking
+  // a response button or changing the severity pair does NOT come through here.
+  useEffect(() => {
+    if (isReady && state.selectedEvent) {
+      computeEventLevel();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReady, state.selectedEvent]);
 
   const clearResults = useCallback(() => {
     setState(prev => ({ ...prev, results: [], error: null }));
@@ -259,9 +339,11 @@ export const useScenarioATE = () => {
     treatmentSeverityLevel: state.treatmentSeverityLevel,
     anticipatedChange: state.anticipatedChange,
     isComputing: state.isComputing,
-    results: state.results,
-    continuousResults: state.continuousResults,
-    segmentResults: state.segmentResults,
+    // Never expose another event's numbers under the newly selected event's name.
+    results: state.resultsEvent === state.selectedEvent ? state.results : [],
+    continuousResults: state.segmentsEvent === state.selectedEvent ? state.continuousResults : {},
+    segmentResults: state.segmentsEvent === state.selectedEvent ? state.segmentResults : {},
+    segmentsReady: state.segmentsEvent === state.selectedEvent,
     error: state.error,
     isReady,
 

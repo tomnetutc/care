@@ -31,33 +31,34 @@ function logisticCDF(z: number): number {
 }
 
 /**
+ * Error function - Abramowitz and Stegun approximation (7.1.26).
+ * Hoisted to module scope: it used to be re-created as a closure on every
+ * normalCDF() call, which sits in the innermost loop of every ATE computation.
+ */
+function erf(x: number): number {
+  const a1 =  0.254829592;
+  const a2 = -0.284496736;
+  const a3 =  1.421413741;
+  const a4 = -1.453152027;
+  const a5 =  1.061405429;
+  const p  =  0.3275911;
+
+  const sign = x >= 0 ? 1 : -1;
+  x = Math.abs(x);
+
+  const t = 1.0 / (1.0 + p * x);
+  const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+  return sign * y;
+}
+
+/**
  * Normal CDF approximation using the error function
- * This is a simplified approximation - for production use, consider a more precise implementation
+ * Phi(z) ~= 0.5 * (1 + erf(z/sqrt(2)))
  */
 function normalCDF(z: number): number {
   // Clamp z to prevent overflow
   const clampedZ = Math.max(-6, Math.min(6, z));
-  
-  // Approximation using the error function
-  // Φ(z) ≈ 0.5 * (1 + erf(z/√2))
-  const erf = (x: number): number => {
-    // Abramowitz and Stegun approximation
-    const a1 =  0.254829592;
-    const a2 = -0.284496736;
-    const a3 =  1.421413741;
-    const a4 = -1.453152027;
-    const a5 =  1.061405429;
-    const p  =  0.3275911;
-
-    const sign = x >= 0 ? 1 : -1;
-    x = Math.abs(x);
-
-    const t = 1.0 / (1.0 + p * x);
-    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-
-    return sign * y;
-  };
-
   return 0.5 * (1 + erf(clampedZ / Math.sqrt(2)));
 }
 
@@ -164,6 +165,56 @@ export function calculateLinearPredictor(
   }
   
   return linearPredictor;
+}
+
+/**
+ * Average of the per-person ordered-category probabilities over many linear
+ * predictors - i.e. mean_i P(Y = k | z_i) for every level k.
+ *
+ * Numerically identical to calling calculateOrderedProbabilities() once per
+ * predictor and averaging the results (same CDF, same per-level arithmetic,
+ * same clamp to [0, 1], same summation order), but it validates and sorts the
+ * thresholds once and allocates nothing per person. That matters because the
+ * Scenario page evaluates this several hundred thousand times per event.
+ */
+export function averageOrderedProbabilities(
+  predictors: ArrayLike<number>,
+  thresholds: number[],
+  levels: number,
+  link: 'logit' | 'probit'
+): number[] {
+  if (levels < 2) {
+    throw new Error('Number of levels must be at least 2');
+  }
+  if (thresholds.length !== levels - 1) {
+    throw new Error(`Expected ${levels - 1} thresholds for ${levels} levels, got ${thresholds.length}`);
+  }
+
+  const sorted = [...thresholds].sort((a, b) => a - b);
+  const cdf = link === 'logit' ? logisticCDF : normalCDF;
+  const n = predictors.length;
+  const sums = new Array(levels).fill(0);
+  const cdfs = new Array(levels - 1).fill(0);
+
+  for (let i = 0; i < n; i++) {
+    const z = predictors[i];
+    for (let k = 0; k < levels - 1; k++) {
+      cdfs[k] = cdf(sorted[k] - z);
+    }
+    for (let k = 1; k <= levels; k++) {
+      let prob: number;
+      if (k === 1) {
+        prob = cdfs[0];
+      } else if (k === levels) {
+        prob = 1 - cdfs[levels - 2];
+      } else {
+        prob = cdfs[k - 1] - cdfs[k - 2];
+      }
+      sums[k - 1] += Math.max(0, Math.min(1, prob));
+    }
+  }
+
+  return sums.map(sum => sum / n);
 }
 
 /**

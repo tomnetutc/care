@@ -5,7 +5,7 @@
  * Preserves all existing ATE calculation logic while updating the UI.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useScenarioATE, segmentResultKey, EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE } from '../../hooks/useScenarioATE';
 import { SEGMENT_GROUPS } from '../../lib/engine/segmentConfig';
 import { hasVerifiedSampleMismatch } from '../../lib/engine/computeATE';
@@ -39,7 +39,7 @@ const CONTINUOUS_VARIABLE_KEY: Record<string, string> = {
  * A result with no base probability (variable not in that model, ATE = 0 by
  * construction) reports 0 for both.
  */
-interface Ate { abs: number; pct: number; inModel: boolean; }
+interface Ate { abs: number; pct: number; inModel: boolean; /** true while the per-event numbers are still being computed */ loading?: boolean; }
 
 const toAte = (result: { ate: number[]; controlProbabilities: number[]; inModel?: boolean }, index: number): Ate => {
   const abs = result.ate[index] || 0;
@@ -50,7 +50,7 @@ const toAte = (result: { ate: number[]; controlProbabilities: number[]; inModel?
 // Shown instead of a number when a variable was not retained in the fitted
 // model for the selected activity: its effect is zero by construction, which
 // must not read as a measured "0.0%".
-const NOT_IN_MODEL_TEXT = 'Not in model';
+const NOT_IN_MODEL_LABEL = 'Not in model';
 const NOT_IN_MODEL_HELP = "Not in model: this variable was not retained in the fitted model for the selected activity (dropped during model selection), so it has no modeled effect on it.";
 
 const ScenarioATEPanel: React.FC = () => {
@@ -75,13 +75,12 @@ const ScenarioATEPanel: React.FC = () => {
     results,
     continuousResults,
     segmentResults,
+    segmentsReady,
     error,
-    isReady,
     setSelectedEvent,
     setBaseSeverityLevel,
     setTreatmentSeverityLevel,
     setAnticipatedChange,
-    computeATE,
     getAvailableEvents,
     getSeverityLevels
   } = useScenarioATE();
@@ -193,14 +192,10 @@ const ScenarioATEPanel: React.FC = () => {
 
   const ateData = convertResultsToATEData();
 
-  // Auto-compute when ready or when configuration changes
-  useEffect(() => {
-    if (isReady && !isComputing) {
-      // Always recompute when configuration changes (including anticipatedChange)
-      computeATE();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady, selectedEvent, baseSeverityLevel, treatmentSeverityLevel, anticipatedChange]);
+  // No compute trigger here: useScenarioATE recomputes severity ATEs when the
+  // event / severity pair changes and the per-event (segment) ATEs once per
+  // event. The response buttons only change which of the already-computed
+  // Do less / About the same / Do more values is displayed.
 
   // Personal Resilience / Community Resilience / Social Engagement: real
   // ate_continuous results (mult=0.01, "+1% of SD", confirmed by Jinghai),
@@ -208,7 +203,7 @@ const ScenarioATEPanel: React.FC = () => {
   // hasn't loaded yet and when the variable isn't in that activity's model
   // (computeContinuousATE's inModel=false already returns [0,0,0]).
   const getContinuousAte = (variable: string): Ate => {
-    if (Object.keys(continuousResults).length === 0) return { abs: 0, pct: 0, inModel: true }; // not loaded yet
+    if (!segmentsReady) return { abs: 0, pct: 0, inModel: true, loading: true }; // this event's numbers still being computed
     const list = continuousResults[CONTINUOUS_VARIABLE_KEY[variable]];
     const result = list?.find(r => r.activity === effectiveActivity);
     if (!result || !result.isValid) return { abs: 0, pct: 0, inModel: false };
@@ -223,7 +218,7 @@ const ScenarioATEPanel: React.FC = () => {
   // hasn't loaded yet and when the group isn't in that activity's model
   // (computeSegmentATEs' inModel=false already returns [0,0,0]).
   const getSegmentAte = (groupKey: string, comparisonLabel: string): Ate => {
-    if (Object.keys(segmentResults).length === 0) return { abs: 0, pct: 0, inModel: true }; // not loaded yet
+    if (!segmentsReady) return { abs: 0, pct: 0, inModel: true, loading: true }; // this event's numbers still being computed
     const list = segmentResults[segmentResultKey(groupKey, comparisonLabel)];
     const result = list?.find(r => r.activity === effectiveActivity);
     if (!result || !result.isValid) return { abs: 0, pct: 0, inModel: false };
@@ -764,7 +759,9 @@ const ScenarioATEPanel: React.FC = () => {
                               <td className="scenario-table-cell">{c.treatmentLevel}</td>
                               <td className="scenario-table-cell">
                                 <div className="scenario-ate-display">
-                                  {c.ate.inModel ? (
+                                  {c.ate.loading ? (
+                                    <span className="scenario-ate-display-value" aria-label="Computing" style={{ color: '#94a3b8' }}>…</span>
+                                  ) : c.ate.inModel ? (
                                     <>
                                       {renderSparkline(c.ate.abs)}
                                       <span className="scenario-ate-display-value" style={{ color: c.ate.abs >= 0 ? '#6dafa0' : '#e25b61' }}>
@@ -772,8 +769,14 @@ const ScenarioATEPanel: React.FC = () => {
                                       </span>
                                     </>
                                   ) : (
-                                    <span className="scenario-ate-display-value scenario-ate-not-in-model" title={NOT_IN_MODEL_HELP} style={{ color: '#94a3b8', fontStyle: 'italic' }}>
-                                      {NOT_IN_MODEL_TEXT}
+                                    <span
+                                      className="scenario-ate-display-value scenario-ate-not-in-model"
+                                      role="img"
+                                      aria-label={NOT_IN_MODEL_LABEL}
+                                      title={NOT_IN_MODEL_HELP}
+                                      style={{ color: '#94a3b8', cursor: 'help' }}
+                                    >
+                                      —
                                     </span>
                                   )}
                                 </div>
@@ -791,7 +794,7 @@ const ScenarioATEPanel: React.FC = () => {
           </div>
 
           <p className="scenario-config-help" style={{ marginTop: '12px' }}>
-            <em>{NOT_IN_MODEL_TEXT}</em> marks a variable that was not retained in the fitted model for the selected activity (dropped during model selection), so it has no modeled effect there. It is not a measured zero.
+            <strong>—</strong> means the variable was not retained in the fitted model for the selected activity (dropped during model selection), so it has no modeled effect there. It is not a measured zero.
           </p>
 
           <div className="scenario-interpretation">

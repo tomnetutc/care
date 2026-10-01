@@ -4,7 +4,17 @@
 // disable above just silences false positives if someone runs a bare `eslint`
 // across the whole repo, since package.json's eslintConfig (react-app/jest)
 // otherwise misapplies Testing-Library/Jest rules to Playwright's page/expect API.
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, Locator } from '@playwright/test';
+
+/**
+ * What a Section 3 value cell means. A variable that is not in the activity's
+ * fitted model renders as a muted "—" (aria-label "Not in model"); everything
+ * else renders its number. Returns 'Not in model' for the former so tests
+ * assert on meaning, not on the glyph.
+ */
+async function readCell(cell: Locator): Promise<string> {
+  return cell.evaluate(el => (el.getAttribute('aria-label') === 'Not in model' ? 'Not in model' : (el.textContent || '').trim()));
+}
 
 /**
  * Smoke test for the live Scenario Analysis page (/#/scenario, HashRouter).
@@ -196,7 +206,8 @@ test('Population Segment table: no Risk Aversion, 3-tier income, binary housing,
     await page.waitForTimeout(150);
     for (const v of Object.keys(finiteSeen)) {
       await expect(rowsFor(v)).toContainText('+1% of SD');
-      const value = (await rowsFor(v).locator('.scenario-ate-display-value').innerText()).trim();
+      await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
+      const value = await readCell(rowsFor(v).locator('.scenario-ate-display-value').first());
       if (value === 'Not in model') continue;
       const parsed = parseFloat(value.replace('%', '').replace('+', ''));
       expect(Number.isFinite(parsed), `${v} / ${activity}: "${value}" is not a finite number`).toBe(true);
@@ -231,13 +242,13 @@ test('Population Segment table is reactive to Activity and Behavioral Response (
   const rowsFor = (variable: string) =>
     section.locator('tr', { has: page.locator('td', { hasText: variable }) });
   const firstValue = async (variable: string) =>
-    (await rowsFor(variable).locator('.scenario-ate-display-value').first().innerText()).trim();
+    readCell(rowsFor(variable).locator('.scenario-ate-display-value').first());
   const isNumber = (v: string) => Number.isFinite(parseFloat(v.replace('%', '').replace('+', '')));
 
   const activitySelect = page.locator('.scenario-section-card')
     .filter({ has: page.locator('.scenario-demographic-groups') })
     .locator('select.scenario-select');
-  const pick = async (activity: string) => { await activitySelect.selectOption({ value: activity }); await page.waitForTimeout(300); };
+  const pick = async (activity: string) => { await activitySelect.selectOption({ value: activity }); await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0); await page.waitForTimeout(150); };
 
   // --- Activity reactivity ---
   await pick('use_car');
@@ -314,6 +325,47 @@ test('Section 3 only offers the activities the selected event has a model for, a
   // Heat / use_car has no Gender term -> its cell must say so instead of "0.0%".
   await page.getByText('Extreme Heat', { exact: true }).click();
   await activitySelect.selectOption({ value: 'use_car' });
-  await expect(segmentCard.locator('tr', { hasText: 'Gender' }).locator('.scenario-ate-display-value')).toHaveText('Not in model');
+  await expect(segmentCard.locator('tr', { hasText: 'Gender' }).locator('.scenario-ate-display-value').first()).toHaveAttribute('aria-label', 'Not in model');
   await expect(segmentCard).toContainText('not a measured zero');
+});
+
+test('Interactions do not block the main thread (performance regression guard)', async ({ page }) => {
+  // Every severity / response / event change used to recompute all ~35
+  // population-segment comparisons from scratch (~1.1 s of frozen UI on
+  // Extreme Heat, several seconds on a slower laptop). Segment numbers depend
+  // only on the event, so they are now computed once per event and cached, and
+  // severity / response changes touch only the cheap severity path. Measured
+  // after the fix: longest task ~25-100 ms. The 1 s ceiling leaves ~10x
+  // headroom for a slow CI runner yet still fails on the old behaviour.
+  await page.addInitScript(() => {
+    (window as any).__longTasks = [];
+    try {
+      new PerformanceObserver(list => {
+        for (const e of list.getEntries()) (window as any).__longTasks.push(Math.round(e.duration));
+      }).observe({ entryTypes: ['longtask'] });
+    } catch { /* longtask unsupported - nothing to assert on */ }
+  });
+  await page.goto('/#/scenario');
+  await expect(page.locator('.scenario-ate-item').first()).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('[aria-label="Computing"]')).toHaveCount(0, { timeout: 30_000 });
+  await page.evaluate(() => { (window as any).__longTasks = []; });
+
+  const settle = async () => {
+    await page.waitForTimeout(300);
+    await expect(page.locator('.scenario-computing')).toHaveCount(0);
+    await expect(page.locator('[aria-label="Computing"]')).toHaveCount(0);
+  };
+
+  await page.locator('select.scenario-select').nth(1).selectOption('very');       // comparison severity
+  await settle();
+  await page.locator('.scenario-behavior-button', { hasText: 'Do Less' }).first().click();   // response
+  await settle();
+  await page.getByText('Power Outage', { exact: true }).click();                      // event (first visit: computes segments)
+  await settle();
+  await page.getByText('Extreme Heat', { exact: true }).click();                      // event (back: served from cache)
+  await settle();
+
+  const longTasks: number[] = await page.evaluate(() => (window as any).__longTasks);
+  const worst = Math.max(0, ...longTasks);
+  expect(worst, `longest main-thread block was ${worst} ms (all long tasks: ${JSON.stringify(longTasks)})`).toBeLessThan(1000);
 });
