@@ -385,7 +385,7 @@ const ScenarioATEPanel: React.FC = () => {
         <div className="scenario-intro-card">
           <h2 className="scenario-intro-title">CARE Scenario Analysis Tool</h2>
           <p className="scenario-intro-text">
-            This interactive dashboard explores how individuals adapt their activity-travel behavior in response to future extreme events. The tool leverages the Average Treatment Effects (ATE) concept. ATEs are computed from a series of econometric models estimated using CARE survey data. Model details are available at <a href="#" className="scenario-link">this link</a>.
+            This interactive dashboard explores how individuals adapt their activity-travel behavior in response to future extreme events. The tool leverages the Average Treatment Effects (ATE) concept. ATEs are computed from a series of econometric models estimated using CARE survey data.
           </p>
           <div className="scenario-intro-grid">
             <div className="scenario-intro-box">
