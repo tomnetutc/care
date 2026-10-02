@@ -62,26 +62,22 @@ export const SEGMENT_GROUPS: Record<string, SegmentGroup> = {
     baseSpec: { bs_grad: 0 },
     comparisons: [{ label: 'BS or higher', spec: { bs_grad: 1 } }]
   },
-  // white/black/asian are independent, non-mutually-exclusive dummies (a
-  // respondent can be e.g. both White and Hispanic) - not a single race_cat
-  // choice, per Codebook.xlsx.
-  raceWhite: {
-    label: 'Race: White',
-    baseLabel: 'Not White',
-    baseSpec: { white: 0 },
-    comparisons: [{ label: 'White', spec: { white: 1 } }]
-  },
-  raceBlack: {
-    label: 'Race: Black',
-    baseLabel: 'Not Black',
-    baseSpec: { black: 0 },
-    comparisons: [{ label: 'Black', spec: { black: 1 } }]
-  },
-  raceAsian: {
-    label: 'Race: Asian',
-    baseLabel: 'Not Asian',
-    baseSpec: { asian: 0 },
-    comparisons: [{ label: 'Asian', spec: { asian: 1 } }]
+  // Race is ONE categorical group with "Other race" as the reference level
+  // (all three dummies 0), exactly as in Jinghai's ATE_segments_by_model.xlsx
+  // (2026-10-01): each comparison forces its own dummy to 1 and the other two
+  // to 0. This matters in the models that keep more than one of
+  // white/black/asian (heat/use_car, cold/work_from_home|office,
+  // earthquake/stay_home, powerout/pick_up), where toggling one dummy while
+  // leaving the others at each person's observed value gives different numbers.
+  race: {
+    label: 'Race',
+    baseLabel: 'Other race',
+    baseSpec: { white: 0, black: 0, asian: 0 },
+    comparisons: [
+      { label: 'White', spec: { white: 1, black: 0, asian: 0 } },
+      { label: 'Black', spec: { white: 0, black: 1, asian: 0 } },
+      { label: 'Asian', spec: { white: 0, black: 0, asian: 1 } }
+    ]
   },
   // hispanic_c is the CLEANED dummy (Codebook: use this, not raw hispanic,
   // whose 1=Yes/2=No coding reverses the sign if used directly).
@@ -96,6 +92,15 @@ export const SEGMENT_GROUPS: Record<string, SegmentGroup> = {
     baseLabel: 'No disability',
     baseSpec: { dis_yes: 0 },
     comparisons: [{ label: 'Has disability', spec: { dis_yes: 1 } }]
+  },
+  // non_wrkr (non-worker) only exists in Jinghai's corrected 2026-09-28 data and is
+  // kept in 14 of the 35 refit models; it is a row in ATE_segments_by_model.xlsx
+  // (2026-10-01) and was not in the earlier 27-variable key.
+  employmentStatus: {
+    label: 'Employment status',
+    baseLabel: 'Worker',
+    baseSpec: { non_wrkr: 0 },
+    comparisons: [{ label: 'Non-worker', spec: { non_wrkr: 1 } }]
   },
   worksOutdoors: {
     label: 'Works outdoors',
@@ -194,14 +199,13 @@ export const SEGMENT_GROUPS: Record<string, SegmentGroup> = {
       { label: 'High', spec: { NetworkDensity_medium: 0, NetworkDensity_high: 1 } }
     ]
   },
+  // Jinghai's ATE_segments_by_model.xlsx defines this as "Not high" vs "High"
+  // (Diversity_medium is not a coefficient in any of the 35 models).
   landUseDiversity: {
     label: 'Land-use Diversity',
-    baseLabel: 'Low',
-    baseSpec: { Diversity_medium: 0, Diversity_high: 0 },
-    comparisons: [
-      { label: 'Medium', spec: { Diversity_medium: 1, Diversity_high: 0 } },
-      { label: 'High', spec: { Diversity_medium: 0, Diversity_high: 1 } }
-    ]
+    baseLabel: 'Not high',
+    baseSpec: { Diversity_high: 0 },
+    comparisons: [{ label: 'High', spec: { Diversity_high: 1 } }]
   },
   transitAccess: {
     label: 'Transit Access',

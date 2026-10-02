@@ -386,8 +386,11 @@ export interface SegmentATEOptions {
 }
 
 export interface SegmentATEResult extends ATEResult {
-  /** False when none of the group's variables survived backward elimination in this
-   *  event/activity's fitted model - the ATE is then exactly 0 by construction. */
+  /** False when the comparison cannot move the prediction in this event/activity's
+   *  fitted model: none of the variables that DIFFER between the base and the
+   *  comparison survived backward elimination (e.g. "Age 31-50 vs 18-30" in a model
+   *  that only kept age_65p). The ATE is then exactly 0 by construction. This is
+   *  Jinghai's per-comparison "In model?" flag (ATE_segments_by_model.xlsx). */
   inModel: boolean;
 }
 
@@ -421,8 +424,11 @@ export function computeSegmentATEs(
 
       const coefficients = modelConfig.coefficients;
       const inModelVars = Object.keys(baseSpec).filter(v => v in coefficients);
+      // Only variables whose forced value differs between base and comparison can
+      // change anything; if none of those is in the model the comparison is a no-op.
+      const changedInModelVars = inModelVars.filter(v => baseSpec[v] !== (comparisonSpec[v] ?? 0));
 
-      if (inModelVars.length === 0) {
+      if (changedInModelVars.length === 0) {
         results.push({
           activity, controlProbabilities: [], treatmentProbabilities: [],
           ate: [0, 0, 0], levelLabels: RESPONSE_LABELS, conservationCheck: 0,

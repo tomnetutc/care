@@ -369,3 +369,47 @@ test('Interactions do not block the main thread (performance regression guard)',
   const worst = Math.max(0, ...longTasks);
   expect(worst, `longest main-thread block was ${worst} ms (all long tasks: ${JSON.stringify(longTasks)})`).toBeLessThan(1000);
 });
+
+test("Section 3 rows and values match Jinghai's ATE_segments_by_model.xlsx (Employment status, Race, per-comparison flag)", async ({ page }) => {
+  // Expected values are read straight from heat_Delivery in his workbook (Do more column):
+  //   Employment status Worker -> Non-worker : ATE_pct -29.0484, ATE_abs -0.0768
+  //   Age Group 18-30 -> 65+                 : ATE_pct -20.0019, ATE_abs -0.0482
+  //   Age Group 18-30 -> 31-50 / 51-65       : in_model FALSE (only age_65p is in this model)
+  await page.goto('/#/scenario');
+  const segmentCard = page.locator('.scenario-section-card').filter({ has: page.locator('.scenario-demographic-groups') });
+  const section = segmentCard.locator('.scenario-demographic-groups');
+  await expect(section).toBeVisible({ timeout: 15_000 });
+  await segmentCard.locator('select.scenario-select').selectOption({ value: 'delivery' });
+  await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
+  await page.waitForTimeout(200);
+
+  const row = (variable: string, comparison: string) =>
+    section.locator('tr', { has: page.locator('td', { hasText: variable }) }).filter({ has: page.locator('td', { hasText: comparison }) });
+  // Only the first row of a multi-row group carries the variable name, so rows are also
+  // addressable by their (unique-within-the-group) Comparison column text alone.
+  const byComparison = (comparison: string) =>
+    section.locator('tr').filter({ has: page.locator('td:nth-child(3)', { hasText: new RegExp(`^${comparison.replace(/[+$]/g, '\\$&')}$`) }) });
+  const cell = (variable: string, comparison: string) =>
+    readCell((variable === 'Age Group' ? byComparison(comparison) : row(variable, comparison)).first().locator('.scenario-ate-display-value').first());
+
+  // Employment status is a real row (it is in 14 of the 35 models and was missing before).
+  await expect(row('Employment status', 'Non-worker')).toHaveCount(1);
+  await expect(section.locator('tr', { hasText: 'Employment status' }).first()).toContainText('Worker');
+  expect(await cell('Employment status', 'Non-worker')).toBe('-29.0%');
+  // Race is one group with "Other race" as the base, not three independent toggles.
+  await expect(section.locator('tr', { hasText: 'Race' }).first()).toContainText('Other race');
+  await expect(section.locator('tr', { hasText: 'Not White' })).toHaveCount(0);
+  // Land-use Diversity: Not high -> High (Medium is not a model term anywhere).
+  await expect(section.locator('tr', { hasText: 'Land-use Diversity' }).first()).toContainText('Not high');
+
+  // Per-comparison flag: only the 65+ dummy is in this model, so 31-50 and 51-65 read "Not in model".
+  expect(await cell('Age Group', '31-50')).toBe('Not in model');
+  expect(await cell('Age Group', '51-65')).toBe('Not in model');
+  expect(await cell('Age Group', '65+')).toBe('-20.0%');
+
+  // Absolute format
+  await segmentCard.locator('.scenario-ate-toggle button', { hasText: 'Absolute ATE' }).click();
+  await page.waitForTimeout(100);
+  expect(await cell('Employment status', 'Non-worker')).toBe('-0.08');
+  expect(await cell('Age Group', '65+')).toBe('-0.05');
+});

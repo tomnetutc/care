@@ -10,14 +10,10 @@
  * data/jinghai_2026-09-28/ is Jinghai's corrected refit (he found a missing
  * `non_wrkr` column, fixed it, and re-ran all 35 event/activity models),
  * delivered 2026-09-28 and superseding the original data/jinghai_2026-09-10/
- * delivery. The 18 "matches ATE_Heat.xlsx Segment_ATE" expectations below
- * that reference heat activities were regenerated from the rebuilt engine
- * output itself (see git history around 2026-09-28), NOT independently
- * re-verified against a fresh xlsx from Jinghai - ATE_Heat.xlsx in
- * data/jinghai_2026-09-10/ is his answer key for the OLD, buggy coefficients
- * and is now stale for numeric comparison (its group/label wording is still
- * accurate and unaffected). Ask Jinghai for a regenerated ATE_Heat.xlsx to
- * get independent verification back on these.
+ * delivery. Section 3 (segment / continuous ATEs) is verified against Jinghai's own
+ * ATE_segments_by_model.xlsx (2026-10-01) in ateSegmentAnswerKey.test.ts, and Section 2 (severity)
+ * against his ATE_severity_all_events.csv in ateSeverityAnswerKey.test.ts; this file covers
+ * structure, validity and invariants of the engine.
  *
  * NOTE ON THE CSV PARSER BELOW: this project already has a CSV parser (d3's
  * csvParse, used by DataService.ts), but d3 v7 ships ESM-only and Create
@@ -435,44 +431,23 @@ describe('computeSegmentATEs - Gender / Age Group / Transit Access', () => {
     }
   });
 
-  it('inModel matches whether any of the group\'s variables is a coefficient of that activity\'s model', () => {
+  it('inModel is per comparison: true only if a variable that DIFFERS between base and comparison is a coefficient of that activity\'s model', () => {
     for (const event of events) {
       for (const g of groups) {
-        const results = run(event, g.label, g.comparisons[0].label);
-        for (const r of results) {
-          const expected = Object.keys(g.baseSpec).some(v => v in modelData[event][r.activity].coefficients);
-          expect(r.inModel).toBe(expected);
+        for (const c of g.comparisons) {
+          const results = run(event, g.label, c.label);
+          for (const r of results) {
+            const coefficients = modelData[event][r.activity].coefficients;
+            const expected = Object.keys(g.baseSpec).some(v => v in coefficients && g.baseSpec[v] !== (c.spec[v] ?? 0));
+            expect(r.inModel).toBe(expected);
+          }
         }
       }
     }
   });
 
-  // REGENERATED 2026-09-28 from the rebuilt engine itself (Jinghai's
-  // corrected data/jinghai_2026-09-28/ refit), not independently re-verified
-  // against a fresh ATE_Heat.xlsx - his old one (data/jinghai_2026-09-10/)
-  // was fit on the pre-fix data and is stale for numeric comparison. These
-  // are regression-guard values, not cross-checks, until he sends an
-  // updated xlsx. "Transit Access High/dine_in" and "Gender Female/use_car"
-  // flipped to inModel:false under the new variable selection (they were
-  // true before); several activities dropped variables that used to put
-  // them in-model here.
-  const KEY: Array<{ group: string; comparison: string; activity: string; i: number; pb?: number; pc?: number; ate: number; inModel: boolean }> = [
-    { group: 'Age Group', comparison: '31-50', activity: 'use_transit', i: 0, pb: 0.192533, pc: 0.237536, ate: 0.045003, inModel: true },
-    { group: 'Age Group', comparison: '65+', activity: 'pick_up', i: 0, pb: 0.199362, pc: 0.252654, ate: 0.053293, inModel: true },
-    { group: 'Transit Access', comparison: 'High', activity: 'dine_in', i: 0, ate: 0, inModel: false },
-    { group: 'Transit Access', comparison: 'Medium', activity: 'use_transit', i: 0, pb: 0.227226, pc: 0.227226, ate: 0, inModel: true },
-    { group: 'Gender', comparison: 'Female', activity: 'go_business_as_usual', i: 2, pb: 0.607576, pc: 0.568002, ate: -0.039574, inModel: true },
-    { group: 'Age Group', comparison: '65+', activity: 'go_business_as_usual', i: 0, pb: 0.246614, pc: 0.246614, ate: 0, inModel: true },
-    { group: 'Gender', comparison: 'Female', activity: 'use_car', i: 0, ate: 0, inModel: false }
-  ];
-  it.each(KEY)('heat $activity / $group ($comparison) matches ATE_Heat.xlsx Segment_ATE', (k) => {
-    const r = run('heat', k.group, k.comparison).find(x => x.activity === k.activity)!;
-    expect(r.inModel).toBe(k.inModel);
-    expect(Math.abs(r.ate[k.i] - k.ate)).toBeLessThan(0.003);
-    const pbDiff = k.pb === undefined ? 0 : Math.abs(r.controlProbabilities[k.i] - k.pb);
-    const pcDiff = k.pc === undefined ? 0 : Math.abs(r.treatmentProbabilities[k.i] - k.pc);
-    expect(Math.max(pbDiff, pcDiff)).toBeLessThan(0.003);
-  });
+  // Numeric / flag correctness of every comparison is checked against Jinghai's own
+  // answer key in ateSegmentAnswerKey.test.ts (1,435 rows x 3 responses).
 });
 
 describe('Household Income (3 tiers) and Housing Type (binary) group definitions', () => {
@@ -530,89 +505,40 @@ describe('computeContinuousATE - PR / CR / SE (ate_continuous, mult=0.01 "+1% of
     }
   });
 
-  // REGENERATED 2026-09-28 from the rebuilt engine itself (Jinghai's
-  // corrected data/jinghai_2026-09-28/ refit) - see the KEY comment above
-  // for why these are regression-guard values, not independent xlsx
-  // cross-checks, until Jinghai sends an updated ATE_Heat.xlsx. SE flipped
-  // to inModel:false for go_business_as_usual under the new variable
-  // selection (it was true before).
-  const KEY: Array<{ variable: string; activity: string; i: number; pb: number; pc: number; ate: number; inModel: boolean }> = [
-    { variable: 'CR', activity: 'go_business_as_usual', i: 0, pb: 0.222178, pc: 0.221994, ate: -0.000184, inModel: true },
-    { variable: 'CR', activity: 'go_business_as_usual', i: 2, pb: 0.583978, pc: 0.584218, ate: 0.00024, inModel: true },
-    { variable: 'SE', activity: 'go_business_as_usual', i: 1, pb: 0, pc: 0, ate: 0, inModel: false },
-    { variable: 'PR', activity: 'go_business_as_usual', i: 2, pb: 0.583978, pc: 0.584502, ate: 0.000524, inModel: true },
-    { variable: 'CR', activity: 'use_car', i: 2, pb: 0, pc: 0, ate: 0, inModel: false }
-  ];
-  it.each(KEY)('heat $activity / $variable (+1% of SD) matches ATE_Heat.xlsx Segment_ATE', (k) => {
-    const results = computeContinuousATE(modelData['heat'], getEventRows('heat'), { event: 'heat', variable: k.variable, mult: 0.01 });
-    const r = results.find(x => x.activity === k.activity)!;
-    expect(r.inModel).toBe(k.inModel);
-    expect(Math.abs(r.ate[k.i] - k.ate)).toBeLessThan(0.003);
-    const pbDiff = k.inModel ? Math.abs(r.controlProbabilities[k.i] - k.pb) : 0;
-    const pcDiff = k.inModel ? Math.abs(r.treatmentProbabilities[k.i] - k.pc) : 0;
-    expect(Math.max(pbDiff, pcDiff)).toBeLessThan(0.003);
-  });
+  // Numeric correctness (+1% of SD and +1 SD, every model) is checked against Jinghai's own
+  // answer key in ateSegmentAnswerKey.test.ts.
 });
 
-describe('computeSegmentATEs - the 19 previously-missing groups (Education x2, Race x3, ' +
-  'Ethnicity, Disability, Works outdoors, Telecommute, Household Size, Child in household, ' +
-  'Zero-vehicle, A/C, Rural, Population/Employment/Network Density, Land-use Diversity, Walkability)', () => {
+describe('computeSegmentATEs - the full set of discrete groups (matches Jinghai\'s ATE_segments_by_model.xlsx)', () => {
   const groups = Object.values(SEGMENT_GROUPS);
-  const run = (event: string, label: string, comparisonLabel: string) => {
-    const g = groups.find(x => x.label === label)!;
-    const c = g.comparisons.find(x => x.label === comparisonLabel)!;
-    return computeSegmentATEs(modelData[event], getEventRows(event), {
-      event, baseSpec: g.baseSpec, comparisonSpec: c.spec
-    });
-  };
 
-  it('all 24 discrete groups (5 original + 19 added) are present, matching ATE_Heat.xlsx Segment_ATE\'s group list', () => {
+  it('all 23 discrete groups are present and give exactly the 35 comparisons in Jinghai\'s ATE_segments_by_model.xlsx', () => {
     const labels = groups.map(g => g.label).sort();
     expect(labels).toEqual([
       'Age Group', 'Disability', "Education (BS or higher)", "Education (Bachelor's)",
-      'Employment Density', 'Ethnicity: Hispanic', 'Gender', 'Household Income', 'Household Size',
-      'Housing Type', 'Land-use Diversity', 'Network Density', 'Population Density', 'Race: Asian',
-      'Race: Black', 'Race: White', 'Rural location', 'Transit Access', 'Walkability Index',
+      'Employment Density', 'Employment status', 'Ethnicity: Hispanic', 'Gender', 'Household Income', 'Household Size',
+      'Housing Type', 'Land-use Diversity', 'Network Density', 'Population Density', 'Race',
+      'Rural location', 'Transit Access', 'Walkability Index',
       'Works outdoors', 'Zero-vehicle household', 'Air conditioning', 'Child in household', 'Does not telecommute'
     ].sort());
+    expect(groups.reduce((n, g) => n + g.comparisons.length, 0)).toBe(35);
   });
 
-  // REGENERATED 2026-09-28 from the rebuilt engine itself (Jinghai's
-  // corrected data/jinghai_2026-09-28/ refit) - see the first KEY comment
-  // above for why these are regression-guard values, not independent xlsx
-  // cross-checks, until Jinghai sends an updated ATE_Heat.xlsx. Several rows
-  // flipped to inModel:false under the new variable selection (Education x2,
-  // Race: Asian, Works outdoors, Does not telecommute, Child in household,
-  // Employment Density, Walkability Index all dropped out of the models
-  // they used to be in for these activities).
-  const KEY: Array<{ group: string; comparison: string; activity: string; i: number; pb?: number; pc?: number; ate: number; inModel: boolean }> = [
-    { group: "Education (Bachelor's)", comparison: 'Has BS', activity: 'use_car', i: 2, ate: 0, inModel: false },
-    { group: 'Education (BS or higher)', comparison: 'BS or higher', activity: 'use_car', i: 2, ate: 0, inModel: false },
-    { group: 'Race: White', comparison: 'White', activity: 'use_car', i: 2, pb: 0.140522, pc: 0.181733, ate: 0.04121, inModel: true },
-    { group: 'Race: Black', comparison: 'Black', activity: 'use_car', i: 2, pb: 0.163963, pc: 0.230788, ate: 0.066825, inModel: true },
-    { group: 'Race: Asian', comparison: 'Asian', activity: 'work_from_office', i: 0, ate: 0, inModel: false },
-    { group: 'Ethnicity: Hispanic', comparison: 'Hispanic', activity: 'use_car', i: 2, pb: 0.168926, pc: 0.210277, ate: 0.041351, inModel: true },
-    { group: 'Disability', comparison: 'Has disability', activity: 'go_business_as_usual', i: 0, pb: 0.213781, pc: 0.249662, ate: 0.035881, inModel: true },
-    { group: 'Works outdoors', comparison: 'Yes', activity: 'use_car', i: 2, ate: 0, inModel: false },
-    { group: 'Does not telecommute', comparison: 'Does not telecommute', activity: 'use_car', i: 2, ate: 0, inModel: false },
-    { group: 'Household Size', comparison: '1 person', activity: 'use_car', i: 2, pb: 0.181568, pc: 0.181568, ate: 0, inModel: true },
-    { group: 'Child in household', comparison: 'Has child', activity: 'use_car', i: 2, ate: 0, inModel: false },
-    { group: 'Zero-vehicle household', comparison: 'Zero vehicle', activity: 'go_business_as_usual', i: 0, pb: 0.217031, pc: 0.257176, ate: 0.040145, inModel: true },
-    { group: 'Air conditioning', comparison: 'Has A/C', activity: 'go_business_as_usual', i: 0, pb: 0.280149, pc: 0.21261, ate: -0.06754, inModel: true },
-    { group: 'Rural location', comparison: 'Rural', activity: 'go_business_as_usual', i: 0, ate: 0, inModel: false },
-    { group: 'Population Density', comparison: 'Medium', activity: 'use_car', i: 2, pb: 0.164728, pc: 0.164728, ate: 0, inModel: true },
-    { group: 'Employment Density', comparison: 'High', activity: 'delivery', i: 1, ate: 0, inModel: false },
-    { group: 'Network Density', comparison: 'Medium', activity: 'delivery', i: 1, pb: 0.635765, pc: 0.627096, ate: -0.008669, inModel: true },
-    { group: 'Land-use Diversity', comparison: 'High', activity: 'dine_in', i: 1, pb: 0.612506, pc: 0.604386, ate: -0.00812, inModel: true },
-    { group: 'Walkability Index', comparison: 'Low', activity: 'go_business_as_usual', i: 0, ate: 0, inModel: false }
-  ];
-  it.each(KEY)('heat $activity / $group ($comparison) matches ATE_Heat.xlsx Segment_ATE', (k) => {
-    const r = run('heat', k.group, k.comparison).find(x => x.activity === k.activity)!;
-    expect(r.inModel).toBe(k.inModel);
-    expect(Math.abs(r.ate[k.i] - k.ate)).toBeLessThan(0.003);
-    const pbDiff = k.pb === undefined ? 0 : Math.abs(r.controlProbabilities[k.i] - k.pb);
-    const pcDiff = k.pc === undefined ? 0 : Math.abs(r.treatmentProbabilities[k.i] - k.pc);
-    expect(Math.max(pbDiff, pcDiff)).toBeLessThan(0.003);
+  it('Race is one categorical group (base "Other race"): each comparison forces its own dummy to 1 and the other two to 0', () => {
+    const race = SEGMENT_GROUPS.race;
+    expect(race.baseLabel).toBe('Other race');
+    expect(race.baseSpec).toEqual({ white: 0, black: 0, asian: 0 });
+    expect(race.comparisons.map(c => c.label)).toEqual(['White', 'Black', 'Asian']);
+    expect(race.comparisons.find(c => c.label === 'Black')!.spec).toEqual({ white: 0, black: 1, asian: 0 });
   });
+
+  it('Employment status (non_wrkr) is a Worker vs Non-worker group', () => {
+    const emp = SEGMENT_GROUPS.employmentStatus;
+    expect([emp.baseLabel, ...emp.comparisons.map(c => c.label)]).toEqual(['Worker', 'Non-worker']);
+    expect(emp.baseSpec).toEqual({ non_wrkr: 0 });
+  });
+
+  // Numbers for these groups are checked against Jinghai's own answer key in
+  // ateSegmentAnswerKey.test.ts (his file replaced the regression fixtures that used to
+  // live here, which were generated from our own engine).
 });
-
