@@ -62,6 +62,10 @@ const NOT_IN_MODEL_HELP = "Not in model: this variable was not retained in the f
 
 const ScenarioATEPanel: React.FC = () => {
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
+  // Position of the "1 Unit Increase*" hover note. The Section 3 groups are overflow:hidden
+  // cards, so an absolutely positioned note gets clipped on the last rows; this one is
+  // position:fixed from the label's on-screen rect instead.
+  const [unitTipPos, setUnitTipPos] = useState<{ left: number; top: number; above: boolean } | null>(null);
   const [showAbsoluteATE, setShowAbsoluteATE] = useState(false);
   const [showDemoAbsoluteATE, setShowDemoAbsoluteATE] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState('use_car');
@@ -766,15 +770,34 @@ const ScenarioATEPanel: React.FC = () => {
                                 {c.treatmentLevel === UNIT_INCREASE_LABEL ? (
                                   <span
                                     className="scenario-tooltip-wrapper"
-                                    onMouseEnter={() => setShowTooltip(`unitIncrease-${vi}`)}
+                                    onMouseEnter={(e) => {
+                                      const r = e.currentTarget.getBoundingClientRect();
+                                      const above = r.top > 96;
+                                      setUnitTipPos({
+                                        left: Math.max(8, Math.min(r.left, window.innerWidth - 392)),
+                                        top: above ? r.top - 8 : r.bottom + 8,
+                                        above
+                                      });
+                                      setShowTooltip(`unitIncrease-${vi}`);
+                                    }}
                                     onMouseLeave={() => setShowTooltip(null)}
                                     style={{ cursor: 'help' }}
                                   >
                                     {c.treatmentLevel}
-                                    {showTooltip === `unitIncrease-${vi}` && (
-                                      <div className="scenario-tooltip" style={{ textAlign: 'left', fontWeight: 400 }}>
+                                    {showTooltip === `unitIncrease-${vi}` && unitTipPos && (
+                                      <div
+                                        className="scenario-tooltip"
+                                        style={{
+                                          position: 'fixed',
+                                          left: unitTipPos.left,
+                                          top: unitTipPos.top,
+                                          transform: unitTipPos.above ? 'translateY(-100%)' : 'none',
+                                          width: 'min(24rem, calc(100vw - 16px))',
+                                          textAlign: 'left',
+                                          fontWeight: 400
+                                        }}
+                                      >
                                         {UNIT_INCREASE_NOTE}
-                                        <div className="scenario-tooltip-arrow"></div>
                                       </div>
                                     )}
                                   </span>

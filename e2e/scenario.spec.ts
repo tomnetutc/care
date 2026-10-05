@@ -443,9 +443,25 @@ test("Attitudes & Personality Traits use the corrected '1 Unit Increase*' defini
   expect(await value('Personal Resilience')).toBe('+9.1%');
   expect(await value('Social Engagement')).toBe('Not in model');
 
-  // The asterisk carries a hover note.
-  await rowsFor('Community Resilience').first().getByText('1 Unit Increase*').hover();
-  await expect(section.locator('.scenario-tooltip').first()).toContainText('one-unit increase');
+  // The asterisk carries a hover note, and it must be fully visible on EVERY row. The Section 3 cards
+  // are overflow:hidden, so a note positioned inside them was cut off on the last row (found on the
+  // live page). pointer-events is switched on only so elementFromPoint can see the tooltip.
+  await page.addStyleTag({ content: '.scenario-tooltip{pointer-events:auto !important}' });
+  for (const v of ['Personal Resilience', 'Community Resilience', 'Social Engagement']) {
+    await rowsFor(v).first().getByText('1 Unit Increase*').hover();
+    const tip = section.locator('.scenario-tooltip').filter({ hasText: 'one-unit increase' });
+    await expect(tip).toBeVisible();
+    const box = (await tip.boundingBox())!;
+    const hits = await page.evaluate(({ x, y, w, h }) => {
+      let ok = 0;
+      for (const fx of [0.05, 0.5, 0.95]) for (const fy of [0.1, 0.5, 0.9]) {
+        const el = document.elementFromPoint(x + w * fx, y + h * fy);
+        if (el && el.closest('.scenario-tooltip')) ok++;
+      }
+      return ok;
+    }, { x: box.x, y: box.y, w: box.width, h: box.height });
+    expect(hits, `${v}: hover note is clipped or covered (${hits}/9 points visible)`).toBe(9);
+  }
 
   await pick('stay_home');
   expect(await value('Community Resilience')).toBe('+7.6%');
