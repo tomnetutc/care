@@ -474,8 +474,13 @@ export interface ContinuousATEOptions {
   event: string;
   /** The continuous variable's coefficient name, e.g. 'PR', 'CR', 'SE'. */
   variable: string;
-  /** Multiplier on the estimation sample's SD of `variable` (Jinghai: 0.01 = "+1% of SD"). */
-  mult: number;
+  /**
+   * Additive shift on the construct's own (already normalized) scale. Jinghai's
+   * definition (2026-10-04, consistent with the paper) is 1: "a one-unit
+   * increase from each respondent's current construct value". It is NOT a
+   * fraction of a standard deviation - the SD is not used anywhere.
+   */
+  shift: number;
 }
 
 export interface ContinuousATEResult extends ATEResult {
@@ -489,13 +494,12 @@ export interface ContinuousATEResult extends ATEResult {
  * scenario is simply each person's own full observed prediction (every
  * coefficient, including their real severity dummies, at their real row
  * values) with NO shift at all. The comparison scenario adds one uniform
- * scalar shift - coefficient[variable] * mult * SD(variable) - to every
- * person's base predictor, where SD is the standard deviation of `variable`
- * computed over THIS activity's own estimation sample (same rows
- * buildEstimationSample returns for this event/activity, not pooled across
- * events or activities, and not a population SD - matches pandas' default
- * sample SD, ddof=1, which is what `sample[var].std()` computes in the
- * notebook).
+ * scalar shift - coefficient[variable] * shift - to every person's base
+ * predictor, i.e. each respondent's own score on the construct goes up by
+ * exactly `shift` (1.0 = "1 Unit Increase", Jinghai's corrected definition of
+ * 2026-10-04, matching ate_continuous() in ATE_Calculation_10.4.ipynb). This
+ * replaces the earlier "+1% of SD" definition (coefficient * 0.01 * SD), which
+ * he withdrew as wrong; no standard deviation is involved any more.
  */
 export function computeContinuousATE(
   eventModelData: EventModelData,
@@ -503,7 +507,7 @@ export function computeContinuousATE(
   options: ContinuousATEOptions
 ): ContinuousATEResult[] {
   const results: ContinuousATEResult[] = [];
-  const { event, variable, mult } = options;
+  const { event, variable, shift: unitShift } = options;
 
   for (const [activity, modelConfig] of Object.entries(eventModelData)) {
     try {
@@ -525,20 +529,11 @@ export function computeContinuousATE(
       }
 
       const observedPredictors = prepared.observedZ;
-      const values = prepared.values[variable];
-
-      // Sample standard deviation (ddof=1), matching pandas' default .std().
-      const n = values.length;
-      let total = 0;
-      for (let i = 0; i < n; i++) total += values[i];
-      const mean = total / n;
-      let squares = 0;
-      for (let i = 0; i < n; i++) squares += (values[i] - mean) ** 2;
-      const sd = Math.sqrt(squares / (n - 1));
-      const shift = coefficients[variable] * mult * sd;
+      const n = observedPredictors.length;
+      const linearShift = coefficients[variable] * unitShift;
 
       const shiftedPredictors = new Float64Array(n);
-      for (let i = 0; i < n; i++) shiftedPredictors[i] = observedPredictors[i] + shift;
+      for (let i = 0; i < n; i++) shiftedPredictors[i] = observedPredictors[i] + linearShift;
 
       const base = averageProbabilities(observedPredictors, modelConfig);
       const comparison = averageProbabilities(shiftedPredictors, modelConfig);

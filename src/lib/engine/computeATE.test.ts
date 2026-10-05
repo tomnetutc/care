@@ -475,14 +475,14 @@ describe('Household Income (3 tiers) and Housing Type (binary) group definitions
   });
 });
 
-describe('computeContinuousATE - PR / CR / SE (ate_continuous, mult=0.01 "+1% of SD")', () => {
+describe('computeContinuousATE - PR / CR / SE (ate_continuous, shift=1 "1 Unit Increase")', () => {
   const events = Object.keys(modelData);
   const VARS = ['PR', 'CR', 'SE'];
 
   it.each(events.flatMap(event => VARS.map(variable => ({ event, variable }))))(
     '$event / $variable: valid 3-level results for every activity; inModel=false implies ATE exactly 0',
     ({ event, variable }) => {
-      const results = computeContinuousATE(modelData[event], getEventRows(event), { event, variable, mult: 0.01 });
+      const results = computeContinuousATE(modelData[event], getEventRows(event), { event, variable, shift: 1 });
       expect(results.length).toBe(Object.keys(modelData[event]).length);
       for (const r of results) {
         expect(r.isValid).toBe(true);
@@ -497,7 +497,7 @@ describe('computeContinuousATE - PR / CR / SE (ate_continuous, mult=0.01 "+1% of
   it('inModel matches whether the variable is a coefficient of that activity\'s model', () => {
     for (const event of events) {
       for (const variable of VARS) {
-        const results = computeContinuousATE(modelData[event], getEventRows(event), { event, variable, mult: 0.01 });
+        const results = computeContinuousATE(modelData[event], getEventRows(event), { event, variable, shift: 1 });
         for (const r of results) {
           expect(r.inModel).toBe(variable in modelData[event][r.activity].coefficients);
         }
@@ -505,8 +505,8 @@ describe('computeContinuousATE - PR / CR / SE (ate_continuous, mult=0.01 "+1% of
     }
   });
 
-  // Numeric correctness (+1% of SD and +1 SD, every model) is checked against Jinghai's own
-  // answer key in ateSegmentAnswerKey.test.ts.
+  // Numeric correctness (1 Unit Increase, every model) is checked against Jinghai's own
+  // answer key (2026-10-04) in ateSegmentAnswerKey.test.ts.
 });
 
 describe('computeSegmentATEs - the full set of discrete groups (matches Jinghai\'s ATE_segments_by_model.xlsx)', () => {

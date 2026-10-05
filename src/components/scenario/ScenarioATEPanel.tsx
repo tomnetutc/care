@@ -16,6 +16,13 @@ type ExpandedGroupsKey = 'attitudes' | 'socioDemo' | 'household' | 'community';
 
 const GBU_NOTE = "This was a 5-level question from very unlikely to very likely. Do less corresponds to very or somewhat unlikely. About the same corresponds to neutral. Do more corresponds to very or somewhat likely.";
 
+// Attitudes & Personality Traits (PR / CR / SE) use Jinghai's corrected treatment definition
+// (2026-10-04, ATE_Calculation_10.4.ipynb): a one-unit increase on the construct's normalized
+// scale from each respondent's current value, consistent with the paper. His workbook labels the
+// row "1 Unit Increase*" (asterisk included). Note wording is a draft built from his own words.
+const UNIT_INCREASE_LABEL = '1 Unit Increase*';
+const UNIT_INCREASE_NOTE = "A one-unit increase on the construct's normalized scale, applied to each respondent's current value.";
+
 const SAMPLE_MISMATCH_NOTE = "Verified data issue: Jinghai's reported fitting sample for this specific model is far smaller than what his own method reproduces from the data he sent (e.g. Power Outage → Go about business as usual: reported n=892 vs. 2,381 recomputed). Numbers below use the full, correctly-filtered sample - the statistically sound choice - but the underlying coefficients may need to be refit by Jinghai. Flagged for his review; not a display bug.";
 
 const ANTICIPATED_CHANGE_INDEX: Record<string, number> = {
@@ -198,8 +205,8 @@ const ScenarioATEPanel: React.FC = () => {
   // Do less / About the same / Do more values is displayed.
 
   // Personal Resilience / Community Resilience / Social Engagement: real
-  // ate_continuous results (mult=0.01, "+1% of SD", confirmed by Jinghai),
-  // for the currently selected activity. 0 both while continuousResults
+  // ate_continuous results ("1 Unit Increase": +1.0 on the construct's own scale,
+  // Jinghai 2026-10-04), for the currently selected activity. 0 both while continuousResults
   // hasn't loaded yet and when the variable isn't in that activity's model
   // (computeContinuousATE's inModel=false already returns [0,0,0]).
   const getContinuousAte = (variable: string): Ate => {
@@ -231,11 +238,11 @@ const ScenarioATEPanel: React.FC = () => {
     attitudes: {
       title: 'Attitudes & Personality Traits',
       // Continuous standardized factor scores. Base = each person's own
-      // observed value; comparison = "+1% of SD" (ate_continuous, mult=0.01).
+      // current value; comparison = "1 Unit Increase*" (ate_continuous, shift=1).
       variables: [
-        { variable: 'Personal Resilience', baseLevel: 'Observed value', comparisons: [{ treatmentLevel: '+1% of SD', ate: getContinuousAte('Personal Resilience') }] },
-        { variable: 'Community Resilience', baseLevel: 'Observed value', comparisons: [{ treatmentLevel: '+1% of SD', ate: getContinuousAte('Community Resilience') }] },
-        { variable: 'Social Engagement', baseLevel: 'Observed value', comparisons: [{ treatmentLevel: '+1% of SD', ate: getContinuousAte('Social Engagement') }] }
+        { variable: 'Personal Resilience', baseLevel: 'Current value', comparisons: [{ treatmentLevel: UNIT_INCREASE_LABEL, ate: getContinuousAte('Personal Resilience') }] },
+        { variable: 'Community Resilience', baseLevel: 'Current value', comparisons: [{ treatmentLevel: UNIT_INCREASE_LABEL, ate: getContinuousAte('Community Resilience') }] },
+        { variable: 'Social Engagement', baseLevel: 'Current value', comparisons: [{ treatmentLevel: UNIT_INCREASE_LABEL, ate: getContinuousAte('Social Engagement') }] }
       ]
     },
     socioDemo: {
@@ -755,7 +762,24 @@ const ScenarioATEPanel: React.FC = () => {
                             <tr key={`${vi}-${ci}`} className="scenario-table-row">
                               <td className="scenario-table-cell scenario-table-cell-bold">{ci === 0 ? v.variable : ''}</td>
                               <td className="scenario-table-cell">{ci === 0 ? v.baseLevel : ''}</td>
-                              <td className="scenario-table-cell">{c.treatmentLevel}</td>
+                              <td className="scenario-table-cell">
+                                {c.treatmentLevel === UNIT_INCREASE_LABEL ? (
+                                  <span
+                                    className="scenario-tooltip-wrapper"
+                                    onMouseEnter={() => setShowTooltip(`unitIncrease-${vi}`)}
+                                    onMouseLeave={() => setShowTooltip(null)}
+                                    style={{ cursor: 'help' }}
+                                  >
+                                    {c.treatmentLevel}
+                                    {showTooltip === `unitIncrease-${vi}` && (
+                                      <div className="scenario-tooltip" style={{ textAlign: 'left', fontWeight: 400 }}>
+                                        {UNIT_INCREASE_NOTE}
+                                        <div className="scenario-tooltip-arrow"></div>
+                                      </div>
+                                    )}
+                                  </span>
+                                ) : c.treatmentLevel}
+                              </td>
                               <td className="scenario-table-cell">
                                 <div className="scenario-ate-display">
                                   {c.ate.loading ? (

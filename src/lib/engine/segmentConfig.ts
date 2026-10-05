@@ -5,8 +5,9 @@
  * eventConfig.ts.
  *
  * Discrete groups only. Continuous attitude scores (PR/CR/SE) are not
- * defined here - handled separately via computeContinuousATE (mult=0.01,
- * "+1% of SD", confirmed by Jinghai). "Risk Aversion" was dropped: no such
+ * defined here - handled separately via computeContinuousATE (shift=1,
+ * "1 Unit Increase", Jinghai 2026-10-04; the earlier "+1% of SD" definition was
+ * withdrawn as wrong). "Risk Aversion" was dropped: no such
  * variable exists in the models.
  *
  * Labels, base/comparison wording, and grouping (`label` on each entry

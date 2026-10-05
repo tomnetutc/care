@@ -1,5 +1,7 @@
 # Jinghai Huo, 2026-10-01: Section 3 (Population Segment Analysis) answer key
 
+> **Superseded by `data/jinghai_2026-10-04/`** for the PR/CR/SE rows (his "+1% of SD" / "+1 SD" definition was withdrawn). The discrete rows are identical in both files. Kept for history only; no test reads this folder any more.
+
 `ATE_segments_by_model.xlsx` is Jinghai's file, unchanged: one sheet per event x activity model
 (35) plus an `index` sheet. Each model sheet has 41 rows (35 discrete comparisons + PR/CR/SE at
 "+1% of SD" and "+1 SD"), with `in_model`, P_base, P_comp, ATE_abs and ATE_pct for Do less /

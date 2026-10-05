@@ -42,10 +42,13 @@ import { SEGMENT_GROUPS } from '../lib/engine/segmentConfig';
 export { EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE };
 
 // Population Segment Analysis's continuous attitude rows (Personal
-// Resilience, Community Resilience, Social Engagement). Per Jinghai,
-// mult=0.01 ("+1% of SD") is the confirmed shift size.
+// Resilience, Community Resilience, Social Engagement). Per Jinghai
+// (2026-10-04, ATE_Calculation_10.4.ipynb) the treatment is "1 Unit Increase":
+// +1.0 on the construct's own normalized scale from each respondent's current
+// value, consistent with the paper. This replaces the earlier "+1% of SD"
+// definition, which he withdrew as wrong (it produced near-zero effects).
 const CONTINUOUS_VARIABLES = ['PR', 'CR', 'SE'];
-const CONTINUOUS_MULT = 0.01;
+const CONTINUOUS_SHIFT = 1;
 
 /** Key used in segmentResults for one (group, comparison) pair - e.g. "age::65+". */
 export function segmentResultKey(groupKey: string, comparisonLabel: string): string {
@@ -250,7 +253,7 @@ export const useScenarioATE = () => {
         continuousResults[variable] = computeContinuousATE(eventModelData, filteredData, {
           event: eventConfig.csvEvent,
           variable,
-          mult: CONTINUOUS_MULT
+          shift: CONTINUOUS_SHIFT
         });
       }
 

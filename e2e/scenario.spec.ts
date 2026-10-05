@@ -205,7 +205,7 @@ test('Population Segment table: no Risk Aversion, 3-tier income, binary housing,
     await activitySelectForAttitudes.selectOption({ value: activity });
     await page.waitForTimeout(150);
     for (const v of Object.keys(finiteSeen)) {
-      await expect(rowsFor(v)).toContainText('+1% of SD');
+      await expect(rowsFor(v)).toContainText('1 Unit Increase');
       await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
       const value = await readCell(rowsFor(v).locator('.scenario-ate-display-value').first());
       if (value === 'Not in model') continue;
@@ -412,4 +412,49 @@ test("Section 3 rows and values match Jinghai's ATE_segments_by_model.xlsx (Empl
   await page.waitForTimeout(100);
   expect(await cell('Employment status', 'Non-worker')).toBe('-0.08');
   expect(await cell('Age Group', '65+')).toBe('-0.05');
+});
+
+test("Attitudes & Personality Traits use the corrected '1 Unit Increase*' definition and match Jinghai's 2026-10-04 workbook", async ({ page }) => {
+  // Expected values are read straight from his 2026-10-04 ATE_segments_by_model.xlsx (Do more column).
+  // The withdrawn "+1% of SD" definition gave values ~100x smaller (e.g. ~+0.1% here), so these pins
+  // fail loudly if the old definition ever comes back.
+  //   heat_Delivery : Community Resilience +8.8077% / +0.0201 ; Personal Resilience +9.1311% / +0.0208 ;
+  //                   Social Engagement not in model
+  //   heat_Home (stay_home): Community Resilience +7.5537% / +0.0334
+  await page.goto('/#/scenario');
+  const segmentCard = page.locator('.scenario-section-card').filter({ has: page.locator('.scenario-demographic-groups') });
+  const section = segmentCard.locator('.scenario-demographic-groups');
+  await expect(section).toBeVisible({ timeout: 15_000 });
+  const rowsFor = (variable: string) => section.locator('tr', { has: page.locator('td', { hasText: variable }) });
+  const value = (variable: string) => readCell(rowsFor(variable).first().locator('.scenario-ate-display-value').first());
+  const pick = async (activity: string) => {
+    await segmentCard.locator('select.scenario-select').selectOption({ value: activity });
+    await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
+    await page.waitForTimeout(200);
+  };
+
+  await pick('delivery');
+  for (const v of ['Personal Resilience', 'Community Resilience', 'Social Engagement']) {
+    await expect(rowsFor(v).first()).toContainText('Current value');
+    await expect(rowsFor(v).first()).toContainText('1 Unit Increase*');
+    await expect(rowsFor(v).first()).not.toContainText('SD');
+  }
+  expect(await value('Community Resilience')).toBe('+8.8%');
+  expect(await value('Personal Resilience')).toBe('+9.1%');
+  expect(await value('Social Engagement')).toBe('Not in model');
+
+  // The asterisk carries a hover note.
+  await rowsFor('Community Resilience').first().getByText('1 Unit Increase*').hover();
+  await expect(section.locator('.scenario-tooltip').first()).toContainText('one-unit increase');
+
+  await pick('stay_home');
+  expect(await value('Community Resilience')).toBe('+7.6%');
+
+  // Absolute format
+  await segmentCard.locator('.scenario-ate-toggle button', { hasText: 'Absolute ATE' }).click();
+  await page.waitForTimeout(100);
+  expect(await value('Community Resilience')).toBe('+0.03');
+  await pick('delivery');
+  expect(await value('Community Resilience')).toBe('+0.02');
+  expect(await value('Personal Resilience')).toBe('+0.02');
 });

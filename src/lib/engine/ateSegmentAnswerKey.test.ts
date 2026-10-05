@@ -1,10 +1,15 @@
 /**
  * Independent check of Section 3 (Population Segment Analysis) against Jinghai's own answer key
- * (data/jinghai_2026-10-01/ATE_segments_by_model.xlsx, flattened to the .csv next to it):
- * all 5 events, all 35 models, 41 rows each (35 discrete comparisons + PR/CR/SE at "+1% of SD"
- * and "+1 SD") = 1,435 rows x 3 response categories. Every row's in-model flag, P_base, P_comp,
- * ATE_abs and ATE_pct must match. Tolerances reflect the precision of his file (his percentages
- * are stored to ~1e-4).
+ * (data/jinghai_2026-10-04/ATE_segments_by_model.xlsx, flattened to the .csv next to it):
+ * all 5 events, all 35 models, 38 rows each (35 discrete comparisons + PR/CR/SE at
+ * "1 Unit Increase*") = 1,330 rows x 3 response categories. Every row's in-model flag, P_base,
+ * P_comp, ATE_abs and ATE_pct must match. Tolerances reflect the precision of his file (his
+ * percentages are stored to ~1e-4).
+ *
+ * 2026-10-04: Jinghai corrected the treatment definition for the continuous constructs (the old
+ * "+1% of SD" / "+1 SD" rows were wrong): the treatment is now a one-unit increase from each
+ * respondent's current construct value, consistent with the paper. The 35 discrete rows per
+ * model are unchanged from his 2026-10-01 file.
  */
 import * as fs from 'fs';
 import * as path from 'path';
@@ -65,9 +70,9 @@ const DISCRETE: Record<string, [string, string]> = {
 };
 const CONTINUOUS: Record<string, string> = { 'Personal Resilience': 'PR', 'Community Resilience': 'CR', 'Social Engagement': 'SE' };
 
-describe("Section 3 vs Jinghai's ATE_segments_by_model.xlsx (1,435 rows x 3 responses)", () => {
+describe("Section 3 vs Jinghai's ATE_segments_by_model.xlsx (1,330 rows x 3 responses)", () => {
   const md: ModelDataByEvent = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/models/model_coeffs_by_event.json'), 'utf8'));
-  const key = parse(fs.readFileSync(path.join(ROOT, 'data/jinghai_2026-10-01/ATE_segments_by_model.csv'), 'utf8'));
+  const key = parse(fs.readFileSync(path.join(ROOT, 'data/jinghai_2026-10-04/ATE_segments_by_model.csv'), 'utf8'));
   const dataCache: Record<string, Record<string, string>[]> = {};
   const resultCache: Record<string, any[]> = {};
 
@@ -79,8 +84,9 @@ describe("Section 3 vs Jinghai's ATE_segments_by_model.xlsx (1,435 rows x 3 resp
     const id = `${ev}|${variable}|${comparison}`;
     if (resultCache[id]) return resultCache[id];
     if (CONTINUOUS[variable]) {
-      const mult = comparison === '+1% of SD' ? 0.01 : 1;
-      return (resultCache[id] = computeContinuousATE(md[ev], eventRows(ev), { event: ev, variable: CONTINUOUS[variable], mult }));
+      // The only continuous comparison in his file is "1 Unit Increase*": +1.0 on the construct's own scale.
+      expect(comparison).toBe('1 Unit Increase*');
+      return (resultCache[id] = computeContinuousATE(md[ev], eventRows(ev), { event: ev, variable: CONTINUOUS[variable], shift: 1 }));
     }
     const [groupKey, label] = DISCRETE[`${variable}|${comparison}`];
     const g = SEGMENT_GROUPS[groupKey];
@@ -93,8 +99,8 @@ describe("Section 3 vs Jinghai's ATE_segments_by_model.xlsx (1,435 rows x 3 resp
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
-  it('has the expected shape: 35 models x 41 rows, and every key row maps to a configured comparison', () => {
-    expect(key.length).toBe(35 * 41);
+  it('has the expected shape: 35 models x 38 rows, and every key row maps to a configured comparison', () => {
+    expect(key.length).toBe(35 * 38);
     for (const r of key) {
       const id = `${r.variable_group}|${r.comparison}`;
       expect(CONTINUOUS[r.variable_group] !== undefined || DISCRETE[id] !== undefined).toBe(true);
