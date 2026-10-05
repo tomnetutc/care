@@ -335,6 +335,13 @@ export const useScenarioATE = () => {
     return EVENT_ACTIVITY_COVERAGE[state.selectedEvent] || [];
   }, [state.selectedEvent]);
 
+  // Coefficients of the final model for (selected event, activity); null until the model data has
+  // loaded or if that activity has no model. Section 3 uses this to show only retained variables.
+  const getActivityCoefficients = useCallback((activity: string): Record<string, number> | null => {
+    const cfg = EVENT_CONFIG[state.selectedEvent];
+    return (cfg && state.modelData?.[cfg.csvEvent]?.[activity]?.coefficients) || null;
+  }, [state.modelData, state.selectedEvent]);
+
   return {
     // State
     selectedEvent: state.selectedEvent,
@@ -361,6 +368,7 @@ export const useScenarioATE = () => {
     // Utilities
     getAvailableEvents,
     getSeverityLevels,
-    getAvailableActivities
+    getAvailableActivities,
+    getActivityCoefficients
   };
 };

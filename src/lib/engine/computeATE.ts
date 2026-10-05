@@ -377,6 +377,28 @@ export function computeSeverityATEs(
   return results;
 }
 
+/**
+ * Whether a population-segment comparison involves at least one variable that is a
+ * coefficient of this activity's final model - i.e. whether the model "retained" it.
+ * Only variables whose forced value differs between base and comparison can change
+ * anything, so a comparison none of them is in the model for is a no-op (its ATE is 0
+ * and Section 3 does not show it). This is the single definition of "retained": the
+ * engine's inModel flag and the rows the page shows both use it, and it is tested
+ * against Jinghai's own in_model flag on every row of his workbook.
+ */
+export function isSegmentComparisonRetained(
+  coefficients: Record<string, number>,
+  baseSpec: Record<string, number>,
+  comparisonSpec: Record<string, number>
+): boolean {
+  return Object.keys(baseSpec).some(v => v in coefficients && baseSpec[v] !== (comparisonSpec[v] ?? 0));
+}
+
+/** Whether a continuous construct (PR / CR / SE) is a coefficient of this activity's final model. */
+export function isContinuousRetained(coefficients: Record<string, number>, variable: string): boolean {
+  return variable in coefficients;
+}
+
 export interface SegmentATEOptions {
   event: string;
   /** {variable: forced value} for the base level - must list EVERY dummy in the group (siblings set to 0). */
@@ -424,11 +446,8 @@ export function computeSegmentATEs(
 
       const coefficients = modelConfig.coefficients;
       const inModelVars = Object.keys(baseSpec).filter(v => v in coefficients);
-      // Only variables whose forced value differs between base and comparison can
-      // change anything; if none of those is in the model the comparison is a no-op.
-      const changedInModelVars = inModelVars.filter(v => baseSpec[v] !== (comparisonSpec[v] ?? 0));
-
-      if (changedInModelVars.length === 0) {
+      // A comparison none of whose changed variables is in the model is a no-op.
+      if (!isSegmentComparisonRetained(coefficients, baseSpec, comparisonSpec)) {
         results.push({
           activity, controlProbabilities: [], treatmentProbabilities: [],
           ate: [0, 0, 0], levelLabels: RESPONSE_LABELS, conservationCheck: 0,
@@ -519,7 +538,7 @@ export function computeContinuousATE(
       }
 
       const coefficients = modelConfig.coefficients;
-      if (!(variable in coefficients)) {
+      if (!isContinuousRetained(coefficients, variable)) {
         results.push({
           activity, controlProbabilities: [], treatmentProbabilities: [],
           ate: [0, 0, 0], levelLabels: RESPONSE_LABELS, conservationCheck: 0,

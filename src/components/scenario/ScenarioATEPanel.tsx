@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import { useScenarioATE, segmentResultKey, EVENT_CONFIG, EVENT_ACTIVITY_COVERAGE } from '../../hooks/useScenarioATE';
 import { SEGMENT_GROUPS } from '../../lib/engine/segmentConfig';
-import { hasVerifiedSampleMismatch } from '../../lib/engine/computeATE';
+import { hasVerifiedSampleMismatch, isSegmentComparisonRetained, isContinuousRetained } from '../../lib/engine/computeATE';
 import { Sun, Snowflake, Droplets, Mountain, Zap, TrendingDown, Minus, TrendingUp, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import './ScenarioATEPanel.scss';
 
@@ -46,7 +46,13 @@ const CONTINUOUS_VARIABLE_KEY: Record<string, string> = {
  * A result with no base probability (variable not in that model, ATE = 0 by
  * construction) reports 0 for both.
  */
-interface Ate { abs: number; pct: number; inModel: boolean; /** true while the per-event numbers are still being computed */ loading?: boolean; }
+interface Ate {
+  abs: number; pct: number; inModel: boolean;
+  /** true while the per-event numbers are still being computed */
+  loading?: boolean;
+  /** false = the selected activity's final model did not retain this variable, so Section 3 hides the row (Irfan, 2026-10-05) */
+  retained?: boolean;
+}
 
 const toAte = (result: { ate: number[]; controlProbabilities: number[]; inModel?: boolean }, index: number): Ate => {
   const abs = result.ate[index] || 0;
@@ -93,7 +99,8 @@ const ScenarioATEPanel: React.FC = () => {
     setTreatmentSeverityLevel,
     setAnticipatedChange,
     getAvailableEvents,
-    getSeverityLevels
+    getSeverityLevels,
+    getActivityCoefficients
   } = useScenarioATE();
 
   const availableEvents = getAvailableEvents();
@@ -103,6 +110,8 @@ const ScenarioATEPanel: React.FC = () => {
   const eventActivities = EVENT_ACTIVITY_COVERAGE[selectedEvent] ?? [];
   const effectiveActivity = eventActivities.includes(selectedActivity) ? selectedActivity : (eventActivities[0] ?? selectedActivity);
   const severityLevels = getSeverityLevels();
+  // Final-model coefficients for the selected activity: decides which Section 3 rows exist.
+  const activityCoefficients = getActivityCoefficients(effectiveActivity);
 
   // Map event IDs to new design
   const eventMap: Record<string, { id: string; name: string; icon: any }> = {
@@ -214,12 +223,13 @@ const ScenarioATEPanel: React.FC = () => {
   // hasn't loaded yet and when the variable isn't in that activity's model
   // (computeContinuousATE's inModel=false already returns [0,0,0]).
   const getContinuousAte = (variable: string): Ate => {
-    if (!segmentsReady) return { abs: 0, pct: 0, inModel: true, loading: true }; // this event's numbers still being computed
+    const retained = activityCoefficients ? isContinuousRetained(activityCoefficients, CONTINUOUS_VARIABLE_KEY[variable]) : true;
+    if (!segmentsReady) return { abs: 0, pct: 0, inModel: true, loading: true, retained }; // this event's numbers still being computed
     const list = continuousResults[CONTINUOUS_VARIABLE_KEY[variable]];
     const result = list?.find(r => r.activity === effectiveActivity);
-    if (!result || !result.isValid) return { abs: 0, pct: 0, inModel: false };
+    if (!result || !result.isValid) return { abs: 0, pct: 0, inModel: false, retained };
     const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
-    return toAte(result, ateIndex);
+    return { ...toAte(result, ateIndex), retained };
   };
 
   // Gender / Age Group / Household Income / Housing Type / Transit Access:
@@ -229,12 +239,17 @@ const ScenarioATEPanel: React.FC = () => {
   // hasn't loaded yet and when the group isn't in that activity's model
   // (computeSegmentATEs' inModel=false already returns [0,0,0]).
   const getSegmentAte = (groupKey: string, comparisonLabel: string): Ate => {
-    if (!segmentsReady) return { abs: 0, pct: 0, inModel: true, loading: true }; // this event's numbers still being computed
+    const group = SEGMENT_GROUPS[groupKey];
+    const comparison = group?.comparisons.find(c => c.label === comparisonLabel);
+    const retained = activityCoefficients && group && comparison
+      ? isSegmentComparisonRetained(activityCoefficients, group.baseSpec, comparison.spec)
+      : true;
+    if (!segmentsReady) return { abs: 0, pct: 0, inModel: true, loading: true, retained }; // this event's numbers still being computed
     const list = segmentResults[segmentResultKey(groupKey, comparisonLabel)];
     const result = list?.find(r => r.activity === effectiveActivity);
-    if (!result || !result.isValid) return { abs: 0, pct: 0, inModel: false };
+    if (!result || !result.isValid) return { abs: 0, pct: 0, inModel: false, retained };
     const ateIndex = ANTICIPATED_CHANGE_INDEX[anticipatedChange ?? 'do_more'] ?? 2;
-    return toAte(result, ateIndex);
+    return { ...toAte(result, ateIndex), retained };
   };
 
   // Dummy data for Population Segment Analysis
@@ -297,7 +312,7 @@ const ScenarioATEPanel: React.FC = () => {
     severityAnalysis: "This analysis compares how people who experienced different severity levels of impact adjust their behavior.",
     ateDefinition: "Average Treatment Effect (ATE) measures the difference in probability of choosing a particular behavioral response when comparing two groups (e.g., those who experienced different severity levels). It quantifies how much more or less likely people are to engage in specific activities based on their prior experience.",
     ateResults: "Average Treatment Effects show probability changes.",
-    populationSegments: "Shows how population characteristics affect behavioral responses."
+    populationSegments: "Shows how population characteristics affect behavioral responses. This table reports ATE estimates only for variables retained in the final model specification. Variables not retained are not displayed because no statistically significant effect was detected; their ATE values can therefore be interpreted as zero."
   };
 
   const InfoButton = ({ tooltipKey }: { tooltipKey: string }) => {
@@ -731,8 +746,19 @@ const ScenarioATEPanel: React.FC = () => {
           </div>
 
           <div className="scenario-demographic-groups">
-            {Object.entries(demographicData).map(([key, group]) => {
+            {!activityCoefficients && (
+              <p className="scenario-config-help" aria-label="Computing">Loading model…</p>
+            )}
+            {activityCoefficients && Object.entries(demographicData).map(([key, group]) => {
               const groupKey = key as ExpandedGroupsKey;
+              // Irfan (2026-10-05): show only variables retained in the selected activity's final model.
+              // A comparison is hidden when its model did not retain it; a variable with no retained
+              // comparison disappears, and a group with no retained variable is not shown at all. The
+              // variable / base labels sit on the first row that is shown.
+              const visibleVariables = group.variables
+                .map(v => ({ ...v, comparisons: v.comparisons.filter(c => c.ate.retained !== false) }))
+                .filter(v => v.comparisons.length > 0);
+              if (visibleVariables.length === 0) return null;
               return (
               <div key={key} className="scenario-demographic-group">
                 <button 
@@ -761,7 +787,7 @@ const ScenarioATEPanel: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody className="scenario-table-body">
-                        {group.variables.map((v, vi) => 
+                        {visibleVariables.map((v, vi) => 
                           v.comparisons.map((c, ci) => (
                             <tr key={`${vi}-${ci}`} className="scenario-table-row">
                               <td className="scenario-table-cell scenario-table-cell-bold">{ci === 0 ? v.variable : ''}</td>
@@ -838,10 +864,6 @@ const ScenarioATEPanel: React.FC = () => {
             );
             })}
           </div>
-
-          <p className="scenario-config-help" style={{ marginTop: '12px' }}>
-            <strong>—</strong> means the variable was not retained in the fitted model for the selected activity (dropped during model selection), so it has no modeled effect there. It is not a measured zero.
-          </p>
 
           <div className="scenario-interpretation">
             <p className="scenario-interpretation-text">

@@ -176,46 +176,64 @@ test('Population Segment table: no Risk Aversion, 3-tier income, binary housing,
 
   const rowsFor = (variable: string) =>
     section.locator('tr', { has: page.locator('td', { hasText: variable }) });
-  // Household Income: base <$50k, comparisons $50k-$100k and $100k+ only
+  const activitySelectFirst = page.locator('.scenario-section-card')
+    .filter({ has: page.locator('.scenario-demographic-groups') })
+    .locator('select.scenario-select');
+  const pickFirst = async (activity: string) => {
+    await activitySelectFirst.selectOption({ value: activity });
+    await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
+    await page.waitForTimeout(150);
+  };
+  // Only retained variables are shown (Irfan, 2026-10-05), so each label check runs in a model that keeps it.
+  // Household Income: base <$50k, comparisons $50k-$100k and $100k+ only (heat / work_from_home retains it).
+  await pickFirst('work_from_home');
   const incomeTable = section.locator('table', { hasText: 'Household Income' });
   await expect(incomeTable).toContainText('Less than $50,000');
   await expect(incomeTable).toContainText('$50,000 - $100,000');
   await expect(incomeTable).toContainText('$100,000 or higher');
   await expect(incomeTable).not.toContainText('$25,000');
-  await expect(incomeTable).not.toContainText('Apartment');
-  await expect(incomeTable).not.toContainText('Mobile home');
-  await expect(incomeTable).toContainText('Not stand-alone');
-  await expect(incomeTable).toContainText('Stand-alone house');
+  // Housing type is binary: Not stand-alone -> Stand-alone house (heat / use_car retains it).
+  await pickFirst('use_car');
+  const housingTable = section.locator('table', { hasText: 'Stand-alone house' });
+  await expect(housingTable).not.toContainText('Apartment');
+  await expect(housingTable).not.toContainText('Mobile home');
+  await expect(housingTable).toContainText('Not stand-alone');
+  await expect(housingTable).toContainText('Stand-alone house');
 
   // No more TBD placeholder anywhere - PR/CR/SE now show real computed values.
   await expect(section).not.toContainText('TBD');
   await expect(section.locator('.scenario-ate-placeholder')).toHaveCount(0);
 
-  // Each PR/CR/SE row is either a real finite number or "Not in model" (the
-  // variable wasn't retained in that activity's fitted model). Across heat's 9
-  // activity models every one of the three is in-model somewhere, so each must
-  // show at least one real, finite, computed value - and never NaN/TBD.
+  // Each PR/CR/SE row is shown only in the activities whose final model retained it (Irfan,
+  // 2026-10-05: not-retained variables are hidden, not shown as a dash). When shown it must be a
+  // real finite number, never NaN/TBD. Which of heat's 9 activity models retain each construct is
+  // read from Jinghai's 2026-10-04 ATE_segments_by_model.xlsx (in_model = TRUE):
+  const RETAINED_IN_HEAT: Record<string, string[]> = {
+    'Personal Resilience': ['use_car', 'delivery', 'pick_up', 'use_transit', 'go_business_as_usual'],
+    'Community Resilience': ['delivery', 'stay_home', 'go_business_as_usual', 'work_from_home', 'work_from_office'],
+    'Social Engagement': ['use_car', 'pick_up']
+  };
   const activitySelectForAttitudes = page.locator('.scenario-section-card')
     .filter({ has: page.locator('.scenario-demographic-groups') })
     .locator('select.scenario-select');
   const activityValues = await activitySelectForAttitudes.locator('option').evaluateAll(o => o.map(x => (x as HTMLOptionElement).value));
   expect(activityValues.length).toBe(9);
-  const finiteSeen: Record<string, boolean> = { 'Personal Resilience': false, 'Community Resilience': false, 'Social Engagement': false };
+  const shownIn: Record<string, string[]> = { 'Personal Resilience': [], 'Community Resilience': [], 'Social Engagement': [] };
   for (const activity of activityValues) {
     await activitySelectForAttitudes.selectOption({ value: activity });
+    await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
     await page.waitForTimeout(150);
-    for (const v of Object.keys(finiteSeen)) {
+    for (const v of Object.keys(shownIn)) {
+      if ((await rowsFor(v).count()) === 0) continue; // not retained in this activity's model -> hidden
       await expect(rowsFor(v)).toContainText('1 Unit Increase');
-      await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
       const value = await readCell(rowsFor(v).locator('.scenario-ate-display-value').first());
-      if (value === 'Not in model') continue;
       const parsed = parseFloat(value.replace('%', '').replace('+', ''));
       expect(Number.isFinite(parsed), `${v} / ${activity}: "${value}" is not a finite number`).toBe(true);
-      finiteSeen[v] = true;
+      shownIn[v].push(activity);
     }
   }
-  for (const [v, seen] of Object.entries(finiteSeen)) {
-    expect(seen, `${v} never showed a real computed value in any activity`).toBe(true);
+  for (const [v, expected] of Object.entries(RETAINED_IN_HEAT)) {
+    expect(shownIn[v].sort(), `${v} is shown in the wrong set of heat activities`).toEqual([...expected].sort());
   }
 });
 
@@ -232,17 +250,18 @@ test('Population Segment table is reactive to Activity and Behavioral Response (
   //   female (Gender)          : go_business_as_usual only
   //   age_3150 (Age 31-50)     : use_transit, go_business_as_usual
   //   in50 ($50k-$100k income) : work_from_home, work_from_office
-  // A variable that is NOT in an activity's model renders "Not in model", so
+  // A variable that is NOT in an activity's model has no row, so
   // reactivity is asserted between two in-model activities where possible
-  // (numbers must differ) and between in-model and not-in-model otherwise.
+  // (numbers must differ) and between in-model and not-shown otherwise.
   await page.goto('/#/scenario');
   const section = page.locator('.scenario-demographic-groups');
   await expect(section).toBeVisible({ timeout: 15_000 });
 
   const rowsFor = (variable: string) =>
     section.locator('tr', { has: page.locator('td', { hasText: variable }) });
+  // A variable whose final model did not retain it has no row at all ('Not shown').
   const firstValue = async (variable: string) =>
-    readCell(rowsFor(variable).locator('.scenario-ate-display-value').first());
+    (await rowsFor(variable).count()) === 0 ? 'Not shown' : readCell(rowsFor(variable).locator('.scenario-ate-display-value').first());
   const isNumber = (v: string) => Number.isFinite(parseFloat(v.replace('%', '').replace('+', '')));
 
   const activitySelect = page.locator('.scenario-section-card')
@@ -253,8 +272,8 @@ test('Population Segment table is reactive to Activity and Behavioral Response (
   // --- Activity reactivity ---
   await pick('use_car');
   const useCar = { gender: await firstValue('Gender'), age: await firstValue('Age Group'), income: await firstValue('Household Income') };
-  expect(useCar, 'Gender/Age/Income are all absent from heat use_car, so all must read "Not in model"')
-    .toEqual({ gender: 'Not in model', age: 'Not in model', income: 'Not in model' });
+  expect(useCar, 'Gender/Age/Income are all absent from heat use_car, so none of them may be shown')
+    .toEqual({ gender: 'Not shown', age: 'Not shown', income: 'Not shown' });
 
   await pick('go_business_as_usual');
   const gbu = { gender: await firstValue('Gender'), age: await firstValue('Age Group') };
@@ -313,7 +332,7 @@ test('Percent ATE is relative change and Absolute ATE is the probability differe
   await expect(carRow.locator('.scenario-ate-value')).toHaveText('+0.042');
 });
 
-test('Section 3 only offers the activities the selected event has a model for, and flags variables not in the model', async ({ page }) => {
+test('Section 3 only offers the activities the selected event has a model for, and hides variables not retained in the model', async ({ page }) => {
   await page.goto('/#/scenario');
   const segmentCard = page.locator('.scenario-section-card').filter({ has: page.locator('.scenario-demographic-groups') });
   const activitySelect = segmentCard.locator('select.scenario-select');
@@ -322,11 +341,17 @@ test('Section 3 only offers the activities the selected event has a model for, a
     await page.getByText(buttonLabel, { exact: true }).click();
     await expect(activitySelect.locator('option')).toHaveCount(expectedActivityCount);
   }
-  // Heat / use_car has no Gender term -> its cell must say so instead of "0.0%".
+  // Heat / use_car has no Gender term -> there is no Gender row at all (and no "0.0%" or dash stand-in),
+  // while a variable it does keep (Household Size) is there.
   await page.getByText('Extreme Heat', { exact: true }).click();
   await activitySelect.selectOption({ value: 'use_car' });
-  await expect(segmentCard.locator('tr', { hasText: 'Gender' }).locator('.scenario-ate-display-value').first()).toHaveAttribute('aria-label', 'Not in model');
-  await expect(segmentCard).toContainText('not a measured zero');
+  await expect(segmentCard.locator('[aria-label="Computing"]')).toHaveCount(0);
+  await expect(segmentCard.locator('tr', { hasText: 'Gender' })).toHaveCount(0);
+  await expect(segmentCard.locator('tr', { hasText: 'Household Size' })).toHaveCount(1);
+  await expect(segmentCard.locator('[aria-label="Not in model"]')).toHaveCount(0);
+  // The old "— means not retained ... It is not a measured zero" legend is gone: it would contradict
+  // Irfan's note (not-retained variables "can be interpreted as zero").
+  await expect(segmentCard).not.toContainText('not a measured zero');
 });
 
 test('Interactions do not block the main thread (performance regression guard)', async ({ page }) => {
@@ -370,61 +395,115 @@ test('Interactions do not block the main thread (performance regression guard)',
   expect(worst, `longest main-thread block was ${worst} ms (all long tasks: ${JSON.stringify(longTasks)})`).toBeLessThan(1000);
 });
 
-test("Section 3 rows and values match Jinghai's ATE_segments_by_model.xlsx (Employment status, Race, per-comparison flag)", async ({ page }) => {
-  // Expected values are read straight from heat_Delivery in his workbook (Do more column):
-  //   Employment status Worker -> Non-worker : ATE_pct -29.0484, ATE_abs -0.0768
-  //   Age Group 18-30 -> 65+                 : ATE_pct -20.0019, ATE_abs -0.0482
-  //   Age Group 18-30 -> 31-50 / 51-65       : in_model FALSE (only age_65p is in this model)
+/** Shared Section 3 helpers for the "only retained variables are shown" tests below. */
+async function openSection3(page: Page, event: string, activity: string) {
   await page.goto('/#/scenario');
   const segmentCard = page.locator('.scenario-section-card').filter({ has: page.locator('.scenario-demographic-groups') });
   const section = segmentCard.locator('.scenario-demographic-groups');
   await expect(section).toBeVisible({ timeout: 15_000 });
-  await segmentCard.locator('select.scenario-select').selectOption({ value: 'delivery' });
+  if (event !== 'Extreme Heat') await page.getByText(event, { exact: true }).click();
+  await segmentCard.locator('select.scenario-select').selectOption({ value: activity });
   await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(250);
+  return { segmentCard, section };
+}
+
+test("Section 3 shows only the rows the model retained, and they match Jinghai's workbook (heat / having food delivered)", async ({ page }) => {
+  // Irfan (2026-10-05): show ATE values only for variables retained in each final model. Expected rows and
+  // values are read from heat_Delivery in Jinghai's 2026-10-04 ATE_segments_by_model.xlsx (in_model = TRUE,
+  // Do more column):
+  //   Age Group 18-30 -> 65+            ATE_pct -20.0019  ATE_abs -0.0482   (31-50 and 51-65: not retained -> no rows)
+  //   Employment status -> Non-worker   ATE_pct -29.0484  ATE_abs -0.0768
+  // 11 retained rows in all (9 discrete + Community Resilience + Personal Resilience), in all 4 groups.
+  const { segmentCard, section } = await openSection3(page, 'Extreme Heat', 'delivery');
+
+  await expect(section.locator('tbody tr')).toHaveCount(11);
+  await expect(section.locator('.scenario-demographic-group')).toHaveCount(4);
+  for (const hidden of ['Gender', 'Race', 'Land-use Diversity', 'Social Engagement', 'Education']) {
+    await expect(section.locator('tr', { hasText: hidden }), `${hidden} is not retained in heat_Delivery and must not be shown`).toHaveCount(0);
+  }
+  // No dash / "Not in model" stand-ins anywhere.
+  await expect(section.locator('[aria-label="Not in model"]')).toHaveCount(0);
 
   const row = (variable: string, comparison: string) =>
     section.locator('tr', { has: page.locator('td', { hasText: variable }) }).filter({ has: page.locator('td', { hasText: comparison }) });
-  // Only the first row of a multi-row group carries the variable name, so rows are also
-  // addressable by their (unique-within-the-group) Comparison column text alone.
-  const byComparison = (comparison: string) =>
-    section.locator('tr').filter({ has: page.locator('td:nth-child(3)', { hasText: new RegExp(`^${comparison.replace(/[+$]/g, '\\$&')}$`) }) });
-  const cell = (variable: string, comparison: string) =>
-    readCell((variable === 'Age Group' ? byComparison(comparison) : row(variable, comparison)).first().locator('.scenario-ate-display-value').first());
+  const ageRows = section.locator('tr').filter({ has: page.locator('td:nth-child(2)', { hasText: '18-30' }) });
+  const cell = (r: Locator) => readCell(r.first().locator('.scenario-ate-display-value').first());
 
-  // Employment status is a real row (it is in 14 of the 35 models and was missing before).
-  await expect(row('Employment status', 'Non-worker')).toHaveCount(1);
-  await expect(section.locator('tr', { hasText: 'Employment status' }).first()).toContainText('Worker');
-  expect(await cell('Employment status', 'Non-worker')).toBe('-29.0%');
-  // Race is one group with "Other race" as the base, not three independent toggles.
-  await expect(section.locator('tr', { hasText: 'Race' }).first()).toContainText('Other race');
-  await expect(section.locator('tr', { hasText: 'Not White' })).toHaveCount(0);
-  // Land-use Diversity: Not high -> High (Medium is not a model term anywhere).
-  await expect(section.locator('tr', { hasText: 'Land-use Diversity' }).first()).toContainText('Not high');
+  // Per-comparison hiding: only the 65+ dummy is in this model. 31-50 / 51-65 have no row, and the
+  // variable + base labels sit on the first row that IS shown (65+).
+  await expect(section.locator('tr').filter({ has: page.locator('td:nth-child(3)', { hasText: /^31-50$/ }) })).toHaveCount(0);
+  await expect(section.locator('tr').filter({ has: page.locator('td:nth-child(3)', { hasText: /^51-65$/ }) })).toHaveCount(0);
+  await expect(ageRows).toHaveCount(1);
+  await expect(ageRows.first()).toContainText('Age Group');
+  await expect(ageRows.first()).toContainText('65+');
+  expect(await cell(ageRows)).toBe('-20.0%');
+  expect(await cell(row('Employment status', 'Non-worker'))).toBe('-29.0%');
 
-  // Per-comparison flag: only the 65+ dummy is in this model, so 31-50 and 51-65 read "Not in model".
-  expect(await cell('Age Group', '31-50')).toBe('Not in model');
-  expect(await cell('Age Group', '51-65')).toBe('Not in model');
-  expect(await cell('Age Group', '65+')).toBe('-20.0%');
-
-  // Absolute format
   await segmentCard.locator('.scenario-ate-toggle button', { hasText: 'Absolute ATE' }).click();
   await page.waitForTimeout(100);
-  expect(await cell('Employment status', 'Non-worker')).toBe('-0.08');
-  expect(await cell('Age Group', '65+')).toBe('-0.05');
+  expect(await cell(ageRows)).toBe('-0.05');
+  expect(await cell(row('Employment status', 'Non-worker'))).toBe('-0.08');
 });
 
-test("Attitudes & Personality Traits use the corrected '1 Unit Increase*' definition and match Jinghai's 2026-10-04 workbook", async ({ page }) => {
-  // Expected values are read straight from his 2026-10-04 ATE_segments_by_model.xlsx (Do more column).
-  // The withdrawn "+1% of SD" definition gave values ~100x smaller (e.g. ~+0.1% here), so these pins
-  // fail loudly if the old definition ever comes back.
-  //   heat_Delivery : Community Resilience +8.8077% / +0.0201 ; Personal Resilience +9.1311% / +0.0208 ;
-  //                   Social Engagement not in model
-  //   heat_Home (stay_home): Community Resilience +7.5537% / +0.0334
+test('Section 3: Race, Land-use Diversity and Education keep their base labels on the first row shown', async ({ page }) => {
+  // heat / use_car (workbook in_model): Race White + Black retained, Asian not -> Race is one group with
+  // "Other race" as the base, shown on the White row, with no Asian row.
+  {
+    const { section } = await openSection3(page, 'Extreme Heat', 'use_car');
+    const raceRows = section.locator('tr').filter({ has: page.locator('td:nth-child(2)', { hasText: 'Other race' }) });
+    await expect(raceRows).toHaveCount(1);
+    await expect(raceRows.first()).toContainText('Race');
+    await expect(raceRows.first()).toContainText('White');
+    await expect(section.locator('tr').filter({ has: page.locator('td:nth-child(3)', { hasText: /^Black$/ }) })).toHaveCount(1);
+    await expect(section.locator('tr').filter({ has: page.locator('td:nth-child(3)', { hasText: /^Asian$/ }) })).toHaveCount(0);
+    await expect(section.locator('tr', { hasText: 'Not White' })).toHaveCount(0);
+  }
+  // heat / dine_in: Land-use Diversity "Not high" -> "High" (-18.5%) and Education (Bachelor's) retained;
+  // the Attitudes group has nothing retained, so its card is not shown at all.
+  {
+    const { section } = await openSection3(page, 'Extreme Heat', 'dine_in');
+    await expect(section.locator('tr', { hasText: 'Land-use Diversity' }).first()).toContainText('Not high');
+    await expect(section.locator('tr', { hasText: "Education (Bachelor's)" }).first()).toContainText('No BS');
+    await expect(section.locator('tbody tr')).toHaveCount(4);
+    await expect(section.locator('.scenario-demographic-group')).toHaveCount(3);
+    await expect(section.locator('.scenario-demographic-group', { hasText: 'Attitudes & Personality Traits' })).toHaveCount(0);
+  }
+});
+
+test('Section 3: a model that retains a single variable shows just that one row (earthquake / working from home)', async ({ page }) => {
+  // earthquake_WFH keeps only tcom_no ("Does not telecommute"): ATE_pct -44.6513, ATE_abs -0.1547.
+  const { segmentCard, section } = await openSection3(page, 'Major Earthquake', 'work_from_home');
+  await expect(section.locator('tbody tr')).toHaveCount(1);
+  await expect(section.locator('.scenario-demographic-group')).toHaveCount(1);
+  const only = section.locator('tbody tr').first();
+  await expect(only).toContainText('Does not telecommute');
+  await expect(only).toContainText('Telecommutes');
+  expect(await readCell(only.locator('.scenario-ate-display-value').first())).toBe('-44.7%');
+  await segmentCard.locator('.scenario-ate-toggle button', { hasText: 'Absolute ATE' }).click();
+  await page.waitForTimeout(100);
+  expect(await readCell(only.locator('.scenario-ate-display-value').first())).toBe('-0.15');
+});
+
+test("Section 3 info button carries Irfan's note about variables not retained in the final model", async ({ page }) => {
   await page.goto('/#/scenario');
   const segmentCard = page.locator('.scenario-section-card').filter({ has: page.locator('.scenario-demographic-groups') });
-  const section = segmentCard.locator('.scenario-demographic-groups');
-  await expect(section).toBeVisible({ timeout: 15_000 });
+  await expect(segmentCard.locator('.scenario-demographic-groups')).toBeVisible({ timeout: 15_000 });
+  await segmentCard.locator('.scenario-section-header .scenario-info-button').hover();
+  await expect(page.locator('.scenario-tooltip')).toContainText(
+    'This table reports ATE estimates only for variables retained in the final model specification. ' +
+    'Variables not retained are not displayed because no statistically significant effect was detected; ' +
+    'their ATE values can therefore be interpreted as zero.'
+  );
+});
+
+test("Attitudes & Personality Traits use the corrected '1 Unit Increase*' definition, show only retained constructs, and match Jinghai's 2026-10-04 workbook", async ({ page }) => {
+  // Expected values are read straight from his 2026-10-04 ATE_segments_by_model.xlsx (Do more column).
+  // The withdrawn "+1% of SD" definition gave values ~100x smaller, so these pins fail loudly if it ever returns.
+  //   heat_Car      : Personal Resilience +11.2239% / +0.0193 ; Social Engagement +11.4677% / +0.0198 ; Community Resilience not retained
+  //   heat_Delivery : Community Resilience +8.8077% / +0.0201 ; Personal Resilience +9.1311% / +0.0208 ; Social Engagement not retained
+  //   heat_Home     : Community Resilience +7.5537% / +0.0334 (the only construct retained)
+  const { segmentCard, section } = await openSection3(page, 'Extreme Heat', 'use_car');
   const rowsFor = (variable: string) => section.locator('tr', { has: page.locator('td', { hasText: variable }) });
   const value = (variable: string) => readCell(rowsFor(variable).first().locator('.scenario-ate-display-value').first());
   const pick = async (activity: string) => {
@@ -432,38 +511,48 @@ test("Attitudes & Personality Traits use the corrected '1 Unit Increase*' defini
     await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
     await page.waitForTimeout(200);
   };
+  const checkTooltips = async (variables: string[]) => {
+    // The hover note must be fully visible on EVERY row. The Section 3 cards are overflow:hidden, so a note
+    // positioned inside them was cut off on the last row (found on the live page). pointer-events is
+    // switched on only so elementFromPoint can see the tooltip.
+    for (const v of variables) {
+      await rowsFor(v).first().getByText('1 Unit Increase*').hover();
+      const tip = section.locator('.scenario-tooltip').filter({ hasText: 'one-unit increase' });
+      await expect(tip).toBeVisible();
+      const box = (await tip.boundingBox())!;
+      const hits = await page.evaluate(({ x, y, w, h }) => {
+        let ok = 0;
+        for (const fx of [0.05, 0.5, 0.95]) for (const fy of [0.1, 0.5, 0.9]) {
+          const el = document.elementFromPoint(x + w * fx, y + h * fy);
+          if (el && el.closest('.scenario-tooltip')) ok++;
+        }
+        return ok;
+      }, { x: box.x, y: box.y, w: box.width, h: box.height });
+      expect(hits, `${v}: hover note is clipped or covered (${hits}/9 points visible)`).toBe(9);
+    }
+  };
+  await page.addStyleTag({ content: '.scenario-tooltip{pointer-events:auto !important}' });
 
-  await pick('delivery');
-  for (const v of ['Personal Resilience', 'Community Resilience', 'Social Engagement']) {
+  // Default activity (use_car): PR and SE retained, CR not.
+  await expect(rowsFor('Community Resilience')).toHaveCount(0);
+  for (const v of ['Personal Resilience', 'Social Engagement']) {
     await expect(rowsFor(v).first()).toContainText('Current value');
     await expect(rowsFor(v).first()).toContainText('1 Unit Increase*');
     await expect(rowsFor(v).first()).not.toContainText('SD');
   }
+  expect(await value('Personal Resilience')).toBe('+11.2%');
+  expect(await value('Social Engagement')).toBe('+11.5%');
+  await checkTooltips(['Personal Resilience', 'Social Engagement']);
+
+  await pick('delivery');
+  await expect(rowsFor('Social Engagement')).toHaveCount(0);
   expect(await value('Community Resilience')).toBe('+8.8%');
   expect(await value('Personal Resilience')).toBe('+9.1%');
-  expect(await value('Social Engagement')).toBe('Not in model');
-
-  // The asterisk carries a hover note, and it must be fully visible on EVERY row. The Section 3 cards
-  // are overflow:hidden, so a note positioned inside them was cut off on the last row (found on the
-  // live page). pointer-events is switched on only so elementFromPoint can see the tooltip.
-  await page.addStyleTag({ content: '.scenario-tooltip{pointer-events:auto !important}' });
-  for (const v of ['Personal Resilience', 'Community Resilience', 'Social Engagement']) {
-    await rowsFor(v).first().getByText('1 Unit Increase*').hover();
-    const tip = section.locator('.scenario-tooltip').filter({ hasText: 'one-unit increase' });
-    await expect(tip).toBeVisible();
-    const box = (await tip.boundingBox())!;
-    const hits = await page.evaluate(({ x, y, w, h }) => {
-      let ok = 0;
-      for (const fx of [0.05, 0.5, 0.95]) for (const fy of [0.1, 0.5, 0.9]) {
-        const el = document.elementFromPoint(x + w * fx, y + h * fy);
-        if (el && el.closest('.scenario-tooltip')) ok++;
-      }
-      return ok;
-    }, { x: box.x, y: box.y, w: box.width, h: box.height });
-    expect(hits, `${v}: hover note is clipped or covered (${hits}/9 points visible)`).toBe(9);
-  }
+  await checkTooltips(['Community Resilience', 'Personal Resilience']);
 
   await pick('stay_home');
+  await expect(rowsFor('Personal Resilience')).toHaveCount(0);
+  await expect(rowsFor('Social Engagement')).toHaveCount(0);
   expect(await value('Community Resilience')).toBe('+7.6%');
 
   // Absolute format

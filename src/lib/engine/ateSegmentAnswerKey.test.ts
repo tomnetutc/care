@@ -16,6 +16,8 @@ import * as path from 'path';
 import {
   computeSegmentATEs,
   computeContinuousATE,
+  isSegmentComparisonRetained,
+  isContinuousRetained,
   ModelDataByEvent,
   SegmentATEResult
 } from './computeATE';
@@ -112,6 +114,29 @@ describe("Section 3 vs Jinghai's ATE_segments_by_model.xlsx (1,330 rows x 3 resp
     expect(ours.size).toBe(Object.keys(DISCRETE).length);
     const mapped = new Set(Object.values(DISCRETE).map(([k, l]) => `${SEGMENT_GROUPS[k].label}|${l}`));
     expect(Array.from(ours).sort()).toEqual(Array.from(mapped).sort());
+  });
+
+  it('the retention rule that decides which rows Section 3 shows equals his in_model flag on every row', () => {
+    // Irfan (2026-10-05): only variables retained in the final model are shown. "Retained" is decided
+    // from the model's coefficients alone (no sample, no ATE needed), so it can be checked directly
+    // against his workbook: 1,330 rows, 35 models.
+    const mismatches: any[] = [];
+    let shown = 0;
+    for (const r of key) {
+      const coefficients = md[EVENT[r.event]][ACTIVITY[r.activity]].coefficients;
+      let retained: boolean;
+      if (CONTINUOUS[r.variable_group]) {
+        retained = isContinuousRetained(coefficients, CONTINUOUS[r.variable_group]);
+      } else {
+        const [groupKey, label] = DISCRETE[`${r.variable_group}|${r.comparison}`];
+        const g = SEGMENT_GROUPS[groupKey];
+        retained = isSegmentComparisonRetained(coefficients, g.baseSpec, g.comparisons.find(x => x.label === label)!.spec);
+      }
+      if (retained) shown++;
+      if (retained !== (r.in_model === 'TRUE')) mismatches.push([r.sheet, r.variable_group, r.comparison, r.in_model, retained]);
+    }
+    expect(mismatches).toEqual([]);
+    expect(shown).toBe(260); // rows the page shows across all 35 models
   });
 
   it('every row: in-model flag, P_base, P_comp, ATE_abs and ATE_pct match for all 3 responses', () => {
