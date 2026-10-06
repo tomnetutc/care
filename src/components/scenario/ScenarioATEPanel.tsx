@@ -19,9 +19,14 @@ const GBU_NOTE = "This was a 5-level question from very unlikely to very likely.
 // Attitudes & Personality Traits (PR / CR / SE) use Jinghai's corrected treatment definition
 // (2026-10-04, ATE_Calculation_10.4.ipynb): a one-unit increase on the construct's normalized
 // scale from each respondent's current value, consistent with the paper. His workbook labels the
-// row "1 Unit Increase*" (asterisk included). Note wording is a draft built from his own words.
+// row "1 Unit Increase*" (asterisk included). The note below is Jinghai's exact wording
+// (Slack, 2026-10-05); it is shown on hover and as a footnote under the Attitudes table.
 const UNIT_INCREASE_LABEL = '1 Unit Increase*';
-const UNIT_INCREASE_NOTE = "A one-unit increase on the construct's normalized scale, applied to each respondent's current value.";
+const UNIT_INCREASE_NOTE = "Note: (*) = Since the latent constructs are unitless, a “1 unit increase” refers to a change normalized to the scale of the error components, which is fixed to 1 for identification purposes";
+
+// Jinghai (2026-10-05): for "Go about business as usual" the three responses should read as
+// Unlikely / Neutral / Likely. Shown in Section 3 under the response buttons when GBU is selected.
+const GBU_SEGMENT_NOTE = "For “Go about business as usual” the three responses are likelihoods: Do less = Unlikely, About the same = Neutral, Do more = Likely.";
 
 const SAMPLE_MISMATCH_NOTE = "Verified data issue: Jinghai's reported fitting sample for this specific model is far smaller than what his own method reproduces from the data he sent (e.g. Power Outage → Go about business as usual: reported n=892 vs. 2,381 recomputed). Numbers below use the full, correctly-filtered sample - the statistically sound choice - but the underlying coefficients may need to be refit by Jinghai. Flagged for his review; not a display bug.";
 
@@ -742,6 +747,9 @@ const ScenarioATEPanel: React.FC = () => {
                 })}
               </div>
               <p className="scenario-config-help">Anticipated change in frequency if the event happens again (vs. other response categories)</p>
+              {effectiveActivity === 'go_business_as_usual' && (
+                <p className="scenario-config-help scenario-gbu-note">{GBU_SEGMENT_NOTE}</p>
+              )}
             </div>
           </div>
 
@@ -858,6 +866,9 @@ const ScenarioATEPanel: React.FC = () => {
                         )}
                       </tbody>
                     </table>
+                    {visibleVariables.some(v => v.comparisons.some(c => c.treatmentLevel === UNIT_INCREASE_LABEL)) && (
+                      <p className="scenario-table-footnote">{UNIT_INCREASE_NOTE}</p>
+                    )}
                   </div>
                 )}
               </div>

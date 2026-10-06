@@ -517,7 +517,7 @@ test("Attitudes & Personality Traits use the corrected '1 Unit Increase*' defini
     // switched on only so elementFromPoint can see the tooltip.
     for (const v of variables) {
       await rowsFor(v).first().getByText('1 Unit Increase*').hover();
-      const tip = section.locator('.scenario-tooltip').filter({ hasText: 'one-unit increase' });
+      const tip = section.locator('.scenario-tooltip').filter({ hasText: 'latent constructs are unitless' });
       await expect(tip).toBeVisible();
       const box = (await tip.boundingBox())!;
       const hits = await page.evaluate(({ x, y, w, h }) => {
@@ -562,4 +562,41 @@ test("Attitudes & Personality Traits use the corrected '1 Unit Increase*' defini
   await pick('delivery');
   expect(await value('Community Resilience')).toBe('+0.02');
   expect(await value('Personal Resilience')).toBe('+0.02');
+});
+
+// Jinghai (Slack, 2026-10-05): exact wording for the latent-construct "(*)" note, and a GBU note that
+// reads Unlikely / Neutral / Likely.
+const UNIT_INCREASE_NOTE_TEXT =
+  'Note: (*) = Since the latent constructs are unitless, a “1 unit increase” refers to a change normalized ' +
+  'to the scale of the error components, which is fixed to 1 for identification purposes';
+const GBU_SEGMENT_NOTE_TEXT =
+  'For “Go about business as usual” the three responses are likelihoods: ' +
+  'Do less = Unlikely, About the same = Neutral, Do more = Likely.';
+
+test("Jinghai's '(*)' note for the latent constructs is his exact wording, both as a footnote under the Attitudes table and on hover", async ({ page }) => {
+  const { section } = await openSection3(page, 'Extreme Heat', 'use_car');
+  const footnote = section.locator('.scenario-table-footnote');
+  await expect(footnote).toHaveCount(1);
+  await expect(footnote).toBeVisible();
+  await expect(footnote).toHaveText(UNIT_INCREASE_NOTE_TEXT);
+
+  await page.addStyleTag({ content: '.scenario-tooltip{pointer-events:auto !important}' });
+  await section.locator('tr', { has: page.locator('td', { hasText: 'Personal Resilience' }) }).first().getByText('1 Unit Increase*').hover();
+  await expect(section.locator('.scenario-tooltip')).toHaveText(UNIT_INCREASE_NOTE_TEXT);
+
+  // No Attitudes card (nothing retained for heat / dine_in) -> no footnote either.
+  const dine = await openSection3(page, 'Extreme Heat', 'dine_in');
+  await expect(dine.section.locator('.scenario-demographic-group', { hasText: 'Attitudes & Personality Traits' })).toHaveCount(0);
+  await expect(dine.section.locator('.scenario-table-footnote')).toHaveCount(0);
+});
+
+test("Jinghai's GBU note: Section 3 reads the responses as Unlikely / Neutral / Likely, only when 'Go about business as usual' is selected", async ({ page }) => {
+  const { segmentCard } = await openSection3(page, 'Extreme Heat', 'go_business_as_usual');
+  const note = segmentCard.locator('.scenario-gbu-note');
+  await expect(note).toHaveCount(1);
+  await expect(note).toBeVisible();
+  await expect(note).toHaveText(GBU_SEGMENT_NOTE_TEXT);
+
+  await segmentCard.locator('select.scenario-select').selectOption({ value: 'use_car' });
+  await expect(note).toHaveCount(0);
 });
