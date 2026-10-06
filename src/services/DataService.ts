@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { EXT_MODULE_FIELD, getExtModuleKey } from '../utils/extremeEventModule';
 
 export interface DataRow {
   [key: string]: string | number;
@@ -274,8 +275,12 @@ class DataService {
         // Unknown values (including 0)
         row['census_region_category'] = 'unknown';
       }
+
+      // Extreme event module membership (which of heat/cold/flooding/earthquake/power outage the
+      // respondent answered, ext_<event>_impact_wlb != -9) for the "Extreme Event Module" filter
+      row[EXT_MODULE_FIELD] = getExtModuleKey(row);
     });
-    
+
     return parsedData;
   }
 

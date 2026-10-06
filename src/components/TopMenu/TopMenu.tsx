@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useFilters } from '../../context/FilterContext';
 import DataService from '../../services/DataService';
+import { EXT_EVENTS, EXT_MODULE_FIELD, extModuleFilterValues } from '../../utils/extremeEventModule';
 import InfoBox from '../InfoBox/InfoBox';
 import './TopMenu.scss';
 
@@ -18,6 +19,9 @@ interface Dimension {
   label: string;
   field: string;
   options: DimOption[];
+  // Optional: the data values that an option stands for, when more than one raw value maps to it
+  // (e.g. a respondent who answered two modules carries a combined key). Default: [option.value].
+  filterValues?: (optionValue: string) => string[];
 }
 
 const DIMENSIONS: Dimension[] = [
@@ -181,6 +185,14 @@ const DIMENSIONS: Dimension[] = [
       { value: 'west-excluding-maricopa-puget', label: 'West' },
     ],
   },
+  {
+    // Respondents who answered the module for the ticked event(s) (ext_<event>_impact_wlb != -9).
+    // A respondent answers up to two modules, so ticking several events means "answered at least one".
+    label: 'Extreme Event Module',
+    field: EXT_MODULE_FIELD,
+    options: EXT_EVENTS.map(e => ({ value: e.key, label: e.label })),
+    filterValues: extModuleFilterValues,
+  },
 ];
 
 // Replicate the filter predicate logic from usePieChartData/useLikertData to
@@ -255,12 +267,12 @@ const TopMenu: React.FC = () => {
   // event handler, so removeFilter + N×addFilter correctly produce [f1, f2, …]).
 
   const syncDimToFilter = (
-    field: string,
-    newSelected: string[],
-    totalOpts: number
+    dim: Dimension,
+    newSelected: string[]
   ) => {
+    const field = dim.field;
     removeFilter(field); // clear any existing filters for this field
-    if (newSelected.length === totalOpts) return; // all selected = no filter needed
+    if (newSelected.length === dim.options.length) return; // all selected = no filter needed
     if (newSelected.length === 0) {
       // 0 selected: add a sentinel value that can never match a real data row.
       // The predicate does values.includes(String(row[field])), and no row
@@ -268,7 +280,11 @@ const TopMenu: React.FC = () => {
       addFilter({ field, value: '__no_match__' });
       return;
     }
-    newSelected.forEach(val => addFilter({ field, value: val }));
+    // Most options are one data value. Where an option stands for several (filterValues), expand it and
+    // drop repeats, so the unchanged OR-within-a-field predicate matches any of them.
+    const values = new Set<string>();
+    newSelected.forEach(val => (dim.filterValues ? dim.filterValues(val) : [val]).forEach(v => values.add(v)));
+    values.forEach(v => addFilter({ field, value: v }));
   };
 
   // ── Event handlers ─────────────────────────────────────────────────────────
@@ -288,7 +304,7 @@ const TopMenu: React.FC = () => {
     } else {
       setDimSelections(prev => ({ ...prev, [dim.field]: newSelected }));
     }
-    syncDimToFilter(dim.field, newSelected, dim.options.length);
+    syncDimToFilter(dim, newSelected);
   };
 
   // "All" link inside a dimension column: restore all options
