@@ -273,10 +273,10 @@ export const AboutContent: React.FC = () => {
           <strong>Note:</strong> When using any material from this dashboard, please consider citing the relevant papers listed below.
           </p>
           <div className="about-citation">
-            Batur, I., Alhassan, V. O., Chester, M. V., Polzin, S. E., Chen, C., Bhat, C. R., & Pendyala, R. M. (2024). Understanding how extreme heat impacts human activity-mobility and time use patterns. <em>Transportation Research Part D: Transport and Environment</em>, 136, 104431.
+            Batur, I., Alhassan, V.O., Chester, M.V., Polzin, S.E., Chen, C., Bhat, C.R. and Pendyala, R.M., 2024. Understanding how extreme heat impacts human activity-mobility and time use patterns. <em>Transportation Research Part D: Transport and Environment</em>, 136, p.104431.
           </div>
           <div className="about-citation">
-            Yu, F., Batur, I., Haddad, A. J., Hennessy, E. M., Ocana, M. G. R., Chen, C., Zhou, X., Bhat, C. R., & Pendyala, R. M. (2025). A U-Shaped Paradigm: Understanding the Impact of Telecommuting on Public Transit Ridership Before and After the Pandemic. <em>Presented at the 104th Annual Meeting of the Transportation Research Board</em>, Washington, DC, January 5-9, 2025.
+            Yu, F., Batur, I., Haddad, A.J., Hennessy, E.M., Rodriguez Ocana, M.G., Chen, C., Zhou, X., Bhat, C.R. and Pendyala, R.M., 2026. A U-shaped paradigm: understanding the impact of telecommuting on public transit ridership before and after the pandemic. <em>Transportation Research Part A: Policy and Practice</em>, 211, p.105128.
           </div>
           <div className="about-citation">
             Huo, J., Batur, I., Robbennolt, D., Yu, F., Rodriguez Ocana, M. G., Hwang, H., Hennessy, E., Chen, C., Polzin, S. E., Zhou, X., Chester, M. V., Bhat, C. R., & Pendyala, R. M. (2025). The role of prior experience in shaping anticipated travel and activity behavior changes in future extreme heat events. <em>Presented at the 2026 Transportation Research Board Annual Meeting</em>.
