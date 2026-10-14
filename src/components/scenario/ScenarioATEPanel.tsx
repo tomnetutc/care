@@ -47,9 +47,10 @@ const GBU_RESPONSE_LABELS: Record<string, string> = { less: 'Unlikely', same: 'N
 // Section 3 display text (Irfan, 2026-10-07 review). Display only: the engine keys
 // (segmentConfig.ts labels, which match Jinghai's answer key) are unchanged, so no number moves.
 //  - sentence case for every variable name, "Ethnicity: Hispanic" -> "Ethnicity";
-//  - units and category cutoffs for the built-environment variables, from Jinghai's
-//    Codebook.xlsx (2026-09-28, "Independent Variables" / "Combined Categorical Vars").
-//    Network density and land-use diversity have no cutoffs in his codebook yet.
+//  - units and category cutoffs for the built-environment variables (EPA Smart Location
+//    Database), as confirmed by Jinghai on Slack (2026-10-14). Land-use diversity is
+//    "Not high" vs "High" in his ATE file, so its base is everything at or below 0.45.
+//    He gave no unit for transit access, so none is shown.
 const VARIABLE_DISPLAY: Record<string, string> = {
   'Age Group': 'Age group',
   'Ethnicity: Hispanic': 'Ethnicity',
@@ -58,14 +59,16 @@ const VARIABLE_DISPLAY: Record<string, string> = {
   'Housing Type': 'Housing type',
   'Population Density': 'Population density (people/acre)',
   'Employment Density': 'Employment density (jobs/acre)',
-  'Network Density': 'Network density',
-  'Land-use Diversity': 'Land-use diversity',
+  'Network Density': 'Network density (miles/sq mi)',
+  'Land-use Diversity': 'Land-use diversity (index)',
   'Transit Access': 'Transit access',
   'Walkability Index': 'Walkability index'
 };
 const LEVEL_DISPLAY: Record<string, Record<string, string>> = {
   'Population Density': { 'Low': 'Low (≤4.00)', 'Medium': 'Medium (>4.00–8.86)', 'High': 'High (>8.86)' },
   'Employment Density': { 'Low': 'Low (≤0.91)', 'Medium': 'Medium (>0.91–2.37)', 'High': 'High (>2.37)' },
+  'Network Density': { 'Low': 'Low (≤0.40)', 'Medium': 'Medium (>0.40–1.11)', 'High': 'High (>1.11)' },
+  'Land-use Diversity': { 'Not high': 'Not high (≤0.45)', 'High': 'High (>0.45)' },
   'Transit Access': { 'Low': 'Low (0)', 'Medium': 'Medium (>0–0.13)', 'High': 'High (>0.13)' },
   'Walkability Index': { 'Very low': 'Very low (≤8)', 'Low': 'Low (>8–10)', 'High': 'High (>10–13)', 'Very high': 'Very high (>13)' }
 };
@@ -79,10 +82,12 @@ const ANTICIPATED_CHANGE_INDEX: Record<string, number> = {
 };
 
 // Population Segment Analysis's continuous attitude rows -> computeContinuousATE's variable key.
+// Names per Irfan's 2026-10-07 review (the paper's latent constructs): CR = Community Support
+// Capacity, SE = Social Interaction Propensity, PR = Personal Resilience. Engine keys unchanged.
 const CONTINUOUS_VARIABLE_KEY: Record<string, string> = {
   'Personal Resilience': 'PR',
-  'Community Resilience': 'CR',
-  'Social Engagement': 'SE'
+  'Community Support Capacity': 'CR',
+  'Social Interaction Propensity': 'SE'
 };
 
 /**
@@ -279,7 +284,7 @@ const ScenarioATEPanel: React.FC = () => {
   // event. The response buttons only change which of the already-computed
   // Do less / About the same / Do more values is displayed.
 
-  // Personal Resilience / Community Resilience / Social Engagement: real
+  // Personal Resilience / Community Support Capacity / Social Interaction Propensity (PR / CR / SE): real
   // ate_continuous results ("1 Unit Increase": +1.0 on the construct's own scale,
   // Jinghai 2026-10-04), for the currently selected activity. 0 both while continuousResults
   // hasn't loaded yet and when the variable isn't in that activity's model
@@ -322,8 +327,8 @@ const ScenarioATEPanel: React.FC = () => {
       // current value; comparison = "1 Unit Increase*" (ate_continuous, shift=1).
       variables: [
         { variable: 'Personal Resilience', baseLevel: 'Current value', comparisons: [{ treatmentLevel: UNIT_INCREASE_LABEL, ate: getContinuousAte('Personal Resilience') }] },
-        { variable: 'Community Resilience', baseLevel: 'Current value', comparisons: [{ treatmentLevel: UNIT_INCREASE_LABEL, ate: getContinuousAte('Community Resilience') }] },
-        { variable: 'Social Engagement', baseLevel: 'Current value', comparisons: [{ treatmentLevel: UNIT_INCREASE_LABEL, ate: getContinuousAte('Social Engagement') }] }
+        { variable: 'Community Support Capacity', baseLevel: 'Current value', comparisons: [{ treatmentLevel: UNIT_INCREASE_LABEL, ate: getContinuousAte('Community Support Capacity') }] },
+        { variable: 'Social Interaction Propensity', baseLevel: 'Current value', comparisons: [{ treatmentLevel: UNIT_INCREASE_LABEL, ate: getContinuousAte('Social Interaction Propensity') }] }
       ]
     },
     socioDemo: {

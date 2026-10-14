@@ -210,15 +210,15 @@ test('Population Segment table: no Risk Aversion, 3-tier income, binary housing,
   // read from Jinghai's 2026-10-04 ATE_segments_by_model.xlsx (in_model = TRUE):
   const RETAINED_IN_HEAT: Record<string, string[]> = {
     'Personal Resilience': ['use_car', 'delivery', 'pick_up', 'use_transit', 'go_business_as_usual'],
-    'Community Resilience': ['delivery', 'stay_home', 'go_business_as_usual', 'work_from_home', 'work_from_office'],
-    'Social Engagement': ['use_car', 'pick_up']
+    'Community Support Capacity': ['delivery', 'stay_home', 'go_business_as_usual', 'work_from_home', 'work_from_office'],
+    'Social Interaction Propensity': ['use_car', 'pick_up']
   };
   const activitySelectForAttitudes = page.locator('.scenario-section-card')
     .filter({ has: page.locator('.scenario-demographic-groups') })
     .locator('select.scenario-select');
   const activityValues = await activitySelectForAttitudes.locator('option').evaluateAll(o => o.map(x => (x as HTMLOptionElement).value));
   expect(activityValues.length).toBe(9);
-  const shownIn: Record<string, string[]> = { 'Personal Resilience': [], 'Community Resilience': [], 'Social Engagement': [] };
+  const shownIn: Record<string, string[]> = { 'Personal Resilience': [], 'Community Support Capacity': [], 'Social Interaction Propensity': [] };
   for (const activity of activityValues) {
     await activitySelectForAttitudes.selectOption({ value: activity });
     await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
@@ -415,12 +415,12 @@ test("Section 3 shows only the rows the model retained, and they match Jinghai's
   // Do more column):
   //   Age Group 18-30 -> 65+            ATE_pct -20.0019  ATE_abs -0.0482   (31-50 and 51-65: not retained -> no rows)
   //   Employment status -> Non-worker   ATE_pct -29.0484  ATE_abs -0.0768
-  // 11 retained rows in all (9 discrete + Community Resilience + Personal Resilience), in all 4 groups.
+  // 11 retained rows in all (9 discrete + Community Support Capacity + Personal Resilience), in all 4 groups.
   const { segmentCard, section } = await openSection3(page, 'Extreme Heat', 'delivery');
 
   await expect(section.locator('tbody tr')).toHaveCount(11);
   await expect(section.locator('.scenario-demographic-group')).toHaveCount(4);
-  for (const hidden of ['Gender', 'Race', 'Land-use Diversity', 'Social Engagement', 'Education']) {
+  for (const hidden of ['Gender', 'Race', 'Land-use Diversity', 'Social Interaction Propensity', 'Education']) {
     await expect(section.locator('tr', { hasText: hidden }), `${hidden} is not retained in heat_Delivery and must not be shown`).toHaveCount(0);
   }
   // No dash / "Not in model" stand-ins anywhere.
@@ -501,9 +501,9 @@ test("Section 3 info button carries Irfan's note about variables not retained in
 test("Attitudes & Personality Traits use the corrected '1 Unit Increase*' definition, show only retained constructs, and match Jinghai's 2026-10-04 workbook", async ({ page }) => {
   // Expected values are read straight from his 2026-10-04 ATE_segments_by_model.xlsx (Do more column).
   // The withdrawn "+1% of SD" definition gave values ~100x smaller, so these pins fail loudly if it ever returns.
-  //   heat_Car      : Personal Resilience +11.2239% / +0.0193 ; Social Engagement +11.4677% / +0.0198 ; Community Resilience not retained
-  //   heat_Delivery : Community Resilience +8.8077% / +0.0201 ; Personal Resilience +9.1311% / +0.0208 ; Social Engagement not retained
-  //   heat_Home     : Community Resilience +7.5537% / +0.0334 (the only construct retained)
+  //   heat_Car      : Personal Resilience +11.2239% / +0.0193 ; Social Interaction Propensity +11.4677% / +0.0198 ; Community Support Capacity not retained
+  //   heat_Delivery : Community Support Capacity +8.8077% / +0.0201 ; Personal Resilience +9.1311% / +0.0208 ; Social Interaction Propensity not retained
+  //   heat_Home     : Community Support Capacity +7.5537% / +0.0334 (the only construct retained)
   const { segmentCard, section } = await openSection3(page, 'Extreme Heat', 'use_car');
   const rowsFor = (variable: string) => section.locator('tr', { has: page.locator('td', { hasText: variable }) });
   const value = (variable: string) => readCell(rowsFor(variable).first().locator('.scenario-ate-display-value').first());
@@ -535,33 +535,33 @@ test("Attitudes & Personality Traits use the corrected '1 Unit Increase*' defini
   await page.addStyleTag({ content: '.scenario-tooltip{pointer-events:auto !important}' });
 
   // Default activity (use_car): PR and SE retained, CR not.
-  await expect(rowsFor('Community Resilience')).toHaveCount(0);
-  for (const v of ['Personal Resilience', 'Social Engagement']) {
+  await expect(rowsFor('Community Support Capacity')).toHaveCount(0);
+  for (const v of ['Personal Resilience', 'Social Interaction Propensity']) {
     await expect(rowsFor(v).first()).toContainText('Current value');
     await expect(rowsFor(v).first()).toContainText('1 Unit Increase*');
     await expect(rowsFor(v).first()).not.toContainText('SD');
   }
   expect(await value('Personal Resilience')).toBe('+11.2%');
-  expect(await value('Social Engagement')).toBe('+11.5%');
-  await checkTooltips(['Personal Resilience', 'Social Engagement']);
+  expect(await value('Social Interaction Propensity')).toBe('+11.5%');
+  await checkTooltips(['Personal Resilience', 'Social Interaction Propensity']);
 
   await pick('delivery');
-  await expect(rowsFor('Social Engagement')).toHaveCount(0);
-  expect(await value('Community Resilience')).toBe('+8.8%');
+  await expect(rowsFor('Social Interaction Propensity')).toHaveCount(0);
+  expect(await value('Community Support Capacity')).toBe('+8.8%');
   expect(await value('Personal Resilience')).toBe('+9.1%');
-  await checkTooltips(['Community Resilience', 'Personal Resilience']);
+  await checkTooltips(['Community Support Capacity', 'Personal Resilience']);
 
   await pick('stay_home');
   await expect(rowsFor('Personal Resilience')).toHaveCount(0);
-  await expect(rowsFor('Social Engagement')).toHaveCount(0);
-  expect(await value('Community Resilience')).toBe('+7.6%');
+  await expect(rowsFor('Social Interaction Propensity')).toHaveCount(0);
+  expect(await value('Community Support Capacity')).toBe('+7.6%');
 
   // Absolute format
   await segmentCard.locator('.scenario-ate-toggle button', { hasText: 'Absolute ATE' }).click();
   await page.waitForTimeout(100);
-  expect(await value('Community Resilience')).toBe('+0.03');
+  expect(await value('Community Support Capacity')).toBe('+0.03');
   await pick('delivery');
-  expect(await value('Community Resilience')).toBe('+0.02');
+  expect(await value('Community Support Capacity')).toBe('+0.02');
   expect(await value('Personal Resilience')).toBe('+0.02');
 });
 
@@ -729,8 +729,8 @@ test("Irfan 10-07: Section 3 variable names are sentence case, 'Ethnicity' repla
     for (const t of await section.locator('tbody td:nth-child(2), tbody td:nth-child(3)').allTextContents()) if (t.trim()) cells.add(t.trim());
   }
   // Sentence case: after the first word, no capitalised word except proper nouns / acronyms / the
-  // three latent-construct names (pending Jinghai's confirmation of the paper's names).
-  const allowed = /^(Personal Resilience|Community Resilience|Social Engagement)$/;
+  // three latent-construct names, which are proper names from the paper (Irfan, 2026-10-07).
+  const allowed = /^(Personal Resilience|Community Support Capacity|Social Interaction Propensity)$/; // construct names stay capitalised, as in the paper
   for (const n of names) {
     if (allowed.test(n)) continue;
     const rest = n.split(/\s+/).slice(1).filter(w => /^[A-Z][a-z]/.test(w) && !/^(BS|Bachelor's)/.test(w.replace(/[()]/g, '')));
@@ -743,4 +743,9 @@ test("Irfan 10-07: Section 3 variable names are sentence case, 'Ethnicity' repla
   }
   // Population density cutoffs from Jinghai's codebook.
   expect([...cells]).toEqual(expect.arrayContaining(['Low (≤4.00)', 'High (>8.86)']));
+  // Land-use diversity cutoffs and construct names confirmed by Jinghai / Irfan (2026-10-14 / 10-07).
+  expect([...names]).toEqual(expect.arrayContaining(['Land-use diversity (index)', 'Community Support Capacity', 'Social Interaction Propensity']));
+  expect([...cells]).toEqual(expect.arrayContaining(['Not high (≤0.45)', 'High (>0.45)']));
+  expect([...names]).not.toContain('Community Resilience');
+  expect([...names]).not.toContain('Social Engagement');
 });
