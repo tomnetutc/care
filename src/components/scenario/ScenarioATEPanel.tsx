@@ -24,11 +24,53 @@ const GBU_NOTE = "This was a 5-level question from very unlikely to very likely.
 const UNIT_INCREASE_LABEL = '1 Unit Increase*';
 const UNIT_INCREASE_NOTE = "Note: (*) = Since the latent constructs are unitless, a “1 unit increase” refers to a change normalized to the scale of the error components, which is fixed to 1 for identification purposes";
 
-// Jinghai (2026-10-05): for "Go about business as usual" the three responses should read as
-// Unlikely / Neutral / Likely. Shown in Section 3 under the response buttons when GBU is selected.
-const GBU_SEGMENT_NOTE = "For “Go about business as usual” the three responses are likelihoods: Do less = Unlikely, About the same = Neutral, Do more = Likely.";
-
 const SAMPLE_MISMATCH_NOTE = "Verified data issue: Jinghai's reported fitting sample for this specific model is far smaller than what his own method reproduces from the data he sent (e.g. Power Outage → Go about business as usual: reported n=892 vs. 2,381 recomputed). Numbers below use the full, correctly-filtered sample - the statistically sound choice - but the underlying coefficients may need to be refit by Jinghai. Flagged for his review; not a display bug.";
+
+// Irfan (2026-10-07 review): the "original" category order used everywhere by default.
+// Section 2 shows activities in this order unless "Sort by value" is switched on;
+// "Go about business as usual" always sits last. Section 3's activity list uses it too.
+const ACTIVITY_ORDER = [
+  'stay_home', 'use_car', 'use_transit', 'work_from_office', 'work_from_home',
+  'dine_in', 'pick_up', 'delivery', 'go_business_as_usual'
+];
+const activityRank = (key: string) => {
+  const i = ACTIVITY_ORDER.indexOf(key);
+  return i === -1 ? ACTIVITY_ORDER.length : i;
+};
+
+// Irfan (2026-10-07 review): for "Go about business as usual" Section 3's response buttons
+// read as likelihoods instead of Do less / About the same / Do more (Jinghai's 2026-10-05 mapping:
+// Do less = Unlikely, About the same = Neutral, Do more = Likely). This replaces the separate
+// note that used to sit under the buttons.
+const GBU_RESPONSE_LABELS: Record<string, string> = { less: 'Unlikely', same: 'Neutral', more: 'Likely' };
+
+// Section 3 display text (Irfan, 2026-10-07 review). Display only: the engine keys
+// (segmentConfig.ts labels, which match Jinghai's answer key) are unchanged, so no number moves.
+//  - sentence case for every variable name, "Ethnicity: Hispanic" -> "Ethnicity";
+//  - units and category cutoffs for the built-environment variables, from Jinghai's
+//    Codebook.xlsx (2026-09-28, "Independent Variables" / "Combined Categorical Vars").
+//    Network density and land-use diversity have no cutoffs in his codebook yet.
+const VARIABLE_DISPLAY: Record<string, string> = {
+  'Age Group': 'Age group',
+  'Ethnicity: Hispanic': 'Ethnicity',
+  'Household Income': 'Household income',
+  'Household Size': 'Household size',
+  'Housing Type': 'Housing type',
+  'Population Density': 'Population density (people/acre)',
+  'Employment Density': 'Employment density (jobs/acre)',
+  'Network Density': 'Network density',
+  'Land-use Diversity': 'Land-use diversity',
+  'Transit Access': 'Transit access',
+  'Walkability Index': 'Walkability index'
+};
+const LEVEL_DISPLAY: Record<string, Record<string, string>> = {
+  'Population Density': { 'Low': 'Low (≤4.00)', 'Medium': 'Medium (>4.00–8.86)', 'High': 'High (>8.86)' },
+  'Employment Density': { 'Low': 'Low (≤0.91)', 'Medium': 'Medium (>0.91–2.37)', 'High': 'High (>2.37)' },
+  'Transit Access': { 'Low': 'Low (0)', 'Medium': 'Medium (>0–0.13)', 'High': 'High (>0.13)' },
+  'Walkability Index': { 'Very low': 'Very low (≤8)', 'Low': 'Low (>8–10)', 'High': 'High (>10–13)', 'Very high': 'Very high (>13)' }
+};
+const displayVariable = (variable: string) => VARIABLE_DISPLAY[variable] ?? variable;
+const displayLevel = (variable: string, level: string) => LEVEL_DISPLAY[variable]?.[level] ?? level;
 
 const ANTICIPATED_CHANGE_INDEX: Record<string, number> = {
   'do_less': 0,
@@ -78,6 +120,8 @@ const ScenarioATEPanel: React.FC = () => {
   // position:fixed from the label's on-screen rect instead.
   const [unitTipPos, setUnitTipPos] = useState<{ left: number; top: number; above: boolean } | null>(null);
   const [showAbsoluteATE, setShowAbsoluteATE] = useState(false);
+  // Section 2: off = fixed category order (default), on = sorted by the value shown.
+  const [sortByValue, setSortByValue] = useState(false);
   const [showDemoAbsoluteATE, setShowDemoAbsoluteATE] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState('use_car');
   const [expandedGroups, setExpandedGroups] = useState<Record<ExpandedGroupsKey, boolean>>({
@@ -139,15 +183,16 @@ const ScenarioATEPanel: React.FC = () => {
   // Activities mapping - real engine activity keys (model_coeffs_by_event.json).
   // Must match computeATE.ts's keys exactly - Section 3's continuous-variable
   // rows look up results by selectedActivity.
+  // Listed in Irfan's category order (ACTIVITY_ORDER).
   const activities = [
+    { value: 'stay_home', label: 'Staying at home' },
     { value: 'use_car', label: 'Using a car for traveling' },
     { value: 'use_transit', label: 'Taking public transit' },
-    { value: 'stay_home', label: 'Staying at home' },
-    { value: 'delivery', label: 'Having food delivered' },
+    { value: 'work_from_office', label: 'Working from the office' },
+    { value: 'work_from_home', label: 'Working from home' },
     { value: 'dine_in', label: 'Eating indoors at a restaurant' },
     { value: 'pick_up', label: 'Picking up takeout' },
-    { value: 'work_from_home', label: 'Working from home' },
-    { value: 'work_from_office', label: 'Working from the office' },
+    { value: 'delivery', label: 'Having food delivered' },
     { value: 'go_business_as_usual', label: 'Go about business as usual' },
   ];
 
@@ -176,6 +221,15 @@ const ScenarioATEPanel: React.FC = () => {
   const currentBaseLevel = severityMap[baseSeverityLevel] || severityMap[1];
   const currentComparisonLevel = severityMap[treatmentSeverityLevel] || severityMap[5];
   const currentAnticipatedChange = mapAnticipatedChange(anticipatedChange);
+  const responsePhrase = currentAnticipatedChange === 'more' ? 'do more' : currentAnticipatedChange === 'less' ? 'do less' : 'maintain the same level';
+  // Section 3 "How to interpret" (Irfan, 2026-10-07 review): the activity in quotes and lowercase,
+  // e.g. choosing to "do more" of "using a car for traveling". For "Go about business as usual"
+  // the response is a likelihood: choosing "likely" to "go about business as usual".
+  const isGbuSegment = effectiveActivity === 'go_business_as_usual';
+  const segmentActivityLabel = (activities.find(a => a.value === effectiveActivity)?.label ?? '').toLowerCase();
+  const segmentChoicePhrase = isGbuSegment
+    ? `choosing "${GBU_RESPONSE_LABELS[currentAnticipatedChange].toLowerCase()}" to "${segmentActivityLabel}"`
+    : `choosing to "${responsePhrase}" of "${segmentActivityLabel}"`;
 
   // Convert results to new format
   const convertResultsToATEData = () => {
@@ -211,8 +265,11 @@ const ScenarioATEPanel: React.FC = () => {
         activityKey: result.activity,
         ate: getATEForChange(result)
       }))
-      // Sort from most positive to most negative of the value actually shown
-      .sort((a, b) => (showAbsoluteATE ? b.ate.abs - a.ate.abs : b.ate.pct - a.ate.pct));
+      // Default: Irfan's fixed category order. "Sort by value" on: most positive to most
+      // negative of the value actually shown (Percent or Absolute).
+      .sort((a, b) => (sortByValue
+        ? (showAbsoluteATE ? b.ate.abs - a.ate.abs : b.ate.pct - a.ate.pct)
+        : activityRank(a.activityKey) - activityRank(b.activityKey)));
   };
 
   const ateData = convertResultsToATEData();
@@ -557,19 +614,34 @@ const ScenarioATEPanel: React.FC = () => {
                   <h3 className="scenario-results-title">Average Treatment Effects (ATEs)</h3>
                   <InfoButton tooltipKey="ateDefinition" />
                 </div>
-                <div className="scenario-ate-toggle">
-                  <button 
-                    onClick={() => setShowAbsoluteATE(false)} 
-                    className={`scenario-ate-toggle-button ${!showAbsoluteATE ? 'scenario-ate-toggle-active' : ''}`}
+                <div className="scenario-results-controls">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={sortByValue}
+                    onClick={() => setSortByValue(v => !v)}
+                    className={`scenario-sort-switch ${sortByValue ? 'scenario-sort-switch-on' : ''}`}
+                    title={sortByValue ? 'Sorted by value. Switch off to return to the category order.' : 'Shown in category order. Switch on to sort by value.'}
                   >
-                    Percent ATE
+                    <span className="scenario-sort-switch-track" aria-hidden="true">
+                      <span className="scenario-sort-switch-knob" />
+                    </span>
+                    <span className="scenario-sort-switch-label">Sort by value</span>
                   </button>
-                  <button 
-                    onClick={() => setShowAbsoluteATE(true)} 
-                    className={`scenario-ate-toggle-button ${showAbsoluteATE ? 'scenario-ate-toggle-active' : ''}`}
-                  >
-                    Absolute ATE
-                  </button>
+                  <div className="scenario-ate-toggle">
+                    <button
+                      onClick={() => setShowAbsoluteATE(false)}
+                      className={`scenario-ate-toggle-button ${!showAbsoluteATE ? 'scenario-ate-toggle-active' : ''}`}
+                    >
+                      Percent ATE
+                    </button>
+                    <button
+                      onClick={() => setShowAbsoluteATE(true)}
+                      className={`scenario-ate-toggle-button ${showAbsoluteATE ? 'scenario-ate-toggle-active' : ''}`}
+                    >
+                      Absolute ATE
+                    </button>
+                  </div>
                 </div>
               </div>
               
@@ -585,7 +657,7 @@ const ScenarioATEPanel: React.FC = () => {
                     ? Math.max(...ateData.map(d => Math.abs(shown(d)))) 
                     : 0;
                   
-                  return ateData.map((item, i) => {
+                  return ateData.map((item) => {
                     // Calculate bar width based on the actual ATE value
                     // Use the exact ATE value (not rounded) for width calculation to ensure precision
                     const absATE = Math.abs(shown(item));
@@ -597,7 +669,7 @@ const ScenarioATEPanel: React.FC = () => {
                     const mismatchTooltipKey = `sampleMismatch-${item.activityKey}`;
 
                     return (
-                      <div key={i} className="scenario-ate-item">
+                      <div key={item.activityKey} className="scenario-ate-item">
                         <div className="scenario-ate-activity">
                           {item.activityKey === 'go_business_as_usual' ? (
                             <span
@@ -605,7 +677,7 @@ const ScenarioATEPanel: React.FC = () => {
                               onMouseEnter={() => setShowTooltip('gbuNote')}
                               onMouseLeave={() => setShowTooltip(null)}
                             >
-                              <em>{item.activity}*</em>
+                              <em className="scenario-gbu-label">{item.activity}*</em>
                               {showTooltip === 'gbuNote' && (
                                 <div className="scenario-tooltip" style={{ textAlign: 'left', fontWeight: 400 }}>
                                   {GBU_NOTE}
@@ -655,9 +727,9 @@ const ScenarioATEPanel: React.FC = () => {
               <div className="scenario-interpretation">
                 <p className="scenario-interpretation-text">
                   <span className="scenario-interpretation-bold">How to interpret:</span> {showAbsoluteATE ? (
-                    <>An absolute ATE of say +0.10 means if we take a sample of 100 individuals whose prior experience was "{currentBaseLevel.label}" and replace them with a sample of 100 whose prior experience was "{currentComparisonLevel.label}", there would be 10 more people choosing to "{currentAnticipatedChange === 'more' ? 'do more' : currentAnticipatedChange === 'less' ? 'do less' : 'maintain the same level'}" of that activity during the next {currentEvent.name.toLowerCase()} event.</>
+                    <>An absolute ATE of say +0.10 means if we take a sample of 100 individuals whose prior experience was "{currentBaseLevel.label.toLowerCase()}" and replace them with a sample of 100 whose prior experience was "{currentComparisonLevel.label.toLowerCase()}", there would be 10 more people choosing to "{responsePhrase}" of that activity during the next {currentEvent.name.toLowerCase()} event.</>
                   ) : (
-                    <>A percent ATE of say +20% means if we take a sample of individuals whose prior experience was "{currentBaseLevel.label}" and replace them with a sample whose prior experience was "{currentComparisonLevel.label}", there would be a 20% increase in those choosing to "{currentAnticipatedChange === 'more' ? 'do more' : currentAnticipatedChange === 'less' ? 'do less' : 'maintain the same level'}" of that activity during the next {currentEvent.name.toLowerCase()} event.</>
+                    <>A percent ATE of say +20% means if we take a sample of individuals whose prior experience was "{currentBaseLevel.label.toLowerCase()}" and replace them with a sample whose prior experience was "{currentComparisonLevel.label.toLowerCase()}", there would be a 20% increase in those choosing to "{responsePhrase}" of that activity during the next {currentEvent.name.toLowerCase()} event.</>
                   )}
                 </p>
               </div>
@@ -741,15 +813,12 @@ const ScenarioATEPanel: React.FC = () => {
                       } : {}}
                     >
                       <Icon className="scenario-behavior-icon" />
-                      <span className="scenario-behavior-label">{btn.label}</span>
+                      <span className="scenario-behavior-label">{isGbuSegment ? GBU_RESPONSE_LABELS[btn.id] : btn.label}</span>
                     </button>
                   );
                 })}
               </div>
               <p className="scenario-config-help">Anticipated change in frequency if the event happens again (vs. other response categories)</p>
-              {effectiveActivity === 'go_business_as_usual' && (
-                <p className="scenario-config-help scenario-gbu-note">{GBU_SEGMENT_NOTE}</p>
-              )}
             </div>
           </div>
 
@@ -798,8 +867,8 @@ const ScenarioATEPanel: React.FC = () => {
                         {visibleVariables.map((v, vi) => 
                           v.comparisons.map((c, ci) => (
                             <tr key={`${vi}-${ci}`} className="scenario-table-row">
-                              <td className="scenario-table-cell scenario-table-cell-bold">{ci === 0 ? v.variable : ''}</td>
-                              <td className="scenario-table-cell">{ci === 0 ? v.baseLevel : ''}</td>
+                              <td className="scenario-table-cell scenario-table-cell-bold">{ci === 0 ? displayVariable(v.variable) : ''}</td>
+                              <td className="scenario-table-cell">{ci === 0 ? displayLevel(v.variable, v.baseLevel) : ''}</td>
                               <td className="scenario-table-cell">
                                 {c.treatmentLevel === UNIT_INCREASE_LABEL ? (
                                   <span
@@ -835,7 +904,7 @@ const ScenarioATEPanel: React.FC = () => {
                                       </div>
                                     )}
                                   </span>
-                                ) : c.treatmentLevel}
+                                ) : displayLevel(v.variable, c.treatmentLevel)}
                               </td>
                               <td className="scenario-table-cell">
                                 <div className="scenario-ate-display">
@@ -879,9 +948,9 @@ const ScenarioATEPanel: React.FC = () => {
           <div className="scenario-interpretation">
             <p className="scenario-interpretation-text">
               <span className="scenario-interpretation-bold">How to interpret:</span> {showDemoAbsoluteATE ? (
-                <>An absolute ATE of say +0.10 means if we take a sample of 100 individuals from the base group (e.g., "Male") and replace them with a sample of 100 from the comparison group (e.g., "Female"), there would be 10 more people choosing to "{currentAnticipatedChange === 'more' ? 'do more' : currentAnticipatedChange === 'less' ? 'do less' : 'maintain the same level'}" of {activities.find(a => a.value === effectiveActivity)?.label} during the next {currentEvent.name.toLowerCase()} event.</>
+                <>An absolute ATE of say +0.10 means if we take a sample of 100 individuals from the base group (e.g., "Male") and replace them with a sample of 100 from the comparison group (e.g., "Female"), there would be 10 more people {segmentChoicePhrase} during the next {currentEvent.name.toLowerCase()} event.</>
               ) : (
-                <>A percent ATE of say +20% means if we take a sample of individuals from the base group (e.g., "Male") and replace them with a sample from the comparison group (e.g., "Female"), there would be a 20% increase in those choosing to "{currentAnticipatedChange === 'more' ? 'do more' : currentAnticipatedChange === 'less' ? 'do less' : 'maintain the same level'}" of {activities.find(a => a.value === effectiveActivity)?.label} during the next {currentEvent.name.toLowerCase()} event.</>
+                <>A percent ATE of say +20% means if we take a sample of individuals from the base group (e.g., "Male") and replace them with a sample from the comparison group (e.g., "Female"), there would be a 20% increase in those {segmentChoicePhrase} during the next {currentEvent.name.toLowerCase()} event.</>
               )}
             </p>
           </div>

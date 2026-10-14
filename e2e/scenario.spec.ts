@@ -157,7 +157,7 @@ test('severity dropdowns: a level chosen in one is disabled in the other', async
   await expect(base.locator('option', { hasText: 'Extremely severe' })).toBeEnabled();
 });
 
-test('GBU label is italic with an asterisk and shows Jinghai\'s note on hover', async ({ page }) => {
+test('GBU label (Section 2) is italic with an asterisk and shows Jinghai\'s note on hover', async ({ page }) => {
   await page.goto('/#/scenario');
   const label = page.locator('.scenario-ate-activity em', { hasText: 'Go about business as usual*' });
   await expect(label).toBeVisible({ timeout: 15_000 });
@@ -297,11 +297,12 @@ test('Population Segment table is reactive to Activity and Behavioral Response (
     .filter({ has: page.locator('.scenario-demographic-groups') })
     .locator('.scenario-behavior-button');
 
+  // GBU's Section 3 buttons read Unlikely / Neutral / Likely (Irfan, 2026-10-07 review).
   await pick('go_business_as_usual');
-  await behaviorButtons.filter({ hasText: 'Do Less' }).click();
+  await behaviorButtons.filter({ hasText: 'Unlikely' }).click();
   await page.waitForTimeout(300);
   const doLess = { gender: await firstValue('Gender'), age: await firstValue('Age Group') };
-  await behaviorButtons.filter({ hasText: 'Do More' }).click();
+  await behaviorButtons.filter({ hasText: /^Likely$/ }).click();
   await page.waitForTimeout(300);
   const doMore = { gender: await firstValue('Gender'), age: await firstValue('Age Group') };
 
@@ -435,7 +436,7 @@ test("Section 3 shows only the rows the model retained, and they match Jinghai's
   await expect(section.locator('tr').filter({ has: page.locator('td:nth-child(3)', { hasText: /^31-50$/ }) })).toHaveCount(0);
   await expect(section.locator('tr').filter({ has: page.locator('td:nth-child(3)', { hasText: /^51-65$/ }) })).toHaveCount(0);
   await expect(ageRows).toHaveCount(1);
-  await expect(ageRows.first()).toContainText('Age Group');
+  await expect(ageRows.first()).toContainText('Age group'); // sentence case (Irfan, 2026-10-07 review)
   await expect(ageRows.first()).toContainText('65+');
   expect(await cell(ageRows)).toBe('-20.0%');
   expect(await cell(row('Employment status', 'Non-worker'))).toBe('-29.0%');
@@ -590,13 +591,156 @@ test("Jinghai's '(*)' note for the latent constructs is his exact wording, both 
   await expect(dine.section.locator('.scenario-table-footnote')).toHaveCount(0);
 });
 
-test("Jinghai's GBU note: Section 3 reads the responses as Unlikely / Neutral / Likely, only when 'Go about business as usual' is selected", async ({ page }) => {
+// ---------------------------------------------------------------------------------------------
+// Irfan's 2026-10-07 review of the Scenario Analysis page
+// ---------------------------------------------------------------------------------------------
+
+test("Irfan 10-07: Section 3 buttons read Unlikely / Neutral / Likely for 'Go about business as usual' (no separate note), and Do less / About the same / Do more otherwise", async ({ page }) => {
   const { segmentCard } = await openSection3(page, 'Extreme Heat', 'go_business_as_usual');
-  const note = segmentCard.locator('.scenario-gbu-note');
-  await expect(note).toHaveCount(1);
-  await expect(note).toBeVisible();
-  await expect(note).toHaveText(GBU_SEGMENT_NOTE_TEXT);
+  const labels = segmentCard.locator('.scenario-behavior-label');
+  await expect(labels).toHaveText(['Unlikely', 'Neutral', 'Likely']);
+  // The old helper note is gone - the button labels carry the meaning now.
+  await expect(segmentCard).not.toContainText(GBU_SEGMENT_NOTE_TEXT);
+  await expect(segmentCard.locator('.scenario-gbu-note')).toHaveCount(0);
+  // Section 2's buttons are unaffected.
+  const severityCard = page.locator('.scenario-section-card').filter({ has: page.locator('.scenario-results') });
+  await expect(severityCard.locator('.scenario-behavior-label')).toHaveText(['Do Less', 'About the Same', 'Do More']);
 
   await segmentCard.locator('select.scenario-select').selectOption({ value: 'use_car' });
-  await expect(note).toHaveCount(0);
+  await expect(labels).toHaveText(['Do Less', 'About the Same', 'Do More']);
+});
+
+test("Irfan 10-07: 'How to interpret' uses lowercase quoted levels and activities, and the likelihood wording for 'Go about business as usual'", async ({ page }) => {
+  const { segmentCard } = await openSection3(page, 'Extreme Heat', 'use_car');
+  const severityCard = page.locator('.scenario-section-card').filter({ has: page.locator('.scenario-results') });
+  const s2 = severityCard.locator('.scenario-interpretation-text');
+  const s3 = segmentCard.locator('.scenario-interpretation-text');
+
+  // Section 2 (Percent ATE default, Do more default)
+  await expect(s2).toContainText('whose prior experience was "not severe at all" and replace them with a sample whose prior experience was "extremely severe"');
+  await expect(s2).not.toContainText('"Not severe at all"');
+  await expect(s2).not.toContainText('"Extremely severe"');
+  await severityCard.getByRole('button', { name: 'Absolute ATE' }).click();
+  await expect(s2).toContainText('whose prior experience was "not severe at all" and replace them with a sample of 100 whose prior experience was "extremely severe"');
+
+  // Section 3, a regular activity: 'do more' of "using a car for traveling"
+  await expect(s3).toContainText('there would be a 20% increase in those choosing to "do more" of "using a car for traveling" during the next extreme heat event.');
+  await segmentCard.getByRole('button', { name: 'Absolute ATE' }).click();
+  await expect(s3).toContainText('there would be 10 more people choosing to "do more" of "using a car for traveling" during the next extreme heat event.');
+
+  // Section 3, GBU: choosing "likely" / "unlikely" / "neutral" to "go about business as usual"
+  await segmentCard.locator('select.scenario-select').selectOption({ value: 'go_business_as_usual' });
+  await expect(s3).toContainText('there would be 10 more people choosing "likely" to "go about business as usual" during the next extreme heat event.');
+  await segmentCard.getByRole('button', { name: 'Unlikely' }).click();
+  await expect(s3).toContainText('choosing "unlikely" to "go about business as usual"');
+  await segmentCard.getByRole('button', { name: 'Neutral' }).click();
+  await expect(s3).toContainText('choosing "neutral" to "go about business as usual"');
+  await segmentCard.getByRole('button', { name: 'Percent ATE' }).click();
+  await expect(s3).toContainText('there would be a 20% increase in those choosing "neutral" to "go about business as usual" during the next extreme heat event.');
+});
+
+test("Irfan 10-07: the 'Go about business as usual*' label in Section 2 is italic but not bold", async ({ page }) => {
+  await page.goto('/#/scenario');
+  const label = page.locator('.scenario-ate-activity em', { hasText: 'Go about business as usual*' });
+  await expect(label).toBeVisible({ timeout: 15_000 });
+  const style = await label.evaluate(el => ({ s: getComputedStyle(el).fontStyle, w: getComputedStyle(el).fontWeight }));
+  expect(style.s).toBe('italic');
+  expect(style.w).toBe('400');
+});
+
+const CATEGORY_ORDER_LABELS = [
+  'Staying at home', 'Using a car for traveling', 'Taking public transit', 'Working from the office',
+  'Working from home', 'Eating indoors at a restaurant', 'Picking up takeout', 'Having food delivered',
+  'Go about business as usual*'
+];
+
+async function section2Rows(page: Page) {
+  const items = page.locator('.scenario-ate-item');
+  const n = await items.count();
+  const rows: Array<{ label: string; value: number }> = [];
+  for (let i = 0; i < n; i++) {
+    const label = (await items.nth(i).locator('.scenario-ate-activity').textContent() || '').trim();
+    const raw = (await items.nth(i).locator('.scenario-ate-value').textContent() || '').trim();
+    rows.push({ label, value: parseFloat(raw.replace('%', '').replace('+', '')) });
+  }
+  return rows;
+}
+
+test("Irfan 10-07: Section 2 lists activities in the fixed category order by default; 'Sort by value' sorts by the shown value and switching it off restores the order", async ({ page }) => {
+  await page.goto('/#/scenario');
+  const items = page.locator('.scenario-ate-item');
+  await expect(items).toHaveCount(9, { timeout: 15_000 });
+  const sw = page.getByRole('switch', { name: 'Sort by value' });
+  await expect(sw).toHaveAttribute('aria-checked', 'false');
+
+  // Default, both formats: fixed category order, GBU last.
+  expect((await section2Rows(page)).map(r => r.label)).toEqual(CATEGORY_ORDER_LABELS);
+  const severityCard = page.locator('.scenario-section-card').filter({ has: page.locator('.scenario-results') });
+  await severityCard.getByRole('button', { name: 'Absolute ATE' }).click();
+  expect((await section2Rows(page)).map(r => r.label)).toEqual(CATEGORY_ORDER_LABELS);
+
+  // On: descending by the value shown, in both formats.
+  await sw.click();
+  await expect(sw).toHaveAttribute('aria-checked', 'true');
+  for (const fmt of ['Absolute ATE', 'Percent ATE']) {
+    await severityCard.getByRole('button', { name: fmt }).click();
+    const values = (await section2Rows(page)).map(r => r.value);
+    expect(values, `${fmt} not sorted descending`).toEqual([...values].sort((a, b) => b - a));
+  }
+
+  // Off again: back to the category order. Smaller events keep the same relative order.
+  await sw.click();
+  expect((await section2Rows(page)).map(r => r.label)).toEqual(CATEGORY_ORDER_LABELS);
+  await page.getByText('Major Flooding', { exact: true }).click();
+  await expect(items).toHaveCount(5, { timeout: 15_000 });
+  const flooding = (await section2Rows(page)).map(r => r.label);
+  expect(flooding).toEqual(CATEGORY_ORDER_LABELS.filter(l => flooding.includes(l)));
+  expect(flooding[flooding.length - 1]).toBe('Go about business as usual*');
+});
+
+test("Irfan 10-07: the sort switch and the category order change only the order, never the numbers", async ({ page }) => {
+  await page.goto('/#/scenario');
+  await expect(page.locator('.scenario-ate-item')).toHaveCount(9, { timeout: 15_000 });
+  const asMap = (rows: Array<{ label: string; value: number }>) => Object.fromEntries(rows.map(r => [r.label, r.value]));
+  const before = asMap(await section2Rows(page));
+  await page.getByRole('switch', { name: 'Sort by value' }).click();
+  expect(asMap(await section2Rows(page))).toEqual(before);
+  // Same anchor value as the existing Jinghai check: heat / car / Do more, not severe -> extremely severe.
+  expect(before['Using a car for traveling']).toBe(27.8);
+});
+
+test("Irfan 10-07: Section 3 activity list follows the same category order", async ({ page }) => {
+  const { segmentCard } = await openSection3(page, 'Extreme Heat', 'use_car');
+  const options = await segmentCard.locator('select.scenario-select option').allTextContents();
+  expect(options).toEqual(CATEGORY_ORDER_LABELS.map(l => l.replace('*', '')));
+});
+
+test("Irfan 10-07: Section 3 variable names are sentence case, 'Ethnicity' replaces 'Ethnicity: Hispanic', and built-environment levels show units and cutoffs", async ({ page }) => {
+  // Collect every variable name and level shown across all heat activities.
+  const { segmentCard, section } = await openSection3(page, 'Extreme Heat', 'use_car');
+  const activities = await segmentCard.locator('select.scenario-select option').evaluateAll(o => o.map(x => (x as HTMLOptionElement).value));
+  const names = new Set<string>();
+  const cells = new Set<string>();
+  for (const a of activities) {
+    await segmentCard.locator('select.scenario-select').selectOption({ value: a });
+    await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
+    await page.waitForTimeout(150);
+    for (const t of await section.locator('tbody td:nth-child(1)').allTextContents()) if (t.trim()) names.add(t.trim());
+    for (const t of await section.locator('tbody td:nth-child(2), tbody td:nth-child(3)').allTextContents()) if (t.trim()) cells.add(t.trim());
+  }
+  // Sentence case: after the first word, no capitalised word except proper nouns / acronyms / the
+  // three latent-construct names (pending Jinghai's confirmation of the paper's names).
+  const allowed = /^(Personal Resilience|Community Resilience|Social Engagement)$/;
+  for (const n of names) {
+    if (allowed.test(n)) continue;
+    const rest = n.split(/\s+/).slice(1).filter(w => /^[A-Z][a-z]/.test(w) && !/^(BS|Bachelor's)/.test(w.replace(/[()]/g, '')));
+    expect(rest, `"${n}" is not sentence case`).toEqual([]);
+  }
+  expect([...names]).not.toContain('Ethnicity: Hispanic');
+  // Every name that appears across heat's 9 models, as displayed:
+  for (const n of ['Age group', 'Ethnicity', 'Household size', 'Housing type', 'Population density (people/acre)']) {
+    expect([...names], `missing "${n}"`).toContain(n);
+  }
+  // Population density cutoffs from Jinghai's codebook.
+  expect([...cells]).toEqual(expect.arrayContaining(['Low (≤4.00)', 'High (>8.86)']));
 });
