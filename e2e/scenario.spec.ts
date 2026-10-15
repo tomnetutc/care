@@ -749,3 +749,10 @@ test("Irfan 10-07: Section 3 variable names are sentence case, 'Ethnicity' repla
   expect([...names]).not.toContain('Community Resilience');
   expect([...names]).not.toContain('Social Engagement');
 });
+
+test("Irfan 10-14: Section 2 heading reads 'Average Treatment Effects (ATE)' (no capital S once uppercased)", async ({ page }) => {
+  await page.goto('/#/scenario');
+  const title = page.locator('.scenario-results-title');
+  await expect(title).toHaveText('Average Treatment Effects (ATE)', { timeout: 15_000 });
+  expect(await title.innerText()).toBe('AVERAGE TREATMENT EFFECTS (ATE)');
+});

@@ -616,7 +616,7 @@ const ScenarioATEPanel: React.FC = () => {
             <div className="scenario-results">
               <div className="scenario-results-header">
                 <div className="scenario-results-title-wrapper">
-                  <h3 className="scenario-results-title">Average Treatment Effects (ATEs)</h3>
+                  <h3 className="scenario-results-title">Average Treatment Effects (ATE)</h3>
                   <InfoButton tooltipKey="ateDefinition" />
                 </div>
                 <div className="scenario-results-controls">
