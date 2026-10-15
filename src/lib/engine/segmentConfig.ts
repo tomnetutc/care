@@ -166,7 +166,7 @@ export const SEGMENT_GROUPS: Record<string, SegmentGroup> = {
     comparisons: [{ label: 'Has A/C', spec: { ac_c: 1 } }]
   },
 
-  // --- Community Resources ---
+  // --- Built Environment Characteristics (shown under that heading; Jinghai/Irfan 2026-10-15) ---
   rural: {
     label: 'Rural location',
     baseLabel: 'Not rural',

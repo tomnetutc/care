@@ -361,7 +361,7 @@ const ScenarioATEPanel: React.FC = () => {
       ]
     },
     community: {
-      title: 'Community Resources',
+      title: 'Built Environment Characteristics',
       variables: [
         { variable: SEGMENT_GROUPS.rural.label, baseLevel: SEGMENT_GROUPS.rural.baseLabel, comparisons: SEGMENT_GROUPS.rural.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('rural', c.label) })) },
         { variable: SEGMENT_GROUPS.populationDensity.label, baseLevel: SEGMENT_GROUPS.populationDensity.baseLabel, comparisons: SEGMENT_GROUPS.populationDensity.comparisons.map(c => ({ treatmentLevel: c.label, ate: getSegmentAte('populationDensity', c.label) })) },
@@ -473,7 +473,7 @@ const ScenarioATEPanel: React.FC = () => {
             <div className="scenario-intro-box">
               <h3 className="scenario-intro-box-title">Population Segment Analysis</h3>
               <p className="scenario-intro-box-text">
-                Explore how demographic characteristics, household attributes, community resources, and personal attitudes affect behavioral responses to extreme events.
+                Explore how demographic characteristics, household attributes, built environment characteristics, and personal attitudes affect behavioral responses to extreme events.
               </p>
             </div>
           </div>
@@ -742,7 +742,7 @@ const ScenarioATEPanel: React.FC = () => {
             <InfoButton tooltipKey="populationSegments" />
           </div>
           <p className="scenario-section-description">
-            Analyze how personal attitudes, socio-demographic characteristics, household attributes, and community resources shape activity-travel choices in future {currentEvent.name.toLowerCase()} events
+            Analyze how personal attitudes, socio-demographic characteristics, household attributes, and built environment characteristics shape activity-travel choices in future {currentEvent.name.toLowerCase()} events
           </p>
           
           <div className="scenario-config-box">

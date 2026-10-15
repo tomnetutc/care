@@ -756,3 +756,12 @@ test("Irfan 10-14: Section 2 heading reads 'Average Treatment Effects (ATE)' (no
   await expect(title).toHaveText('Average Treatment Effects (ATE)', { timeout: 15_000 });
   expect(await title.innerText()).toBe('AVERAGE TREATMENT EFFECTS (ATE)');
 });
+
+test('Section 3: density and other neighborhood variables sit under "Built Environment Characteristics" (Jinghai/Irfan 2026-10-15)', async ({ page }) => {
+  // heat / dine_in retains Land-use Diversity, which belongs to the renamed group.
+  const { section } = await openSection3(page, 'Extreme Heat', 'dine_in');
+  const group = section.locator('.scenario-demographic-group', { hasText: 'Land-use Diversity' });
+  await expect(group.locator('.scenario-demographic-title')).toHaveText('Built Environment Characteristics');
+  await expect(section.locator('.scenario-demographic-title', { hasText: 'Community Resources' })).toHaveCount(0);
+  await expect(page.getByText('household attributes, and built environment characteristics shape')).toBeVisible();
+});
