@@ -162,42 +162,36 @@ em, i {
   margin: 2rem 0;
 }
 
-// Team headshots: always balanced, centered rows.
-// Wide enough: 4 per row (7 people = 4 + 3). Narrow (phones): 2 per row (2 + 2 + 2 + 1).
-// The last, shorter row is centered, so nobody is left stranded on one side.
-// Photo size scales with the space available, so it fits at any screen size.
-.team-wrap { container-type: inline-size; }
-
-.about-content-wrapper .row.team-grid {
-  --team-cols: 4;
-  --team-gap: 1.25rem;
+// Team headshots: rows and card size are worked out in TeamGrid (AboutContent.tsx) from the space available.
+.about-content-wrapper .team-grid {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  margin: 2rem 0;
+}
+.about-content-wrapper .team-row {
+  display: flex;
   justify-content: center;
-  gap: 2rem var(--team-gap);
-  max-width: 920px;
-  margin: 2rem auto;
-  padding: 0;
-
-  > .col {
-    flex: 0 0 calc((100% - (var(--team-cols) - 1) * var(--team-gap)) / var(--team-cols));
-    max-width: calc((100% - (var(--team-cols) - 1) * var(--team-gap)) / var(--team-cols));
-    min-width: 0;
-    padding: 0;
-  }
-
-  a { display: block !important; }
-  .figure { margin-bottom: 0; width: 100%; }
+  gap: var(--team-gap);
+  width: 100%;
+}
+.about-content-wrapper .team-grid .team-card {
+  flex: 0 0 var(--team-card);
+  width: var(--team-card);
+  min-width: 0;
+  display: block;
+  text-align: center;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  &:hover { transform: translateY(-3px); opacity: 0.9; .figure-img { border-color: #4db39a; } }
+  .figure { margin: 0; width: 100%; }
   .figure-img {
-    width: min(140px, 100%) !important;
+    width: min(140px, calc(var(--team-card) - 16px)) !important;
     height: auto !important;
     aspect-ratio: 1 / 1;
   }
   .figure-caption { overflow-wrap: anywhere; }
-}
-
-@container (max-width: 520px) {
-  .about-content-wrapper .row.team-grid { --team-cols: 2; --team-gap: 1rem; }
 }
 
 .figure {

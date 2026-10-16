@@ -8,6 +8,76 @@ import xuesongzhou from '../../images/HeadShots/xuesongzhou.png';
 import norahennessy from '../../images/HeadShots/norahennessy.png';
 import './AboutContent.scss';
 
+type TeamMember = { name: string; role: string; org: string; img: string; href: string };
+
+// To add or remove a team member, edit this list. The layout adjusts by itself.
+const TEAM: TeamMember[] = [
+  { name: 'Irfan Batur, PhD', role: 'Principal Investigator', org: 'Arizona State University', img: ibatur, href: 'https://search.asu.edu/profile/3243599' },
+  { name: 'Mohammed Zaid', role: 'Developer', org: 'Arizona State University', img: mohammed, href: 'https://www.linkedin.com/in/mohammedzaid1609/' },
+  { name: 'Cynthia Chen, PhD', role: 'Chief Executive Officer', org: 'University of Washington', img: cchen, href: 'https://www.ce.washington.edu/facultyfinder/cynthia-chen' },
+  { name: 'Ram M. Pendyala, PhD', role: 'Chief Science Officer', org: 'Arizona State University', img: rpendyala, href: 'https://search.asu.edu/profile/980477' },
+  { name: 'Steven E. Polzin, PhD', role: 'Senior Adviser', org: 'Arizona State University', img: spolzin, href: 'https://search.asu.edu/profile/3993044' },
+  { name: 'Xuesong Zhou, PhD', role: 'Co-Principal Investigator', org: 'Arizona State University', img: xuesongzhou, href: 'https://search.asu.edu/profile/2182101' },
+  { name: 'Nora Hennessy', role: 'Research Scientist', org: 'Arizona State University', img: norahennessy, href: 'https://search.asu.edu/profile/1683643' },
+];
+
+const TEAM_MIN_CARD = 165; // narrowest a card may get (px)
+const TEAM_MAX_CARD = 200; // widest a card may get (px)
+const TEAM_GAP = 24;
+
+// Splits n people into balanced rows for the available width:
+// as many per row as fit, then the rows are evened out (7 -> 7, or 4+3, or 3+2+2, ... down to 1 per row).
+export function teamRows(n: number, width: number): number[] {
+  if (n <= 0) return [];
+  const fit = Math.max(1, Math.floor((width + TEAM_GAP) / (TEAM_MIN_CARD + TEAM_GAP)));
+  const perRowMax = Math.min(n, fit);
+  const rows = Math.ceil(n / perRowMax);
+  const base = Math.floor(n / rows);
+  const extra = n % rows;
+  return Array.from({ length: rows }, (_, i) => base + (i < extra ? 1 : 0));
+}
+
+const TeamGrid: React.FC<{ members: TeamMember[] }> = ({ members }) => {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [width, setWidth] = React.useState(1000);
+  React.useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => setWidth(el.clientWidth);
+    update();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
+    ro?.observe(el);
+    window.addEventListener('resize', update);
+    return () => { ro?.disconnect(); window.removeEventListener('resize', update); };
+  }, []);
+  const sizes = teamRows(members.length, width);
+  const widest = Math.max(1, ...sizes);
+  const card = Math.max(120, Math.min(TEAM_MAX_CARD, Math.floor((width - (widest - 1) * TEAM_GAP) / widest)));
+  let start = 0;
+  return (
+    <div className="team-grid" ref={ref} style={{ ['--team-card' as any]: `${card}px`, ['--team-gap' as any]: `${TEAM_GAP}px` }}>
+      {sizes.map((count, r) => {
+        const row = members.slice(start, start + count);
+        start += count;
+        return (
+          <div className="team-row" key={r}>
+            {row.map((m) => (
+              <a key={m.name} href={m.href} target="_blank" rel="noopener noreferrer" className="team-card text-decoration-none">
+                <figure className="figure">
+                  <img src={m.img} className="figure-img img-fluid rounded-circle" alt={m.name} />
+                  <figcaption className="figure-caption">{m.name}</figcaption>
+                  <figcaption className="figure-caption">{m.role}</figcaption>
+                  <figcaption className="figure-caption">{m.org}</figcaption>
+                </figure>
+              </a>
+            ))}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export const AboutContent: React.FC = () => {
   return (
     <div 
@@ -139,80 +209,7 @@ export const AboutContent: React.FC = () => {
           <h3 id="section5" className="mt-4 fw-bold contenthead">
             Team
           </h3>
-          <div className="team-wrap">
-          <div className="row text-center team-grid">
-            <div className="col">
-              <a href="https://search.asu.edu/profile/3243599" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
-                <figure className="figure">
-                  <img src={ibatur} className="figure-img img-fluid rounded-circle" alt="Irfan Batur, PhD" style={{ width: '150px', height: '150px' }} />
-                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Irfan Batur, PhD</figcaption>
-                  <figcaption className="figure-caption">Principal Investigator</figcaption>
-                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
-                </figure>
-              </a>
-            </div>
-            <div className="col">
-              <a href="https://www.linkedin.com/in/mohammedzaid1609/" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
-                <figure className="figure">
-                  <img src={mohammed} className="figure-img img-fluid rounded-circle" alt="Mohammed Zaid" style={{ width: '150px', height: '150px' }} />
-                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Mohammed Zaid</figcaption>
-                  <figcaption className="figure-caption">Developer</figcaption>
-                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
-                </figure>
-              </a>
-            </div>
-            <div className="col">
-              <a href="https://www.ce.washington.edu/facultyfinder/cynthia-chen" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
-                <figure className="figure">
-                  <img src={cchen} className="figure-img img-fluid rounded-circle" alt="Cynthia Chen, PhD" style={{ width: '150px', height: '150px' }} />
-                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Cynthia Chen, PhD</figcaption>
-                  <figcaption className="figure-caption">Chief Executive Officer</figcaption>
-                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >University of Washington</figcaption>
-                </figure>
-              </a>
-            </div>
-            <div className="col">
-              <a href="https://search.asu.edu/profile/980477" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
-                <figure className="figure">
-                  <img src={rpendyala} className="figure-img img-fluid rounded-circle" alt="Ram M. Pendyala, PhD" style={{ width: '150px', height: '150px' }} />
-                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Ram M. Pendyala, PhD</figcaption>
-                  <figcaption className="figure-caption">Chief Science Officer</figcaption>
-                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
-                </figure>
-              </a>
-            </div>
-            <div className="col">
-              <a href="https://search.asu.edu/profile/3993044" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
-                <figure className="figure">
-                  <img src={spolzin} className="figure-img img-fluid rounded-circle" alt="Steven E. Polzin, PhD" style={{ width: '150px', height: '150px' }} />
-                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Steven E. Polzin, PhD</figcaption>
-                  <figcaption className="figure-caption">Senior Adviser</figcaption>
-                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
-                </figure>
-              </a>
-            </div>
-            <div className="col">
-              <a href="https://search.asu.edu/profile/2182101" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
-                <figure className="figure">
-                  <img src={xuesongzhou} className="figure-img img-fluid rounded-circle" alt="Xuesong Zhou, PhD" style={{ width: '150px', height: '150px' }} />
-                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Xuesong Zhou, PhD</figcaption>
-                  <figcaption className="figure-caption">Co-Principal Investigator</figcaption>
-                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
-                </figure>
-              </a>
-            </div>
-            <div className="col">
-              <a href="https://search.asu.edu/profile/1683643" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
-                <figure className="figure">
-                  <img src={norahennessy} className="figure-img img-fluid rounded-circle" alt="Nora Hennessy" style={{ width: '150px', height: '150px' }} />
-                  <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>Nora Hennessy</figcaption>
-                  <figcaption className="figure-caption">Research Scientist</figcaption>
-                  <figcaption className="figure-caption" style={{ fontStyle: 'italic' }} >Arizona State University</figcaption>
-                </figure>
-              </a>
-            </div>
-          </div>
-          </div>
+          <TeamGrid members={TEAM} />
         </section>
         <section style={{ textAlign: "justify" }}>
           <h3 id="section6" className="mt-4 fw-bold contenthead">
