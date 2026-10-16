@@ -162,6 +162,44 @@ em, i {
   margin: 2rem 0;
 }
 
+// Team headshots: always balanced, centered rows.
+// Wide enough: 4 per row (7 people = 4 + 3). Narrow (phones): 2 per row (2 + 2 + 2 + 1).
+// The last, shorter row is centered, so nobody is left stranded on one side.
+// Photo size scales with the space available, so it fits at any screen size.
+.team-wrap { container-type: inline-size; }
+
+.about-content-wrapper .row.team-grid {
+  --team-cols: 4;
+  --team-gap: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem var(--team-gap);
+  max-width: 920px;
+  margin: 2rem auto;
+  padding: 0;
+
+  > .col {
+    flex: 0 0 calc((100% - (var(--team-cols) - 1) * var(--team-gap)) / var(--team-cols));
+    max-width: calc((100% - (var(--team-cols) - 1) * var(--team-gap)) / var(--team-cols));
+    min-width: 0;
+    padding: 0;
+  }
+
+  a { display: block !important; }
+  .figure { margin-bottom: 0; width: 100%; }
+  .figure-img {
+    width: min(140px, 100%) !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1;
+  }
+  .figure-caption { overflow-wrap: anywhere; }
+}
+
+@container (max-width: 520px) {
+  .about-content-wrapper .row.team-grid { --team-cols: 2; --team-gap: 1rem; }
+}
+
 .figure {
   margin-bottom: 1rem;
   text-align: center;

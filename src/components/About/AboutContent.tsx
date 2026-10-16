@@ -139,7 +139,8 @@ export const AboutContent: React.FC = () => {
           <h3 id="section5" className="mt-4 fw-bold contenthead">
             Team
           </h3>
-          <div className="row text-center">
+          <div className="team-wrap">
+          <div className="row text-center team-grid">
             <div className="col">
               <a href="https://search.asu.edu/profile/3243599" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
                 <figure className="figure">
@@ -210,14 +211,7 @@ export const AboutContent: React.FC = () => {
                 </figure>
               </a>
             </div>
-            <div className="col">
-              <figure className="figure">
-                <div style={{ width: '150px', height: '150px', borderRadius: '50%', backgroundColor: '#e8f3f0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', color: '#6dafa0', fontSize: '3rem', fontWeight: 'bold' }}>TBD</div>
-                <figcaption className="figure-caption" style={{ fontWeight: 'bold' }}>To Be Determined</figcaption>
-                <figcaption className="figure-caption" style={{ color: '#999' }}>Coming Soon</figcaption>
-                <figcaption className="figure-caption" style={{ fontStyle: 'italic', color: '#999' }}>TBD</figcaption>
-              </figure>
-            </div>
+          </div>
           </div>
         </section>
         <section style={{ textAlign: "justify" }}>
