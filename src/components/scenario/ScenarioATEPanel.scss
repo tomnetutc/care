@@ -631,7 +631,9 @@
 }
 
 .scenario-demographic-title {
+  font-size: 1rem; // one step below the section title (1.125rem) so groups read as sub-headings
   font-weight: 600;
+  line-height: 1.4;
   color: #0f172a;
   margin: 0;
 }
