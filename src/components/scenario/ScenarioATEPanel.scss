@@ -84,6 +84,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: #0f172a;
+  margin: 0; // no leftover paragraph gap, so the line sits centred in the box
 }
 
 .scenario-get-started-bold {
