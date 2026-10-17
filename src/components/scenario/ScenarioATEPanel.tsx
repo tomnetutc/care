@@ -124,10 +124,10 @@ const ScenarioATEPanel: React.FC = () => {
   // cards, so an absolutely positioned note gets clipped on the last rows; this one is
   // position:fixed from the label's on-screen rect instead.
   const [unitTipPos, setUnitTipPos] = useState<{ left: number; top: number; above: boolean } | null>(null);
-  const [showAbsoluteATE, setShowAbsoluteATE] = useState(false);
+  const [showAbsoluteATE, setShowAbsoluteATE] = useState(true); // Absolute ATE is the default (Irfan 2026-10-17)
   // Section 2: off = fixed category order (default), on = sorted by the value shown.
   const [sortByValue, setSortByValue] = useState(false);
-  const [showDemoAbsoluteATE, setShowDemoAbsoluteATE] = useState(false);
+  const [showDemoAbsoluteATE, setShowDemoAbsoluteATE] = useState(true); // Absolute ATE is the default (Irfan 2026-10-17)
   const [selectedActivity, setSelectedActivity] = useState('use_car');
   const [expandedGroups, setExpandedGroups] = useState<Record<ExpandedGroupsKey, boolean>>({
     attitudes: true,
@@ -481,9 +481,6 @@ const ScenarioATEPanel: React.FC = () => {
             <p className="scenario-get-started-text">
               <span className="scenario-get-started-bold">Get Started:</span> Choose one of five extreme event types below, then follow the steps to configure your scenario and view results.
             </p>
-            <p style={{ marginTop: '6px', marginBottom: 0, fontSize: '12px', color: '#64748b', fontStyle: 'italic' }}>
-              The design of this page is finalized; full functionality is still in progress.
-            </p>
           </div>
         </div>
 
@@ -624,16 +621,16 @@ const ScenarioATEPanel: React.FC = () => {
                   </button>
                   <div className="scenario-ate-toggle">
                     <button
-                      onClick={() => setShowAbsoluteATE(false)}
-                      className={`scenario-ate-toggle-button ${!showAbsoluteATE ? 'scenario-ate-toggle-active' : ''}`}
-                    >
-                      Percent ATE
-                    </button>
-                    <button
                       onClick={() => setShowAbsoluteATE(true)}
                       className={`scenario-ate-toggle-button ${showAbsoluteATE ? 'scenario-ate-toggle-active' : ''}`}
                     >
                       Absolute ATE
+                    </button>
+                    <button
+                      onClick={() => setShowAbsoluteATE(false)}
+                      className={`scenario-ate-toggle-button ${!showAbsoluteATE ? 'scenario-ate-toggle-active' : ''}`}
+                    >
+                      Percent ATE
                     </button>
                   </div>
                 </div>
@@ -772,16 +769,16 @@ const ScenarioATEPanel: React.FC = () => {
                 <label className="scenario-config-label">Display Format</label>
                 <div className="scenario-ate-toggle">
                   <button 
-                    onClick={() => setShowDemoAbsoluteATE(false)} 
-                    className={`scenario-ate-toggle-button ${!showDemoAbsoluteATE ? 'scenario-ate-toggle-active' : ''}`}
-                  >
-                    Percent ATE
-                  </button>
-                  <button 
                     onClick={() => setShowDemoAbsoluteATE(true)} 
                     className={`scenario-ate-toggle-button ${showDemoAbsoluteATE ? 'scenario-ate-toggle-active' : ''}`}
                   >
                     Absolute ATE
+                  </button>
+                  <button 
+                    onClick={() => setShowDemoAbsoluteATE(false)} 
+                    className={`scenario-ate-toggle-button ${!showDemoAbsoluteATE ? 'scenario-ate-toggle-active' : ''}`}
+                  >
+                    Percent ATE
                   </button>
                 </div>
                 <p className="scenario-config-help">Choose display format</p>

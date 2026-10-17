@@ -328,6 +328,7 @@ test('Percent ATE is relative change and Absolute ATE is the probability differe
   await page.goto('/#/scenario');
   const carRow = page.locator('.scenario-ate-item', { hasText: 'Using a car for traveling' });
   await expect(carRow).toBeVisible({ timeout: 15_000 });
+  await usePercent(page);
   await expect(carRow.locator('.scenario-ate-value')).toHaveText('+27.8%');
   await page.locator('.scenario-ate-toggle').first().getByRole('button', { name: 'Absolute ATE' }).click();
   await expect(carRow.locator('.scenario-ate-value')).toHaveText('+0.042');
@@ -397,6 +398,12 @@ test('Interactions do not block the main thread (performance regression guard)',
 });
 
 /** Shared Section 3 helpers for the "only retained variables are shown" tests below. */
+// Absolute ATE is the default since Irfan 2026-10-17; tests that pin Percent values switch to it explicitly.
+async function usePercent(page: Page) {
+  for (const t of await page.locator('.scenario-ate-toggle').all()) await t.getByRole('button', { name: 'Percent ATE' }).click();
+  await page.waitForTimeout(100);
+}
+
 async function openSection3(page: Page, event: string, activity: string) {
   await page.goto('/#/scenario');
   const segmentCard = page.locator('.scenario-section-card').filter({ has: page.locator('.scenario-demographic-groups') });
@@ -406,6 +413,7 @@ async function openSection3(page: Page, event: string, activity: string) {
   await segmentCard.locator('select.scenario-select').selectOption({ value: activity });
   await expect(section.locator('[aria-label="Computing"]')).toHaveCount(0);
   await page.waitForTimeout(250);
+  await usePercent(page);
   return { segmentCard, section };
 }
 
@@ -616,7 +624,7 @@ test("Irfan 10-07: 'How to interpret' uses lowercase quoted levels and activitie
   const s2 = severityCard.locator('.scenario-interpretation-text');
   const s3 = segmentCard.locator('.scenario-interpretation-text');
 
-  // Section 2 (Percent ATE default, Do more default)
+  // Section 2 (Percent ATE selected via usePercent in openSection3, Do more default)
   await expect(s2).toContainText('whose prior experience was "not severe at all" and replace them with a sample whose prior experience was "extremely severe"');
   await expect(s2).not.toContainText('"Not severe at all"');
   await expect(s2).not.toContainText('"Extremely severe"');
@@ -701,6 +709,7 @@ test("Irfan 10-07: Section 2 lists activities in the fixed category order by def
 test("Irfan 10-07: the sort switch and the category order change only the order, never the numbers", async ({ page }) => {
   await page.goto('/#/scenario');
   await expect(page.locator('.scenario-ate-item')).toHaveCount(9, { timeout: 15_000 });
+  await usePercent(page);
   const asMap = (rows: Array<{ label: string; value: number }>) => Object.fromEntries(rows.map(r => [r.label, r.value]));
   const before = asMap(await section2Rows(page));
   await page.getByRole('switch', { name: 'Sort by value' }).click();
@@ -764,4 +773,18 @@ test('Section 3: density and other neighborhood variables sit under "Built Envir
   await expect(group.locator('.scenario-demographic-title')).toHaveText('Built Environment Characteristics');
   await expect(section.locator('.scenario-demographic-title', { hasText: 'Community Resources' })).toHaveCount(0);
   await expect(page.getByText('household attributes, and built environment characteristics shape')).toBeVisible();
+});
+
+test('Irfan 10-17: Absolute ATE is the default and sits left of Percent ATE in both sections', async ({ page }) => {
+  await page.goto('/#/scenario');
+  await expect(page.locator('.scenario-ate-item').first()).toBeVisible({ timeout: 15_000 });
+  const toggles = page.locator('.scenario-ate-toggle');
+  await expect(toggles).toHaveCount(2);
+  for (const t of await toggles.all()) {
+    await expect(t.locator('button')).toHaveText(['Absolute ATE', 'Percent ATE']);
+    await expect(t.getByRole('button', { name: 'Absolute ATE' })).toHaveClass(/scenario-ate-toggle-active/);
+  }
+  // heat / car / Do more, not severe -> extremely severe: ATE_abs = 0.0415 (Jinghai ATE_severity_all_events.csv)
+  await expect(page.locator('.scenario-ate-item', { hasText: 'Using a car for traveling' }).locator('.scenario-ate-value')).toHaveText('+0.042');
+  await expect(page.getByText('full functionality is still in progress')).toHaveCount(0);
 });
