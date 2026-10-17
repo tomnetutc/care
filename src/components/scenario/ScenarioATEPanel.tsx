@@ -457,17 +457,6 @@ const ScenarioATEPanel: React.FC = () => {
 
   return (
     <div className="scenario-page-wrapper">
-      <div style={{
-        background: '#c0392b',
-        color: 'white',
-        padding: '8px 20px',
-        fontSize: '13px',
-        fontWeight: 600,
-        textAlign: 'center',
-        letterSpacing: '0.01em',
-      }}>
-        ⚠ This section is under development — it will be available soon.
-      </div>
       <div className="scenario-container">
         <div className="scenario-intro-card">
           <h2 className="scenario-intro-title">CARE Scenario Analysis Tool</h2>
