@@ -155,10 +155,10 @@ export const AboutContent: React.FC = () => {
             Comprehensive documentation of all survey variables is available in the data dictionary linked below as well as in the Survey Explorer page of the dashboard, which includes variable names, descriptions, coding schemes, response categories, and summary statistics. In addition, the complete survey instrument, including question wording, skip logic, and survey flow, is also available for researchers who wish to understand the full survey design.
           </p>
           <p style={{ marginLeft: '1.5rem', marginTop: '1rem' }}>
-            <a href="#data-dictionary">Download Data Dictionary</a>
+            <a href={`${process.env.PUBLIC_URL}/docs/CARE_Data_Dictionary.xlsx`} download>Download Data Dictionary (Excel)</a>
           </p>
           <p style={{ marginLeft: '1.5rem', marginTop: '0.5rem' }}>
-            <a href="#survey-instrument">Download Survey Instrument</a>
+            <a href={`${process.env.PUBLIC_URL}/docs/CARE_Survey_Instrument.pdf`} target="_blank" rel="noopener noreferrer">Download Survey Instrument (PDF)</a>
           </p>
         </section>
         <section style={{ textAlign: "justify" }}>
@@ -202,7 +202,7 @@ export const AboutContent: React.FC = () => {
             <strong>Model Estimation Results:</strong> For detailed information about model specifications, estimation results, goodness-of-fit measures, and interpretation of findings, please refer to the comprehensive model documentation:
           </p>
           <p style={{ marginLeft: '1.5rem' }}>
-            📄 <a href="#model-results-pdf">Download Model Estimation Results (PDF)</a>
+            📄 <a href={`${process.env.PUBLIC_URL}/docs/CARE_Model_Estimation_Results.pdf`} target="_blank" rel="noopener noreferrer">Download Model Estimation Results (PDF)</a>
           </p>
         </section>
         <section style={{ textAlign: "justify" }}>
